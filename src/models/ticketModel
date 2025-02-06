@@ -1,0 +1,17 @@
+// ticketModel.js
+import mongoose from "mongoose";
+
+// Ticket 모델 정의
+const ticketSchema = new mongoose.Schema({
+  eventTitle: String,
+  eventDay: String,
+  eventTime: String,
+  eventPlace: String,
+  eventComment: String,
+  eventPlaceComment: String,
+  eventCode: String,
+});
+
+const Ticket = mongoose.model("Ticket", ticketSchema);
+
+export default Ticket;
