@@ -3,7 +3,7 @@ import Ticket from "../models/ticketModel"; // 티켓 모델 불러오기
 
 const router = express.Router();
 
-router.get("/ticket/main", async (req, res) => {
+router.get("/ticket/detail", async (req, res) => {
   const ssotoken = req.headers.authorization || req.query.ssotoken;
 
   if (!ssotoken) {
@@ -19,7 +19,7 @@ router.get("/ticket/main", async (req, res) => {
     // DB에서 티켓 데이터 조회
     const tickets = await Ticket.find(
       {},
-      "eventTitle eventDay eventTime eventPlace -_id"
+      "eventTitle eventDay eventTime eventPlace eventComment eventPlaceComment -_id"
     );
 
     return res.status(200).json({
