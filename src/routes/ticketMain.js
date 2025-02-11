@@ -1,5 +1,5 @@
 import express from "express";
-import Ticket from "../models/ticketModel"; // 티켓 모델 불러오기
+import Ticket from "../models/ticketModel.js"; // 티켓 모델 불러오기
 
 const router = express.Router();
 
