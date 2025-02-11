@@ -8,6 +8,8 @@ import ticketMainRoutes from "../routes/ticketMain.js";
 import ticketDetailRoutes from "../routes/ticketDetail";
 import createTicketRoutes from "../routes/createTicket.js";
 import addTicketRoutes from "../routes/addTicket.js";
+import ticketListRoutes from "../routes/ticketList.js";
+import modifyTikcetRoutes from "../routes/modifyTicket.js";
 
 // dotenv 환경 변수 로드
 dotenv.config();
@@ -31,6 +33,8 @@ ticketDB.once("open", () => {
     app.use(ticketDetailRoutes);
     app.use(createTicketRoutes);
     app.use(addTicketRoutes);
+    app.use(ticketListRoutes);
+    app.use(modifyTikcetRoutes);
 
     app.listen(port, () => {
       console.log(`🚀 Server is running on http://localhost:${port}`);
