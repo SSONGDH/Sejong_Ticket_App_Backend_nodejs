@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   major: String,
   gradeLevel: String,
   tickets: [String],
+  refunds: [String],
 });
 
 // 'UserDB' 연결을 사용하여 모델을 정의
