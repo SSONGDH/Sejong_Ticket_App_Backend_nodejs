@@ -38,7 +38,7 @@ const refundSchema = new mongoose.Schema(
       type: String,
       required: true, // 필수 항목
     },
-    permissionStatus: {
+    refundPermissionStatus: {
       type: Boolean, // bool 타입
       default: false, // 기본값을 false로 설정 (승인되지 않음)
     },

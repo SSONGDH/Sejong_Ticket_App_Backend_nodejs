@@ -30,8 +30,8 @@ router.put("/refund/refundPermission", async (req, res) => {
       });
     }
 
-    // 2️⃣ permissionStatus를 TRUE로 변경
-    refund.permissionStatus = true;
+    // 2️⃣ refundPermissionStatus를 TRUE로 변경
+    refund.refundPermissionStatus = true;
     await refund.save();
 
     return res.status(200).json({
@@ -40,7 +40,7 @@ router.put("/refund/refundPermission", async (req, res) => {
       message: "환불 요청이 승인되었습니다.",
       result: {
         _id: refund._id,
-        permissionStatus: refund.permissionStatus, // TRUE로 변경된 값
+        refundPermissionStatus: refund.refundPermissionStatus, // TRUE로 변경된 값
       },
     });
   } catch (error) {

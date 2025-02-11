@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   gradeLevel: String,
   tickets: [String],
   refunds: [String],
+  admin: { type: Boolean, default: false }, // admin 필드 추가, 기본값은 false
 });
 
 // 'UserDB' 연결을 사용하여 모델을 정의

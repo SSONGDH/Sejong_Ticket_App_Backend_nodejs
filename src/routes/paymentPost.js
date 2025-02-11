@@ -1,0 +1,72 @@
+import express from "express";
+import multer from "multer";
+import path from "path";
+import Payment from "../models/paymentModel.js";
+
+const router = express.Router();
+
+// ✅ 이미지 업로드를 위한 multer 설정
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // 서버의 'uploads/' 폴더에 저장
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname); // 고유한 파일명 생성
+  },
+});
+
+const upload = multer({ storage: storage });
+
+// ✅ 결제 정보 저장 API
+router.post(
+  "/payment/paymentpost",
+  upload.single("paymentPicture"),
+  async (req, res) => {
+    try {
+      const { ticketId, name, studentId, phone } = req.body;
+
+      // 필수 데이터 확인
+      if (!ticketId || !name || !studentId || !phone || !req.file) {
+        return res.status(400).json({
+          isSuccess: false,
+          code: "ERROR-0001",
+          message: "필수 데이터가 누락되었습니다.",
+          result: [],
+        });
+      }
+
+      // 저장된 이미지 파일 경로 생성
+      const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+        req.file.filename
+      }`;
+
+      // 결제 정보 생성 및 DB 저장
+      const newPayment = new Payment({
+        ticketId,
+        name,
+        studentId,
+        phone,
+        paymentPicture: imageUrl, // DB에는 URL 저장
+      });
+
+      await newPayment.save();
+
+      return res.status(200).json({
+        isSuccess: true,
+        code: "SUCCESS-0000",
+        message: "납부내역이 성공적으로로 저장되었습니다.",
+        result: newPayment,
+      });
+    } catch (error) {
+      console.error("❌ 결제 저장 오류:", error);
+      return res.status(500).json({
+        isSuccess: false,
+        code: "ERROR-0002",
+        message: "서버 오류",
+        result: [],
+      });
+    }
+  }
+);
+
+export default router;

@@ -14,6 +14,11 @@ import refundRequestRoutes from "../routes/refundRequest.js";
 import refundListRoutes from "../routes/refundList.js";
 import refundDetailRoutes from "../routes/refundDetail.js";
 import refundPermissionRoutes from "../routes/refundPermission.js";
+import paymentPostRoutes from "../routes/paymentPost.js";
+import paymentListRoutes from "../routes/paymentList.js";
+import paymentDetailRoutes from "../routes/paymentDetail.js";
+import paymentPermissionRoutes from "../routes/paymentPermission.js";
+import adminConnectionRoutes from "../routes/adminConnection.js";
 
 // dotenv 환경 변수 로드
 dotenv.config();
@@ -46,6 +51,11 @@ ticketDB.once("open", () => {
       app.use(refundListRoutes);
       app.use(refundDetailRoutes);
       app.use(refundPermissionRoutes);
+      app.use(paymentPostRoutes);
+      app.use(paymentListRoutes);
+      app.use(paymentDetailRoutes);
+      app.use(paymentPermissionRoutes);
+      app.use(adminConnectionRoutes);
 
       app.listen(port, () => {
         console.log(`🚀 Server is running on http://localhost:${port}`);
