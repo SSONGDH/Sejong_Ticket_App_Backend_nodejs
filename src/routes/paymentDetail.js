@@ -6,10 +6,10 @@ const router = express.Router();
 
 // 납부 내역 상세 조회 API (GET 방식)
 router.get("/payment/paymentDetail", async (req, res) => {
-  const { ticketId, paymentId } = req.query; // 쿼리 파라미터로 ticketId와 paymentId 받기
+  const { paymentId } = req.query; // 쿼리 파라미터로 paymentId 받기
 
-  // ticketId 또는 paymentId가 제공되지 않은 경우 에러 반환
-  if (!ticketId || !paymentId) {
+  // paymentId가 제공되지 않은 경우 에러 반환
+  if (!paymentId) {
     return res.status(400).json({
       isSuccess: false,
       code: "ERROR-0001",
@@ -31,8 +31,8 @@ router.get("/payment/paymentDetail", async (req, res) => {
       });
     }
 
-    // 2️⃣ Ticket 컬렉션에서 ticketId에 해당하는 이벤트 제목(eventTitle) 찾기
-    const ticket = await Ticket.findById(ticketId);
+    // 2️⃣ payment에서 ticketId를 사용하여 Ticket 컬렉션에서 이벤트 제목(eventTitle) 찾기
+    const ticket = await Ticket.findById(payment.ticketId);
 
     if (!ticket) {
       return res.status(404).json({

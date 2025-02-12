@@ -46,6 +46,7 @@ router.get("/refund/refundDetail", async (req, res) => {
         refundReason: refund.refundReason,
         visitDate: refund.visitDate,
         visitTime: refund.visitTime,
+        major: refund.major, // major 추가
       },
     });
   } catch (error) {

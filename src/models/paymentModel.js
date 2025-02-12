@@ -13,6 +13,7 @@ const paymentSchema = new mongoose.Schema(
     name: { type: String, required: true },
     studentId: { type: String, required: true },
     phone: { type: String, required: true },
+    major: { type: String, required: true },
     paymentPicture: { type: String, required: true }, // 이미지 URL 저장
     paymentPermissionStatus: {
       type: Boolean, // bool 타입

@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import Payment from "../models/paymentModel.js";
+import verifySSOService from "../service/ssoAuth.js"; // SSO 인증 서비스
 
 const router = express.Router();
 
@@ -23,13 +24,30 @@ router.post(
   upload.single("paymentPicture"),
   async (req, res) => {
     try {
-      const { ticketId, name, studentId, phone } = req.body;
+      const { ticketId, phone } = req.body;
+
+      // SSO 토큰을 헤더에서 가져오기
+      const ssotoken = req.headers.authorization?.split(" ")[1];
+
+      if (!ssotoken) {
+        return res.status(400).json({
+          isSuccess: false,
+          code: "ERROR-0001",
+          message: "SSO 토큰이 없습니다.",
+          result: [],
+        });
+      }
+
+      // SSO 토큰을 사용하여 유저 정보 가져오기
+      const userProfile = await verifySSOService.verifySSOToken(ssotoken);
+
+      const { name, studentId, major } = userProfile;
 
       // 필수 데이터 확인
       if (!ticketId || !name || !studentId || !phone || !req.file) {
         return res.status(400).json({
           isSuccess: false,
-          code: "ERROR-0001",
+          code: "ERROR-0002",
           message: "필수 데이터가 누락되었습니다.",
           result: [],
         });
@@ -46,6 +64,7 @@ router.post(
         name,
         studentId,
         phone,
+        major, // 전공 추가
         paymentPicture: imageUrl, // DB에는 URL 저장
       });
 
@@ -54,14 +73,14 @@ router.post(
       return res.status(200).json({
         isSuccess: true,
         code: "SUCCESS-0000",
-        message: "납부내역이 성공적으로로 저장되었습니다.",
+        message: "납부내역이 성공적으로 저장되었습니다.",
         result: newPayment,
       });
     } catch (error) {
       console.error("❌ 결제 저장 오류:", error);
       return res.status(500).json({
         isSuccess: false,
-        code: "ERROR-0002",
+        code: "ERROR-0003",
         message: "서버 오류",
         result: [],
       });
