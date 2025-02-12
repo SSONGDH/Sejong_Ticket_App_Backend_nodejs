@@ -8,6 +8,7 @@ import ticketMainRoutes from "../routes/ticketMain.js";
 import ticketDetailRoutes from "../routes/ticketDetail.js";
 import createTicketRoutes from "../routes/createTicket.js";
 import ticketAddRoutes from "../routes/ticketAdd.js";
+import ticketAddNFCRoutes from "../routes/ticketAddNFC.js";
 import ticketListRoutes from "../routes/ticketList.js";
 import modifyTikcetRoutes from "../routes/modifyTicket.js";
 import refundRequestRoutes from "../routes/refundRequest.js";
@@ -56,6 +57,7 @@ ticketDB.once("open", () => {
       app.use(paymentDetailRoutes);
       app.use(paymentPermissionRoutes);
       app.use(adminConnectionRoutes);
+      app.use(ticketAddNFCRoutes);
 
       app.listen(port, () => {
         console.log(`🚀 Server is running on http://localhost:${port}`);
