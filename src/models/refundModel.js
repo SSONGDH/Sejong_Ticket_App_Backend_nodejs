@@ -18,6 +18,10 @@ const refundSchema = new mongoose.Schema(
       type: String,
       required: true, // 필수 항목
     },
+    major: {
+      type: String,
+      required: true, // 필수 항목
+    },
     studentId: {
       type: String,
       required: true, // 필수 항목

@@ -6,10 +6,10 @@ const router = express.Router();
 
 // 환불 상세 조회 API
 router.get("/refund/refundDetail", async (req, res) => {
-  const { _id } = req.query; // GET 요청이므로 req.query에서 _id 받음
+  const { refundId } = req.query; // GET 요청이므로 req.query에서 _id 받음
 
   // _id가 제공되지 않은 경우 에러 반환
-  if (!_id) {
+  if (!refundId) {
     return res.status(400).json({
       isSuccess: false,
       code: "ERROR-0001",
@@ -20,7 +20,7 @@ router.get("/refund/refundDetail", async (req, res) => {
 
   try {
     // 1️⃣ refunds 컬렉션에서 _id를 기준으로 환불 데이터 찾기
-    const refund = await Refund.findById(_id);
+    const refund = await Refund.findById(refundId);
 
     if (!refund) {
       return res.status(404).json({

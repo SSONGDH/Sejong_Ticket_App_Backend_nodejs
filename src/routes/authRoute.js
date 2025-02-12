@@ -50,7 +50,7 @@ router.post("/login", async (req, res) => {
     }
 
     await user.save();
-    console.log("✅ [DB 저장 완료]");
+    console.log("✅USER DB 저장 완료");
   } catch (error) {
     console.error("❌ DB 저장 중 오류 발생:", error);
     return res

@@ -5,10 +5,10 @@ const router = express.Router();
 
 // 환불 승인 API
 router.put("/refund/refundPermission", async (req, res) => {
-  const { _id } = req.query; // Query String으로 _id 받기
+  const { refundId } = req.query; // Query String으로 refundId 받기
 
-  // _id가 제공되지 않은 경우 에러 반환
-  if (!_id) {
+  // refundId가 제공되지 않은 경우 에러 반환
+  if (!refundId) {
     return res.status(400).json({
       isSuccess: false,
       code: "ERROR-0001",
@@ -18,8 +18,8 @@ router.put("/refund/refundPermission", async (req, res) => {
   }
 
   try {
-    // 1️⃣ 해당 _id의 환불 요청 찾기
-    const refund = await Refund.findById(_id);
+    // 1️⃣ 해당 refundId의 환불 요청 찾기
+    const refund = await Refund.findById(refundId);
 
     if (!refund) {
       return res.status(404).json({
@@ -39,7 +39,7 @@ router.put("/refund/refundPermission", async (req, res) => {
       code: "SUCCESS-0000",
       message: "환불 요청이 승인되었습니다.",
       result: {
-        _id: refund._id,
+        refundId: refund.refundId,
         refundPermissionStatus: refund.refundPermissionStatus, // TRUE로 변경된 값
       },
     });

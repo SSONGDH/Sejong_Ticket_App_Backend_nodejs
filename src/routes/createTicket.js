@@ -84,7 +84,7 @@ router.post("/ticket/createTicket", async (req, res) => {
 
     const savedTicket = await newTicket.save();
 
-    console.log("✅ DB 저장 완료:", savedTicket);
+    console.log("✅Ticket DB 저장 완료");
 
     return res.status(201).json({
       isSuccess: true,
