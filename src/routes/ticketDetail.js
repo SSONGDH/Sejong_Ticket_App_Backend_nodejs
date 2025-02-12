@@ -1,0 +1,60 @@
+import express from "express";
+import Ticket from "../models/ticketModel.js"; // 티켓 모델 불러오기
+
+const router = express.Router();
+
+router.get("/ticket/detail", async (req, res) => {
+  const ssotoken = req.headers.authorization; // 헤더에서 SSO 토큰 받기
+  const ticketId = req.query.ticketId; // 쿼리 파라미터에서 ticketId 받기
+
+  if (!ssotoken) {
+    return res.status(400).json({
+      isSuccess: false,
+      code: "ERROR-0001",
+      message: "SSO 토큰이 없습니다.",
+      result: [],
+    });
+  }
+
+  if (!ticketId) {
+    return res.status(400).json({
+      isSuccess: false,
+      code: "ERROR-0003",
+      message: "티켓 ID가 누락되었습니다.",
+      result: [],
+    });
+  }
+
+  try {
+    // DB에서 특정 티켓 데이터 조회
+    const ticket = await Ticket.findById(
+      ticketId,
+      "eventTitle eventDay eventTime eventPlace eventComment eventPlaceComment"
+    );
+
+    if (!ticket) {
+      return res.status(404).json({
+        isSuccess: false,
+        code: "ERROR-0004",
+        message: "해당 티켓을 찾을 수 없습니다.",
+        result: [],
+      });
+    }
+
+    return res.status(200).json({
+      isSuccess: true,
+      code: "SUCCESS-0000",
+      message: "요청에 성공하였습니다.",
+      result: ticket,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      isSuccess: false,
+      code: "ERROR-0002",
+      message: "서버 오류",
+      result: [],
+    });
+  }
+});
+
+export default router;

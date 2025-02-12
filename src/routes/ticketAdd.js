@@ -7,7 +7,17 @@ const router = express.Router();
 
 router.post("/ticket/add", async (req, res) => {
   const { eventCode } = req.body;
-  const ssoToken = req.headers["sso-token"]; // SSO 토큰을 요청 헤더에서 가져옴
+  const authHeader = req.headers.authorization; // Bearer 토큰 형식
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(400).json({
+      isSuccess: false,
+      code: "ERROR-0003",
+      message: "유효한 Authorization 헤더가 필요합니다.",
+    });
+  }
+
+  const ssoToken = authHeader.split(" ")[1]; // "Bearer TOKEN_VALUE"에서 토큰 값만 추출
 
   if (!eventCode || !ssoToken) {
     return res.status(400).json({

@@ -26,24 +26,13 @@ router.post("/login", async (req, res) => {
 
   // ✅ userProfile.body에서 데이터 추출
   const { name, studentId, major, gradeLevel } = userProfile.body;
-  console.log("🔍 로그인 후 받은 userProfile:", {
-    name,
-    studentId,
-    major,
-    gradeLevel,
-  });
 
   try {
     // 2️⃣ MongoDB에서 studentId로 기존 유저 찾기
     let user = await User.findOne({ studentId });
 
     if (!user) {
-      console.log("🆕 새로운 유저 생성:", {
-        name,
-        studentId,
-        major,
-        gradeLevel,
-      });
+      console.log("🆕 새로운 유저 생성");
 
       // 3️⃣ 유저가 없으면 새로 생성
       user = new User({

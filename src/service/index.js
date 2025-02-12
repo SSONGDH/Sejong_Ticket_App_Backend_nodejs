@@ -5,9 +5,9 @@ import dotenv from "dotenv";
 import { ticketDB, userDB, financeDB } from "../config/db.js"; // db.js에서 export한 ticketDB, userDB, financeDB 가져오기
 import authRouter from "../routes/authRoute.js";
 import ticketMainRoutes from "../routes/ticketMain.js";
-import ticketDetailRoutes from "../routes/ticketDetail";
+import ticketDetailRoutes from "../routes/ticketDetail.js";
 import createTicketRoutes from "../routes/createTicket.js";
-import addTicketRoutes from "../routes/addTicket.js";
+import ticketAddRoutes from "../routes/ticketAdd.js";
 import ticketListRoutes from "../routes/ticketList.js";
 import modifyTikcetRoutes from "../routes/modifyTicket.js";
 import refundRequestRoutes from "../routes/refundRequest.js";
@@ -44,7 +44,7 @@ ticketDB.once("open", () => {
       app.use(ticketMainRoutes);
       app.use(ticketDetailRoutes);
       app.use(createTicketRoutes);
-      app.use(addTicketRoutes);
+      app.use(ticketAddRoutes);
       app.use(ticketListRoutes);
       app.use(modifyTikcetRoutes);
       app.use(refundRequestRoutes);

@@ -17,7 +17,7 @@ class VerifySSOService {
         throw new Error("❌ SSO 토큰이 제공되지 않음");
       }
 
-      console.log("📜 검증할 SSO 토큰:", ssotoken);
+      //console.log("📜 검증할 SSO 토큰:", ssotoken);
 
       // 세종대학교 사이트에 요청 보내기
       const finalResponse = await fetch(this.finalUrl, {
@@ -38,7 +38,7 @@ class VerifySSOService {
 
       // 프로필 데이터 추출
       const profileData = this.extractProfileData(html);
-      console.log("✅ 가져온 사용자 프로필:", profileData);
+      //console.log("✅ 가져온 사용자 프로필:", profileData);
 
       return profileData;
     } catch (error) {
