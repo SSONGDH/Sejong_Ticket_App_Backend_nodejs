@@ -80,11 +80,17 @@ router.post("/ticket/createTicket", async (req, res) => {
       "YYYY-MM-DD HH:mm"
     ).format("YYYY-MM-DD HH:mm:ss");
 
+    // ✅ eventStartTime도 동일한 방식으로 포맷
+    const formattedEventStartTime = moment(
+      `${eventDay} ${eventStartTime}`,
+      "YYYY-MM-DD HH:mm"
+    ).format("YYYY-MM-DD HH:mm:ss");
+
     // ✅ 새로운 티켓 생성
     const newTicket = new Ticket({
       eventTitle,
       eventDay,
-      eventStartTime, // ⏰ 저장
+      eventStartTime: formattedEventStartTime, // ⏰ 저장
       eventEndTime: formattedEventEndTime, // ⏰ 저장
       eventPlace,
       eventPlaceComment,

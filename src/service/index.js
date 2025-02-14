@@ -26,7 +26,7 @@ import cronJob from "../jobs/cronJob.js"; // ✅ 크론 작업 실행
 // dotenv 환경 변수 로드
 dotenv.config();
 
-//cronJob(); // ✅ 크론 작업 실행 코드 추가
+cronJob(); // ✅ 크론 작업 실행 코드 추가
 
 // ticketDB와 userDB, financeDB 연결이 성공한 후 서버 실행
 ticketDB.once("open", () => {
