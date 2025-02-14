@@ -1,5 +1,6 @@
 import express from "express";
 import Ticket from "../models/ticketModel.js"; // 티켓 모델
+import moment from "moment"; // 날짜 처리 라이브러리
 
 const router = express.Router();
 
@@ -73,12 +74,18 @@ router.post("/ticket/createTicket", async (req, res) => {
       finalEventCode = await generateUniqueEventCode();
     }
 
+    // ✅ eventDay와 eventEndTime을 합쳐서 eventEndTime 생성
+    const formattedEventEndTime = moment(
+      `${eventDay} ${eventEndTime}`,
+      "YYYY-MM-DD HH:mm"
+    ).format("YYYY-MM-DD HH:mm:ss");
+
     // ✅ 새로운 티켓 생성
     const newTicket = new Ticket({
       eventTitle,
       eventDay,
       eventStartTime, // ⏰ 저장
-      eventEndTime, // ⏰ 저장
+      eventEndTime: formattedEventEndTime, // ⏰ 저장
       eventPlace,
       eventPlaceComment,
       eventComment,

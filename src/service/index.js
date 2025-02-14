@@ -21,12 +21,12 @@ import paymentDetailRoutes from "../routes/paymentDetail.js";
 import paymentPermissionRoutes from "../routes/paymentPermission.js";
 import adminConnectionRoutes from "../routes/adminConnection.js";
 import fcmTokenRoutes from "../routes/fcmTokenAdd.js"; // ✅ FCM 토큰 저장 API 추가
-import cronJob from "./jobs/cronJob.js"; // ✅ 크론 작업 실행
+import cronJob from "../jobs/cronJob.js"; // ✅ 크론 작업 실행
 
 // dotenv 환경 변수 로드
 dotenv.config();
 
-cronJob(); // ✅ 크론 작업 실행 코드 추가
+//cronJob(); // ✅ 크론 작업 실행 코드 추가
 
 // ticketDB와 userDB, financeDB 연결이 성공한 후 서버 실행
 ticketDB.once("open", () => {
@@ -62,7 +62,7 @@ ticketDB.once("open", () => {
       app.use(paymentPermissionRoutes);
       app.use(adminConnectionRoutes);
       app.use(ticketAddNFCRoutes);
-      app.use(fcmTokenRoutes);
+      // app.use(fcmTokenRoutes);
 
       app.listen(port, () => {
         console.log(`🚀 Server is running on http://localhost:${port}`);

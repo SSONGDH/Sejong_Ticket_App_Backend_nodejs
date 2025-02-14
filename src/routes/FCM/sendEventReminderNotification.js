@@ -1,6 +1,6 @@
-import admin from "../config/firebaseConfig.js";
-import User from "../models/userModel.js"; // 유저 모델
-import Ticket from "../models/ticketModel.js"; // 티켓 모델
+//import admin from "../../config/firebaseConfig.js";
+import User from "../../models/userModel.js"; // 유저 모델
+import Ticket from "../../models/ticketModel.js"; // 티켓 모델
 
 const sendEventReminderNotification = async (eventId) => {
   try {
