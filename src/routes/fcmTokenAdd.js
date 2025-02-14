@@ -1,0 +1,73 @@
+import express from "express";
+import User from "../models/userModel.js";
+import verifySSOService from "../service/ssoAuth.js"; // SSO 인증 서비스
+
+const router = express.Router();
+
+/**
+ * ✅ FCM 토큰 저장 API
+ * - 클라이언트에서 SSO 토큰과 FCM 토큰을 보내면 DB에 저장
+ */
+router.post("/fcm/tokenAdd", async (req, res) => {
+  const ssotoken = req.headers.authorization?.split(" ")[1]; // SSO 토큰 가져오기
+  const { fcmToken } = req.body; // FCM 토큰 가져오기
+
+  if (!ssotoken) {
+    return res.status(400).json({
+      isSuccess: false,
+      code: "ERROR-0001",
+      message: "SSO 토큰이 없습니다.",
+    });
+  }
+
+  if (!fcmToken) {
+    return res.status(400).json({
+      isSuccess: false,
+      code: "ERROR-0002",
+      message: "FCM 토큰이 없습니다.",
+    });
+  }
+
+  try {
+    // 1️⃣ SSO 토큰 검증 -> 유저 정보 가져오기
+    const userProfile = await verifySSOService.verifySSOToken(ssotoken);
+
+    if (!userProfile || !userProfile.studentId) {
+      return res.status(401).json({
+        isSuccess: false,
+        code: "ERROR-0003",
+        message: "SSO 인증 실패",
+      });
+    }
+
+    // 2️⃣ 유저 찾기 (학번 기준)
+    const user = await User.findOne({ studentId: userProfile.studentId });
+
+    if (!user) {
+      return res.status(404).json({
+        isSuccess: false,
+        code: "ERROR-0004",
+        message: "유저 정보를 찾을 수 없습니다.",
+      });
+    }
+
+    // 3️⃣ FCM 토큰 저장
+    user.fcmToken = fcmToken;
+    await user.save();
+
+    return res.status(200).json({
+      isSuccess: true,
+      code: "SUCCESS-0000",
+      message: "FCM 토큰이 성공적으로 저장되었습니다.",
+    });
+  } catch (error) {
+    console.error("❌ FCM 토큰 저장 중 오류 발생:", error);
+    return res.status(500).json({
+      isSuccess: false,
+      code: "ERROR-0005",
+      message: "서버 오류",
+    });
+  }
+});
+
+export default router;
