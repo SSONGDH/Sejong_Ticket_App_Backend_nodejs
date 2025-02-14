@@ -55,7 +55,7 @@ router.get("/ticket/main", async (req, res) => {
       });
     }
 
-    // 3️⃣ 티켓 ID를 기반으로 티켓 데이터 조회
+    // 4️⃣ 티켓 ID를 기반으로 티켓 데이터 조회
     const tickets = await Ticket.find({
       _id: { $in: ticketIds },
     });
@@ -77,12 +77,13 @@ router.get("/ticket/main", async (req, res) => {
         _id: ticket._id,
         eventTitle: ticket.eventTitle,
         eventDay: ticket.eventDay,
-        eventTime: ticket.eventTime,
+        eventStartTime: ticket.eventStartTime, // ⏰ 시작 시간 추가
+        eventEndTime: ticket.eventEndTime, // ⏰ 종료 시간 추가
         eventPlace: ticket.eventPlace,
       })),
     });
   } catch (error) {
-    console.error(error);
+    console.error("❌ 티켓 조회 중 오류 발생:", error);
     return res.status(500).json({
       isSuccess: false,
       code: "ERROR-0005",

@@ -26,7 +26,8 @@ router.post("/ticket/createTicket", async (req, res) => {
   const {
     eventTitle,
     eventDay,
-    eventTime,
+    eventStartTime, // ⏰ 시작 시간 추가
+    eventEndTime, // ⏰ 종료 시간 추가
     eventPlace,
     eventPlaceComment,
     eventComment,
@@ -37,7 +38,8 @@ router.post("/ticket/createTicket", async (req, res) => {
   if (
     !eventTitle ||
     !eventDay ||
-    !eventTime ||
+    !eventStartTime || // ⏰ 시작 시간 필수
+    !eventEndTime || // ⏰ 종료 시간 필수
     !eventPlace ||
     !eventPlaceComment ||
     !eventComment
@@ -75,7 +77,8 @@ router.post("/ticket/createTicket", async (req, res) => {
     const newTicket = new Ticket({
       eventTitle,
       eventDay,
-      eventTime,
+      eventStartTime, // ⏰ 저장
+      eventEndTime, // ⏰ 저장
       eventPlace,
       eventPlaceComment,
       eventComment,
@@ -83,8 +86,6 @@ router.post("/ticket/createTicket", async (req, res) => {
     });
 
     const savedTicket = await newTicket.save();
-
-    //console.log("✅ Ticket DB 저장 완료");
 
     return res.status(201).json({
       isSuccess: true,

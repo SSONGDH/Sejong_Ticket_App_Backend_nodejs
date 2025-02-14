@@ -27,10 +27,15 @@ router.get("/ticket/detail", async (req, res) => {
 
   try {
     // DB에서 특정 티켓 데이터 조회
-    const ticket = await Ticket.findById(
-      ticketId,
-      "eventTitle eventDay eventTime eventPlace eventComment eventPlaceComment"
-    );
+    const ticket = await Ticket.findById(ticketId, {
+      eventTitle: 1,
+      eventDay: 1,
+      eventStartTime: 1, // ⏰ 시작 시간 추가
+      eventEndTime: 1, // ⏰ 종료 시간 추가
+      eventPlace: 1,
+      eventComment: 1,
+      eventPlaceComment: 1,
+    });
 
     if (!ticket) {
       return res.status(404).json({
@@ -48,6 +53,7 @@ router.get("/ticket/detail", async (req, res) => {
       result: ticket,
     });
   } catch (error) {
+    console.error("❌ 티켓 조회 중 오류 발생:", error);
     return res.status(500).json({
       isSuccess: false,
       code: "ERROR-0002",

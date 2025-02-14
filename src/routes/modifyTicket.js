@@ -8,7 +8,8 @@ router.put("/ticket/modifyTicket", async (req, res) => {
     _id,
     eventTitle,
     eventDay,
-    eventTime,
+    eventStartTime, // ⏰ 시작 시간 추가
+    eventEndTime, // ⏰ 종료 시간 추가
     eventPlace,
     eventPlaceComment,
     eventComment,
@@ -30,7 +31,8 @@ router.put("/ticket/modifyTicket", async (req, res) => {
       {
         eventTitle,
         eventDay,
-        eventTime,
+        eventStartTime, // ⏰ 반영
+        eventEndTime, // ⏰ 반영
         eventPlace,
         eventPlaceComment,
         eventComment,
@@ -54,6 +56,7 @@ router.put("/ticket/modifyTicket", async (req, res) => {
       result: updatedTicket,
     });
   } catch (error) {
+    console.error("❌ 티켓 수정 중 오류 발생:", error);
     return res.status(500).json({
       isSuccess: false,
       code: "ERROR-0002",

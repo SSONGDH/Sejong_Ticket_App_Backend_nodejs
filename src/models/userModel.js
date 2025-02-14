@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
   tickets: [String],
   refunds: [String],
   admin: { type: Boolean, default: false }, // admin 필드 추가, 기본값은 false
+  fcmToken: { type: String }, // FCM 토큰 저장 필드 추가
 });
 
 // 'UserDB' 연결을 사용하여 모델을 정의

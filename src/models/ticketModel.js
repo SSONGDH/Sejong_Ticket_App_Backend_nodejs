@@ -10,7 +10,8 @@ const ticketDB = mongoose.createConnection(process.env.MONGO_TICKET_URI, {
 const ticketSchema = new mongoose.Schema({
   eventTitle: String,
   eventDay: String,
-  eventTime: String,
+  eventStartTime: String,
+  eventEndTime: String,
   eventPlace: String,
   eventPlaceComment: String,
   eventComment: String,
