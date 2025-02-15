@@ -1,5 +1,5 @@
 import express from "express";
-import Refund from "../models/refundModel.js"; // Refund 모델 불러오기
+import Refund from "../../models/refundModel.js"; // Refund 모델 불러오기
 
 const router = express.Router();
 

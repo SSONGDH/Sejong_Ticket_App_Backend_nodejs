@@ -1,6 +1,6 @@
 import express from "express";
-import User from "../models/userModel.js";
-import verifySSOService from "../service/ssoAuth.js"; // SSO 인증 서비스
+import User from "../../models/userModel.js";
+import verifySSOService from "../../service/ssoAuth.js"; // SSO 인증 서비스
 
 const router = express.Router();
 

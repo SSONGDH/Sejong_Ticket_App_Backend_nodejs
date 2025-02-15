@@ -1,7 +1,7 @@
 import express from "express";
-import Ticket from "../models/ticketModel.js"; // 티켓 모델 불러오기
-import User from "../models/userModel.js"; // 유저 모델 불러오기
-import verifySSOService from "../service/ssoAuth.js"; // SSO 인증 서비스 불러오기
+import Ticket from "../../models/ticketModel.js"; // 티켓 모델 불러오기
+import User from "../../models/userModel.js"; // 유저 모델 불러오기
+import verifySSOService from "../../service/ssoAuth.js"; // SSO 인증 서비스 불러오기
 
 const router = express.Router();
 

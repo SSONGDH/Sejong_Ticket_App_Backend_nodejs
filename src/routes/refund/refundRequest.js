@@ -1,8 +1,8 @@
 import express from "express";
-import Refund from "../models/refundModel.js"; // refund 모델 불러오기
-import User from "../models/userModel.js"; // user 모델 불러오기
-import Ticket from "../models/ticketModel.js"; // ticket 모델 불러오기
-import verifySSOService from "../service/ssoAuth.js"; // ssoAuth 서비스 불러오기
+import Refund from "../../models/refundModel.js"; // refund 모델 불러오기
+import User from "../../models/userModel.js"; // user 모델 불러오기
+import Ticket from "../../models/ticketModel.js"; // ticket 모델 불러오기
+import verifySSOService from "../../service/ssoAuth.js"; // ssoAuth 서비스 불러오기
 
 const router = express.Router();
 

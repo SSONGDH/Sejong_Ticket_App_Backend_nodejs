@@ -1,6 +1,6 @@
 import express from "express";
-import User from "../models/userModel.js"; // User 모델 불러오기
-import verifySSOService from "../service/ssoAuth.js"; // SSO 인증 서비스 가져오기
+import User from "../../models/userModel.js"; // User 모델 불러오기
+import verifySSOService from "../../service/ssoAuth.js"; // SSO 인증 서비스 가져오기
 
 const router = express.Router();
 

@@ -1,8 +1,8 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
-import Payment from "../models/paymentModel.js";
-import verifySSOService from "../service/ssoAuth.js"; // SSO 인증 서비스
+import Payment from "../../models/paymentModel.js";
+import verifySSOService from "../../service/ssoAuth.js"; // SSO 인증 서비스
 
 const router = express.Router();
 

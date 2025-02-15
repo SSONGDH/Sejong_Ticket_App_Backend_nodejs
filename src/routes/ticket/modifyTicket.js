@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import moment from "moment"; // ✅ 날짜 변환을 위해 moment.js 추가
-import Ticket from "../models/ticketModel.js"; // 티켓 모델 불러오기
+import Ticket from "../../models/ticketModel.js"; // 티켓 모델 불러오기
 
 const router = express.Router();
 

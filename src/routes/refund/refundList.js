@@ -1,8 +1,8 @@
 // routes/refundList.js
 
 import express from "express";
-import Refund from "../models/refundModel.js"; // Refund 모델 가져오기
-import Ticket from "../models/ticketModel.js"; // Ticket 모델 가져오기
+import Refund from "../../models/refundModel.js"; // Refund 모델 가져오기
+import Ticket from "../../models/ticketModel.js"; // Ticket 모델 가져오기
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
-import Ticket from "../models/ticketModel.js"; // 티켓 모델
+import Ticket from "../../models/ticketModel.js"; // 티켓 모델
 import moment from "moment"; // 날짜 처리 라이브러리
 
 const router = express.Router();

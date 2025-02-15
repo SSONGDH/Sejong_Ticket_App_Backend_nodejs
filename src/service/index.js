@@ -4,24 +4,24 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import { ticketDB, userDB, financeDB } from "../config/db.js"; // DB 연결 객체
-import authRouter from "../routes/authRoute.js";
-import ticketMainRoutes from "../routes/ticketMain.js";
-import ticketDetailRoutes from "../routes/ticketDetail.js";
-import createTicketRoutes from "../routes/createTicket.js";
-import ticketAddRoutes from "../routes/ticketAdd.js";
-import ticketAddNFCRoutes from "../routes/ticketAddNFC.js";
-import ticketListRoutes from "../routes/ticketList.js";
-import modifyTikcetRoutes from "../routes/modifyTicket.js";
-import refundRequestRoutes from "../routes/refundRequest.js";
-import refundListRoutes from "../routes/refundList.js";
-import refundDetailRoutes from "../routes/refundDetail.js";
-import refundPermissionRoutes from "../routes/refundPermission.js";
-import paymentPostRoutes from "../routes/paymentPost.js";
-import paymentListRoutes from "../routes/paymentList.js";
-import paymentDetailRoutes from "../routes/paymentDetail.js";
-import paymentPermissionRoutes from "../routes/paymentPermission.js";
-import adminConnectionRoutes from "../routes/adminConnection.js";
-import fcmTokenRoutes from "../routes/fcmTokenAdd.js"; // ✅ FCM 토큰 저장 API 추가
+import authRouter from "../routes/login/authRoute.js";
+import ticketMainRoutes from "../routes/ticket/ticketMain.js";
+import ticketDetailRoutes from "../routes/ticket/ticketDetail.js";
+import createTicketRoutes from "../routes/ticket/createTicket.js";
+import ticketAddRoutes from "../routes/ticket/ticketAdd.js";
+import ticketAddNFCRoutes from "../routes/ticket/ticketAddNFC.js";
+import ticketListRoutes from "../routes/ticket/ticketList.js";
+import modifyTikcetRoutes from "../routes/ticket/modifyTicket.js";
+import refundRequestRoutes from "../routes/refund/refundRequest.js";
+import refundListRoutes from "../routes/refund/refundList.js";
+import refundDetailRoutes from "../routes/refund/refundDetail.js";
+import refundPermissionRoutes from "../routes/refund/refundPermission.js";
+import paymentPostRoutes from "../routes/payment/paymentPost.js";
+import paymentListRoutes from "../routes/payment/paymentList.js";
+import paymentDetailRoutes from "../routes/payment/paymentDetail.js";
+import paymentPermissionRoutes from "../routes/payment/paymentPermission.js";
+import adminConnectionRoutes from "../routes/admin/adminConnection.js";
+import fcmTokenRoutes from "../routes/FCM/fcmTokenAdd.js"; // ✅ FCM 토큰 저장 API 추가
 import cronJob from "../jobs/cronJob.js"; // ✅ 크론 작업 실행
 
 const __filename = fileURLToPath(import.meta.url);

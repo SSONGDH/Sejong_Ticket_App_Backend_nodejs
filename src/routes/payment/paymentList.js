@@ -1,5 +1,5 @@
 import express from "express";
-import Payment from "../models/paymentModel.js"; // Payment 모델 가져오기
+import Payment from "../../models/paymentModel.js"; // Payment 모델 가져오기
 
 const router = express.Router();
 

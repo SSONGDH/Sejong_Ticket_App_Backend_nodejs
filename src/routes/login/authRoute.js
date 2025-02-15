@@ -1,6 +1,6 @@
 import express from "express";
-import AuthService from "../service/authService.js";
-import User from "../models/userModel.js"; // User 모델 불러오기
+import AuthService from "../../service/authService.js";
+import User from "../../models/userModel.js"; // User 모델 불러오기
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 import express from "express";
-import Ticket from "../models/ticketModel.js";
-import User from "../models/userModel.js";
-import verifySSOService from "../service/ssoAuth.js"; // SSO 검증 서비스
+import Ticket from "../../models/ticketModel.js";
+import User from "../../models/userModel.js";
+import verifySSOService from "../../service/ssoAuth.js"; // SSO 검증 서비스
 
 const router = express.Router();
 
