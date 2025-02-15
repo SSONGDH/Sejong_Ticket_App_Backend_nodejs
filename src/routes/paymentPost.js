@@ -54,9 +54,9 @@ router.post(
       }
 
       // 저장된 이미지 파일 경로 생성
-      const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
-        req.file.filename
-      }`;
+      const imageUrl = `${req.protocol}://${req.get(
+        "host"
+      )}/uploads/paymentPictures${req.file.filename}`;
 
       // 결제 정보 생성 및 DB 저장
       const newPayment = new Payment({

@@ -4,17 +4,7 @@ import Ticket from "../models/ticketModel.js"; // 티켓 모델 불러오기
 const router = express.Router();
 
 router.get("/ticket/detail", async (req, res) => {
-  const ssotoken = req.headers.authorization; // 헤더에서 SSO 토큰 받기
   const ticketId = req.query.ticketId; // 쿼리 파라미터에서 ticketId 받기
-
-  if (!ssotoken) {
-    return res.status(400).json({
-      isSuccess: false,
-      code: "ERROR-0001",
-      message: "SSO 토큰이 없습니다.",
-      result: [],
-    });
-  }
 
   if (!ticketId) {
     return res.status(400).json({

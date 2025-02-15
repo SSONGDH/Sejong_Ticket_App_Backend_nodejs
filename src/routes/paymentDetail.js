@@ -4,11 +4,11 @@ import Ticket from "../models/ticketModel.js"; // Ticket 모델 가져오기
 
 const router = express.Router();
 
-// 납부 내역 상세 조회 API (GET 방식)
+// ✅ 납부 내역 상세 조회 API (GET 방식)
 router.get("/payment/paymentDetail", async (req, res) => {
   const { paymentId } = req.query; // 쿼리 파라미터로 paymentId 받기
 
-  // paymentId가 제공되지 않은 경우 에러 반환
+  // ✅ paymentId가 제공되지 않은 경우 에러 반환
   if (!paymentId) {
     return res.status(400).json({
       isSuccess: false,
@@ -26,12 +26,12 @@ router.get("/payment/paymentDetail", async (req, res) => {
       return res.status(404).json({
         isSuccess: false,
         code: "ERROR-0002",
-        message: "해당 결제 내역을 찾을 수 없습니다.",
+        message: "해당 납부 내역을 찾을 수 없습니다.",
         result: [],
       });
     }
 
-    // 2️⃣ payment에서 ticketId를 사용하여 Ticket 컬렉션에서 이벤트 제목(eventTitle) 찾기
+    // 2️⃣ Ticket 컬렉션에서 ticketId를 사용하여 이벤트 정보 찾기 (사진 포함)
     const ticket = await Ticket.findById(payment.ticketId);
 
     if (!ticket) {
@@ -43,7 +43,7 @@ router.get("/payment/paymentDetail", async (req, res) => {
       });
     }
 
-    // 3️⃣ 응답으로 필요한 데이터 반환
+    // ✅ 사진 URL 포함하여 응답 반환
     return res.status(200).json({
       isSuccess: true,
       code: "SUCCESS-0000",
@@ -54,7 +54,8 @@ router.get("/payment/paymentDetail", async (req, res) => {
         name: payment.name,
         studentId: payment.studentId,
         phone: payment.phone,
-        eventTitle: ticket.eventTitle, // ticketId에 해당하는 eventTitle을 반환
+        eventTitle: ticket.eventTitle, // 티켓 제목
+        eventPlacePicture: ticket.eventPlacePicture, // 티켓 장소 사진 URL 추가
       },
     });
   } catch (error) {

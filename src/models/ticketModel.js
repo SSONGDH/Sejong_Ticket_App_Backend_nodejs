@@ -7,16 +7,20 @@ const ticketDB = mongoose.createConnection(process.env.MONGO_TICKET_URI, {
 });
 
 // ticketDB에서 사용할 스키마 정의
-const ticketSchema = new mongoose.Schema({
-  eventTitle: String,
-  eventDay: String,
-  eventStartTime: String,
-  eventEndTime: String,
-  eventPlace: String,
-  eventPlaceComment: String,
-  eventComment: String,
-  eventCode: String,
-});
+const ticketSchema = new mongoose.Schema(
+  {
+    eventTitle: String,
+    eventDay: String,
+    eventStartTime: String,
+    eventEndTime: String,
+    eventPlace: String,
+    eventPlaceComment: String,
+    eventComment: String,
+    eventCode: String,
+    eventPlacePicture: String,
+  },
+  { timestamps: true }
+);
 
 // ticketDB에서 사용할 모델 정의
 const Ticket = ticketDB.model("Ticket", ticketSchema);
