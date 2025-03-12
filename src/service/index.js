@@ -23,6 +23,7 @@ import paymentPermissionRoutes from "../routes/payment/paymentPermission.js";
 import adminConnectionRoutes from "../routes/admin/adminConnection.js";
 import fcmTokenRoutes from "../routes/FCM/fcmTokenAdd.js"; // ✅ FCM 토큰 저장 API 추가
 import cronJob from "../jobs/cronJob.js"; // ✅ 크론 작업 실행
+import cookieParser from "cookie-parser"; // 쿠키 파서 미들웨어
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,12 +33,13 @@ dotenv.config();
 
 // ✅ 서버 설정
 const app = express();
-const port = 3000;
+const port = 80;
 
 // ✅ 미들웨어 설정
 app.use(bodyParser.json());
 app.use("/eventPlacePictures", express.static(path.join(__dirname, "uploads")));
 app.use("/paymentPictures", express.static(path.join(__dirname, "uploads")));
+app.use(cookieParser()); // cookie-parser 미들웨어 사용
 
 // ✅ 라우트 등록
 app.use(authRouter);
@@ -59,42 +61,39 @@ app.use(adminConnectionRoutes);
 app.use(ticketAddNFCRoutes);
 // app.use(fcmTokenRoutes);
 
-cronJob(); // ✅ 크론 작업 실행
+//cronJob(); // ✅ 크론 작업 실행
 
-// ✅ DB 연결 상태 확인 및 서버 실행
-let dbConnectedCount = 0;
-const totalDBs = 3;
+// ✅ 서버 시작
+app.listen(port, "0.0.0.0", () => {
+  console.log(`🚀 Server is running on http://localhost:${port}`);
 
-const checkAndStartServer = () => {
-  dbConnectedCount++;
-  if (dbConnectedCount === totalDBs) {
-    app.listen(port, () => {
-      console.log(`🚀 Server is running on http://localhost:${port}`);
-    });
-  }
+  // DB 연결 시도
+  connectToDatabases();
+});
+
+// ✅ DB 연결 함수
+const connectToDatabases = () => {
+  // ticketDB 연결
+  ticketDB.once("open", () => {
+    console.log("✅ Connected to ticketDB");
+  });
+  ticketDB.on("error", (err) => {
+    console.error("❌ Error connecting to ticketDB:", err);
+  });
+
+  // userDB 연결
+  userDB.once("open", () => {
+    console.log("✅ Connected to userDB");
+  });
+  userDB.on("error", (err) => {
+    console.error("❌ Error connecting to userDB:", err);
+  });
+
+  // financeDB 연결
+  financeDB.once("open", () => {
+    console.log("✅ Connected to financeDB");
+  });
+  financeDB.on("error", (err) => {
+    console.error("❌ Error connecting to financeDB:", err);
+  });
 };
-
-// ✅ 독립적으로 DB 연결
-ticketDB.once("open", () => {
-  console.log("✅ Connected to ticketDB");
-  checkAndStartServer();
-});
-ticketDB.on("error", (err) => {
-  console.error("❌ Error connecting to ticketDB:", err);
-});
-
-userDB.once("open", () => {
-  console.log("✅ Connected to userDB");
-  checkAndStartServer();
-});
-userDB.on("error", (err) => {
-  console.error("❌ Error connecting to userDB:", err);
-});
-
-financeDB.once("open", () => {
-  console.log("✅ Connected to financeDB");
-  checkAndStartServer();
-});
-financeDB.on("error", (err) => {
-  console.error("❌ Error connecting to financeDB:", err);
-});
