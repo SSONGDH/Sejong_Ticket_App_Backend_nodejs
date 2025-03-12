@@ -1,17 +1,19 @@
 import express from "express";
+import cookieParser from "cookie-parser"; // ✅ 쿠키 파싱 미들웨어 추가
 import Refund from "../../models/refundModel.js"; // refund 모델 불러오기
 import User from "../../models/userModel.js"; // user 모델 불러오기
 import Ticket from "../../models/ticketModel.js"; // ticket 모델 불러오기
 import verifySSOService from "../../service/ssoAuth.js"; // ssoAuth 서비스 불러오기
 
 const router = express.Router();
+router.use(cookieParser()); // ✅ 쿠키 사용 설정
 
 // 환불 요청 처리
 router.post("/refund/request", async (req, res) => {
   const { refundReason, visitDate, visitTime, ticketId, phone } = req.body;
 
-  // SSO 토큰을 헤더에서 가져오기
-  const ssotoken = req.headers.authorization?.split(" ")[1];
+  // SSO 토큰을 쿠키에서 가져오기
+  const ssotoken = req.cookies.ssotoken; // ✅ HTTP-Only 쿠키에서 SSO 토큰 가져오기
 
   if (!ssotoken) {
     return res.status(400).json({

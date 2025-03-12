@@ -1,15 +1,19 @@
 import express from "express";
-import User from "../../models/userModel.js";
+import User from "../../models/userModel.js"; // User 모델 불러오기
 import verifySSOService from "../../service/ssoAuth.js"; // SSO 인증 서비스
 
 const router = express.Router();
+import cookieParser from "cookie-parser"; // 쿠키 파싱 미들웨어 추가
+
+router.use(cookieParser()); // 쿠키 사용 설정
 
 /**
  * ✅ FCM 토큰 저장 API
  * - 클라이언트에서 SSO 토큰과 FCM 토큰을 보내면 DB에 저장
  */
 router.post("/fcm/tokenAdd", async (req, res) => {
-  const ssotoken = req.headers.authorization?.split(" ")[1]; // SSO 토큰 가져오기
+  // ✅ 쿠키에서 SSO 토큰 가져오기
+  const ssotoken = req.cookies.ssotoken; // HTTP-Only 쿠키에서 SSO 토큰을 가져옵니다.
   const { fcmToken } = req.body; // FCM 토큰 가져오기
 
   if (!ssotoken) {

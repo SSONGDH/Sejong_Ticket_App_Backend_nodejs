@@ -1,13 +1,14 @@
 import express from "express";
+import cookieParser from "cookie-parser"; // 쿠키 파싱 미들웨어 추가
 import Ticket from "../../models/ticketModel.js"; // 티켓 모델 불러오기
 import User from "../../models/userModel.js"; // 유저 모델 불러오기
 import verifySSOService from "../../service/ssoAuth.js"; // SSO 인증 서비스 불러오기
 
 const router = express.Router();
+router.use(cookieParser()); // 쿠키 사용 설정
 
 router.get("/ticket/main", async (req, res) => {
-  const ssotoken =
-    req.headers.authorization?.split(" ")[1] || req.query.ssotoken;
+  const ssotoken = req.cookies.ssotoken; // ✅ HTTP-Only 쿠키에서 SSO 토큰 가져오기
 
   if (!ssotoken) {
     return res.status(400).json({

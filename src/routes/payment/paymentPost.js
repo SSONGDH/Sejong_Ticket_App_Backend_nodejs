@@ -1,10 +1,12 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
-import Payment from "../../models/paymentModel.js";
+import cookieParser from "cookie-parser"; // ✅ 쿠키 파싱 미들웨어 추가
+import Payment from "../../models/paymentModel.js"; // payment 모델 불러오기
 import verifySSOService from "../../service/ssoAuth.js"; // SSO 인증 서비스
 
 const router = express.Router();
+router.use(cookieParser()); // ✅ 쿠키 사용 설정
 
 // ✅ 이미지 업로드를 위한 multer 설정
 const storage = multer.diskStorage({
@@ -26,8 +28,8 @@ router.post(
     try {
       const { ticketId, phone } = req.body;
 
-      // SSO 토큰을 헤더에서 가져오기
-      const ssotoken = req.headers.authorization?.split(" ")[1];
+      // SSO 토큰을 쿠키에서 가져오기
+      const ssotoken = req.cookies.ssotoken; // ✅ HTTP-Only 쿠키에서 SSO 토큰 가져오기
 
       if (!ssotoken) {
         return res.status(400).json({

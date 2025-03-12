@@ -1,35 +1,35 @@
 import express from "express";
+import cookieParser from "cookie-parser"; // ✅ 쿠키 파싱 미들웨어 추가
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
 import verifySSOService from "../../service/ssoAuth.js"; // SSO 검증 서비스
 
 const router = express.Router();
+router.use(cookieParser()); // ✅ 쿠키 사용 설정
 
 router.post("/ticket/add", async (req, res) => {
   const { eventCode } = req.body;
-  const authHeader = req.headers.authorization; // Bearer 토큰 형식
+  const ssotoken = req.cookies.ssotoken; // ✅ HTTP-Only 쿠키에서 SSO 토큰 가져오기
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!ssotoken) {
     return res.status(400).json({
       isSuccess: false,
       code: "ERROR-0003",
-      message: "유효한 Authorization 헤더가 필요합니다.",
+      message: "SSO 토큰이 없습니다.",
     });
   }
 
-  const ssoToken = authHeader.split(" ")[1]; // "Bearer TOKEN_VALUE"에서 토큰 값만 추출
-
-  if (!eventCode || !ssoToken) {
+  if (!eventCode) {
     return res.status(400).json({
       isSuccess: false,
       code: "ERROR-0003",
-      message: "eventCode 또는 SSO 토큰이 누락되었습니다.",
+      message: "eventCode가 누락되었습니다.",
     });
   }
 
   try {
     // 1️⃣ SSO 토큰으로 유저 정보 가져오기
-    const userProfile = await verifySSOService.verifySSOToken(ssoToken);
+    const userProfile = await verifySSOService.verifySSOToken(ssotoken);
     if (!userProfile) {
       return res.status(401).json({
         isSuccess: false,
@@ -74,7 +74,7 @@ router.post("/ticket/add", async (req, res) => {
       result: user,
     });
   } catch (error) {
-    console.error(error);
+    console.error("❌ 티켓 추가 중 오류 발생:", error);
     return res.status(500).json({
       isSuccess: false,
       code: "ERROR-0006",

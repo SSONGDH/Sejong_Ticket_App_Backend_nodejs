@@ -1,14 +1,17 @@
 import express from "express";
 import User from "../../models/userModel.js"; // User 모델 불러오기
 import verifySSOService from "../../service/ssoAuth.js"; // SSO 인증 서비스 가져오기
+import cookieParser from "cookie-parser"; // 쿠키 파싱 미들웨어 추가
 
 const router = express.Router();
+router.use(cookieParser()); // 쿠키 사용 설정
 
 // 관리자 인증 API (GET 방식)
 router.get("/admin/connection", async (req, res) => {
-  const { authorization } = req.headers; // 헤더에서 Authorization 값을 가져옵니다.
+  // ✅ 쿠키에서 SSO 토큰 가져오기
+  const ssoToken = req.cookies.ssotoken; // HTTP-Only 쿠키에서 SSO 토큰을 가져옵니다.
 
-  if (!authorization) {
+  if (!ssoToken) {
     return res.status(400).json({
       isSuccess: false,
       code: "ERROR-0001",
@@ -18,7 +21,6 @@ router.get("/admin/connection", async (req, res) => {
 
   try {
     // 1️⃣ SSO 토큰을 사용하여 사용자 프로필 정보 확인
-    const ssoToken = authorization.split(" ")[1]; // Bearer 토큰에서 실제 토큰을 추출
     const profileData = await verifySSOService.verifySSOToken(ssoToken);
 
     // 2️⃣ 프로필 데이터에서 학번(studentId)으로 유저 조회
