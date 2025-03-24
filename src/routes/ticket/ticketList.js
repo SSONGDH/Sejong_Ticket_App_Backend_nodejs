@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.get("/ticket/list", async (req, res) => {
   try {
-    // DB에서 티켓 데이터 조회 (eventTitle과 _id만 선택)
-    const tickets = await Ticket.find({}, "eventTitle _id");
+    // DB에서 모든 티켓 데이터 조회
+    const tickets = await Ticket.find();
 
     return res.status(200).json({
       isSuccess: true,
