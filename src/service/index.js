@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import cors from "cors"; // CORS 미들웨어 추가
 import { ticketDB, userDB, financeDB } from "../config/db.js"; // DB 연결 객체
 import authRouter from "../routes/login/authRoute.js";
 import ticketMainRoutes from "../routes/ticket/ticketMain.js";
@@ -33,12 +34,24 @@ dotenv.config();
 
 // ✅ 서버 설정
 const app = express();
-const port = 80;
+const port = 3000;
+
+// ✅ CORS 설정
+app.use(cors()); // 모든 도메인에서의 요청 허용
 
 // ✅ 미들웨어 설정
 app.use(bodyParser.json());
-app.use("/eventPlacePictures", express.static(path.join(__dirname, "uploads")));
-app.use("/paymentPictures", express.static(path.join(__dirname, "uploads")));
+app.use(
+  "/eventUploads",
+  express.static(
+    path.join(__dirname, "..", "..", "uploads", "eventPlacePictures")
+  )
+);
+console.log("gdd", __dirname);
+app.use(
+  "/paymentPictures",
+  express.static(path.join(__dirname, "..", "..", "uploads/paymentPictures"))
+);
 app.use(cookieParser()); // cookie-parser 미들웨어 사용
 
 // ✅ 라우트 등록

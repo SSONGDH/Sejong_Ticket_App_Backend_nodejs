@@ -25,6 +25,7 @@ router.get("/ticket/detail", async (req, res) => {
       eventPlace: 1,
       eventComment: 1,
       eventPlaceComment: 1,
+      eventPlacePicture: 1, // 📸 이미지 URL 추가
     });
 
     if (!ticket) {

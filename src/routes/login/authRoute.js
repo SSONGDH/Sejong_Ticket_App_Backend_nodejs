@@ -58,11 +58,11 @@ router.post("/login", async (req, res) => {
       .status(500)
       .json({ error: "Failed to save user data in the database" });
   }
-
+  console.log("✅response.cookie에 포함된 token:", ssotoken);
   // ✅ SSO 토큰을 HTTP-Only 쿠키로 저장
   res.cookie("ssotoken", ssotoken, {
     httpOnly: true, // JavaScript에서 접근 불가
-    secure: true, // HTTPS에서만 사용 가능 (개발 중에는 false로 변경 가능)
+    secure: false, // HTTPS에서만 사용 가능 (개발 중에는 false로 변경 가능)
     sameSite: "Strict", // CSRF 방지
   });
 

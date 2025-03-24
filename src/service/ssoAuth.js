@@ -17,8 +17,6 @@ class VerifySSOService {
         throw new Error("❌ SSO 토큰이 제공되지 않음");
       }
 
-      //console.log("📜 검증할 SSO 토큰:", ssotoken);
-
       // 세종대학교 사이트에 요청 보내기
       const finalResponse = await fetch(this.finalUrl, {
         method: "GET",
