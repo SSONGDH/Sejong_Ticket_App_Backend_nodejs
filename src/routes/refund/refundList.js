@@ -1,5 +1,3 @@
-// routes/refundList.js
-
 import express from "express";
 import Refund from "../../models/refundModel.js"; // Refund 모델 가져오기
 import Ticket from "../../models/ticketModel.js"; // Ticket 모델 가져오기
@@ -20,22 +18,22 @@ router.get("/refund/refundList", async (req, res) => {
     }
 
     // 환불 내역과 해당 이벤트 이름을 조합
-    const result = [];
+    const result = await Promise.all(
+      refunds.map(async (refund) => {
+        const ticket = await Ticket.findById(refund.ticketId); // refund에서 ticketId를 가져와 Ticket 조회
+        const eventName = ticket ? ticket.eventTitle : "이벤트 정보 없음"; // 이벤트명 (티켓에서 가져옴)
 
-    for (let refund of refunds) {
-      const ticket = await Ticket.findOne({ eventCode: refund._id }); // 환불에 해당하는 티켓을 찾음
-      const eventName = ticket ? ticket.eventTitle : "이벤트 정보 없음"; // 이벤트명 (티켓에서 가져옴)
-
-      result.push({
-        name: refund.name,
-        eventName: eventName, // ticketDB에서 eventTitle을 가져와 표시
-        visitDate: refund.visitDate,
-        visitTime: refund.visitTime,
-        permissionStatus: refund.permissionStatus ? "TRUE" : "FALSE",
-        refundReason: refund.refundReason, // 환불 사유 추가
-        _id: refund._id,
-      });
-    }
+        return {
+          name: refund.name,
+          eventName: eventName, // ticketDB에서 eventTitle을 가져와 표시
+          visitDate: refund.visitDate,
+          visitTime: refund.visitTime,
+          permissionStatus: refund.permissionStatus ? "TRUE" : "FALSE",
+          refundReason: refund.refundReason, // 환불 사유 추가
+          _id: refund._id,
+        };
+      })
+    );
 
     return res.status(200).json({
       isSuccess: true,

@@ -50,7 +50,7 @@ app.use(
 console.log("gdd", __dirname);
 app.use(
   "/paymentPictures",
-  express.static(path.join(__dirname, "..", "..", "uploads/paymentPictures"))
+  express.static(path.join(__dirname, "..", "..", "uploads", "paymentPictures"))
 );
 app.use(cookieParser()); // cookie-parser 미들웨어 사용
 
