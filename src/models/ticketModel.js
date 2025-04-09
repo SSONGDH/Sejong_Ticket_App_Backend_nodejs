@@ -18,6 +18,7 @@ const ticketSchema = new mongoose.Schema(
     eventComment: String,
     eventCode: String,
     eventPlacePicture: String,
+    status: String,
   },
   { timestamps: true }
 );

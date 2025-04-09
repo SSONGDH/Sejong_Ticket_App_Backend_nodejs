@@ -54,6 +54,7 @@ router.get("/payment/paymentDetail", async (req, res) => {
         name: payment.name,
         studentId: payment.studentId,
         phone: payment.phone,
+        paymentPermissionStatus: payment.paymentPermissionStatus,
         eventTitle: ticket.eventTitle, // 티켓 제목
         eventPlacePicture: ticket.eventPlacePicture, // 티켓 장소 사진 URL 추가
       },

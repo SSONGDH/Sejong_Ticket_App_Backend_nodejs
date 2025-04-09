@@ -4,7 +4,7 @@ import Payment from "../../models/paymentModel.js"; // Payment 모델 가져오�
 const router = express.Router();
 
 // 결제 승인 상태 변경 (PUT 방식)
-router.put("/payment/paymentPermission", async (req, res) => {
+router.put("/payment/paymentDeny", async (req, res) => {
   const { paymentId } = req.query; // 쿼리 스트링에서 paymentId 받기
 
   // paymentId가 제공되지 않으면 에러 반환
@@ -31,12 +31,13 @@ router.put("/payment/paymentPermission", async (req, res) => {
       });
     }
 
-    // 2️⃣ paymentPermissionStatus를 TRUE로 변경
-    payment.paymentPermissionStatus = true;
+    // 2️⃣ paymentPermissionStatus를 false로 변경
+    payment.paymentPermissionStatus = false;
 
     // 3️⃣ 변경된 결제 정보 저장
     await payment.save();
 
+    // 4️⃣ 응답 반환
     return res.status(200).json({
       isSuccess: true,
       code: "SUCCESS-0000",

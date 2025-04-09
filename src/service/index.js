@@ -22,6 +22,8 @@ import paymentListRoutes from "../routes/payment/paymentList.js";
 import paymentDetailRoutes from "../routes/payment/paymentDetail.js";
 import paymentPermissionRoutes from "../routes/payment/paymentPermission.js";
 import adminConnectionRoutes from "../routes/admin/adminConnection.js";
+import refundDenyRoutes from "../routes/refund/refundDeny.js";
+import paymentDenyRoutes from "../routes/payment/paymentDeny.js";
 import fcmTokenRoutes from "../routes/FCM/fcmTokenAdd.js"; // ✅ FCM 토큰 저장 API 추가
 import cronJob from "../jobs/cronJob.js"; // ✅ 크론 작업 실행
 import cookieParser from "cookie-parser"; // 쿠키 파서 미들웨어
@@ -47,7 +49,7 @@ app.use(
     path.join(__dirname, "..", "..", "uploads", "eventPlacePictures")
   )
 );
-console.log("gdd", __dirname);
+//console.log("gdd", __dirname);
 app.use(
   "/paymentPictures",
   express.static(path.join(__dirname, "..", "..", "uploads", "paymentPictures"))
@@ -72,6 +74,8 @@ app.use(paymentDetailRoutes);
 app.use(paymentPermissionRoutes);
 app.use(adminConnectionRoutes);
 app.use(ticketAddNFCRoutes);
+app.use(refundDenyRoutes);
+app.use(paymentDenyRoutes);
 // app.use(fcmTokenRoutes);
 
 //cronJob(); // ✅ 크론 작업 실행
