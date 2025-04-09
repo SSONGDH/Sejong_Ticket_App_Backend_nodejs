@@ -1,12 +1,13 @@
 import express from "express";
 import Refund from "../../models/refundModel.js";
 import Ticket from "../../models/ticketModel.js";
+import User from "../../models/userModel.js"; // ✅ 유저 모델 추가
 
 const router = express.Router();
 
 // 티켓에 대한 환불 상세 조회 API (쿼리 파라미터 사용)
 router.get("/ticketRefundDetail", async (req, res) => {
-  const { ticketId } = req.query; // ✅ 쿼리 파라미터에서 ticketId 추출
+  const { ticketId } = req.query;
 
   if (!ticketId) {
     return res.status(400).json({
@@ -41,13 +42,26 @@ router.get("/ticketRefundDetail", async (req, res) => {
       });
     }
 
-    // 3️⃣ 환불 상세 정보 반환
+    // 3️⃣ 환불 요청자 이름으로 유저 정보 조회
+    const user = await User.findOne({ name: refund.name });
+    if (!user) {
+      return res.status(404).json({
+        isSuccess: false,
+        code: "ERROR-0003",
+        message: "유저 정보를 찾을 수 없습니다.",
+        result: [],
+      });
+    }
+
+    // 4️⃣ 환불 상세 정보 반환
     return res.status(200).json({
       isSuccess: true,
       code: "SUCCESS-0000",
       message: "환불 상세 정보를 가져왔습니다.",
       result: {
         name: refund.name,
+        studentId: user.studentId, // ✅ 학번 추가
+        major: user.major, // ✅ 학과 추가
         eventName: ticket.eventTitle,
         visitDate: refund.visitDate,
         visitTime: refund.visitTime,
@@ -62,7 +76,7 @@ router.get("/ticketRefundDetail", async (req, res) => {
     console.error("❌ 환불 상세 조회 중 오류 발생:", error);
     return res.status(500).json({
       isSuccess: false,
-      code: "ERROR-0003",
+      code: "ERROR-0004",
       message: "서버 오류",
       result: [],
     });

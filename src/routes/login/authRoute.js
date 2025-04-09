@@ -45,7 +45,7 @@ router.post("/login", async (req, res) => {
         tickets: [], // 기본 값으로 빈 배열
       });
     } else {
-      console.log("🔄 기존 유저 업데이트");
+      // console.log("🔄 기존 유저 업데이트");
       user.name = name;
       user.major = major; // department -> major로 수정
       user.gradeLevel = gradeLevel; // gradeLevel 추가
@@ -58,7 +58,7 @@ router.post("/login", async (req, res) => {
       .status(500)
       .json({ error: "Failed to save user data in the database" });
   }
-  //console.log("✅response.cookie에 포함된 token:", ssotoken);
+  //  console.log("✅response.cookie에 포함된 token:", ssotoken);
   // ✅ SSO 토큰을 HTTP-Only 쿠키로 저장
   res.cookie("ssotoken", ssotoken, {
     httpOnly: true, // JavaScript에서 접근 불가
