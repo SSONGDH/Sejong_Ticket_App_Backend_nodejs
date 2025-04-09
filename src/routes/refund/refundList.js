@@ -28,7 +28,9 @@ router.get("/refund/refundList", async (req, res) => {
           eventName: eventName, // ticketDB에서 eventTitle을 가져와 표시
           visitDate: refund.visitDate,
           visitTime: refund.visitTime,
-          permissionStatus: refund.permissionStatus ? "TRUE" : "FALSE",
+          refundPermissionStatus: refund.refundPermissionStatus
+            ? "TRUE"
+            : "FALSE",
           refundReason: refund.refundReason, // 환불 사유 추가
           _id: refund._id,
         };
