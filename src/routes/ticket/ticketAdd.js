@@ -1,15 +1,16 @@
 import express from "express";
-import cookieParser from "cookie-parser"; // ✅ 쿠키 파싱 미들웨어 추가
+import cookieParser from "cookie-parser";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
-import verifySSOService from "../../service/ssoAuth.js"; // SSO 검증 서비스
+import Payment from "../../models/paymentModel.js"; // ✅ payment 모델 import
+import verifySSOService from "../../service/ssoAuth.js";
 
 const router = express.Router();
-router.use(cookieParser()); // ✅ 쿠키 사용 설정
+router.use(cookieParser());
 
 router.post("/ticket/add", async (req, res) => {
   const { eventCode } = req.body;
-  const ssotoken = req.cookies.ssotoken; // ✅ HTTP-Only 쿠키에서 SSO 토큰 가져오기
+  const ssotoken = req.cookies.ssotoken;
 
   if (!ssotoken) {
     return res.status(400).json({
@@ -48,7 +49,7 @@ router.post("/ticket/add", async (req, res) => {
       });
     }
 
-    // 3️⃣ SSO 토큰을 통해 얻은 유저 정보로 유저 찾기
+    // 3️⃣ 유저 찾기
     const user = await User.findOne({ studentId: userProfile.studentId });
     if (!user) {
       return res.status(404).json({
@@ -58,7 +59,7 @@ router.post("/ticket/add", async (req, res) => {
       });
     }
 
-    // 4️⃣ 유저의 티켓 목록에 추가 (중복 방지)
+    // 4️⃣ 유저의 티켓 목록에 추가
     if (!user.tickets) {
       user.tickets = [];
     }
@@ -67,10 +68,25 @@ router.post("/ticket/add", async (req, res) => {
       await user.save();
     }
 
+    // 5️⃣ Payment 컬렉션에 새로운 결제 정보 추가
+    const newPayment = new Payment({
+      ticketId: ticket._id.toString(),
+      name: user.name,
+      studentId: user.studentId,
+      phone: "현장 조사 필요",
+      major: user.major,
+      paymentPicture: "", // 현장 코드 추가 시 이미지 없음
+      paymentPermissionStatus: true, // 기본값 false
+      etc: "현장 코드 추가",
+    });
+
+    await newPayment.save();
+
     return res.status(200).json({
       isSuccess: true,
       code: "SUCCESS-0001",
-      message: "티켓이 사용자에게 성공적으로 추가되었습니다.",
+      message:
+        "티켓이 사용자에게 성공적으로 추가되었고, Payment 문서가 생성되었습니다.",
       result: user,
     });
   } catch (error) {

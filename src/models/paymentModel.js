@@ -14,11 +14,12 @@ const paymentSchema = new mongoose.Schema(
     studentId: { type: String, required: true },
     phone: { type: String, required: true },
     major: { type: String, required: true },
-    paymentPicture: { type: String, required: true }, // 이미지 URL 저장
+    paymentPicture: { type: String }, // 이미지 URL 저장
     paymentPermissionStatus: {
       type: Boolean, // bool 타입
       default: false, // 기본값을 false로 설정 (승인되지 않음)
     },
+    etc: String,
   },
   { timestamps: true }
 );
