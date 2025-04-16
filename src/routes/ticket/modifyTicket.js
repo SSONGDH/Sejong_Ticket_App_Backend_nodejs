@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import moment from "moment"; // ✅ 날짜 변환을 위해 moment.js 추가
+import moment from "moment"; // 날짜 변환을 위해 moment.js 추가
 import Ticket from "../../models/ticketModel.js"; // 티켓 모델 불러오기
 
 const router = express.Router();
@@ -8,7 +8,7 @@ const router = express.Router();
 // ✅ 이미지 업로드를 위한 multer 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/eventPlacePictures/"); // 'uploads/eventPictures/' 폴더에 저장
+    cb(null, "uploads/eventPlacePictures/"); // 실제 저장 위치
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname); // 고유한 파일명 생성
@@ -31,7 +31,7 @@ router.put(
       eventPlace,
       eventPlaceComment,
       eventComment,
-      eventCode, // ✅ 이벤트 코드 추가
+      eventCode, // 이벤트 코드 추가
     } = req.body;
 
     if (!_id) {
@@ -56,7 +56,7 @@ router.put(
         });
       }
 
-      // ✅ 시간 형식이 "HH:mm:ss" 이므로 변환 후 저장
+      // 시간 형식이 "HH:mm:ss" 이므로 변환 후 저장
       const formattedStartTime = eventStartTime
         ? moment(eventStartTime, "HH:mm:ss").format("HH:mm:ss")
         : existingTicket.eventStartTime;
@@ -65,28 +65,28 @@ router.put(
         ? moment(eventEndTime, "HH:mm:ss").format("HH:mm:ss")
         : existingTicket.eventEndTime;
 
-      // ✅ 이미지 업로드 시 URL 업데이트, 없으면 기존 이미지 유지
+      // 이미지 업로드 시 URL 업데이트
       const eventPlacePicture = req.file
-        ? `${req.protocol}://${req.get("host")}/uploads/eventPlacePictures/${
+        ? `${req.protocol}://${req.get("host")}/eventUploads/${
             req.file.filename
           }`
         : existingTicket.eventPlacePicture;
 
-      // ✅ 티켓 정보 업데이트 (eventCode 및 날짜 형식 포함)
+      // 티켓 정보 업데이트
       const updatedTicket = await Ticket.findByIdAndUpdate(
         _id,
         {
           eventTitle,
           eventDay,
-          eventStartTime: formattedStartTime, // ✅ 시간 형식 (HH:mm:ss) 변환 후 저장
-          eventEndTime: formattedEndTime, // ✅ 시간 형식 (HH:mm:ss) 변환 후 저장
+          eventStartTime: formattedStartTime,
+          eventEndTime: formattedEndTime,
           eventPlace,
           eventPlaceComment,
           eventComment,
-          eventCode, // ✅ 이벤트 코드 업데이트 추가
-          eventPlacePicture, // 📸 이미지 URL 업데이트
+          eventCode,
+          eventPlacePicture,
         },
-        { new: true } // 업데이트 후 변경된 문서 반환
+        { new: true }
       );
 
       return res.status(200).json({

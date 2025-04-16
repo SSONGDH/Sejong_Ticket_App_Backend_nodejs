@@ -1,17 +1,16 @@
 import express from "express";
 import multer from "multer";
-import path from "path";
-import cookieParser from "cookie-parser"; // ✅ 쿠키 파싱 미들웨어 추가
+import cookieParser from "cookie-parser"; // 쿠키 파싱 미들웨어
 import Payment from "../../models/paymentModel.js"; // payment 모델 불러오기
 import verifySSOService from "../../service/ssoAuth.js"; // SSO 인증 서비스
 
 const router = express.Router();
-router.use(cookieParser()); // ✅ 쿠키 사용 설정
+router.use(cookieParser()); // 쿠키 사용 설정
 
-// ✅ 이미지 업로드를 위한 multer 설정
+// 이미지 업로드를 위한 multer 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // 서버의 'uploads/' 폴더에 저장
+    cb(null, "uploads/paymentPictures"); // 실제 저장 경로
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname); // 고유한 파일명 생성
@@ -20,7 +19,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// ✅ 결제 정보 저장 API
+// 결제 정보 저장 API
 router.post(
   "/payment/paymentpost",
   upload.single("paymentPicture"),
@@ -29,7 +28,7 @@ router.post(
       const { ticketId, phone } = req.body;
 
       // SSO 토큰을 쿠키에서 가져오기
-      const ssotoken = req.cookies.ssotoken; // ✅ HTTP-Only 쿠키에서 SSO 토큰 가져오기
+      const ssotoken = req.cookies.ssotoken;
 
       if (!ssotoken) {
         return res.status(400).json({
@@ -42,11 +41,10 @@ router.post(
 
       // SSO 토큰을 사용하여 유저 정보 가져오기
       const userProfile = await verifySSOService.verifySSOToken(ssotoken);
-
       const { name, studentId, major } = userProfile;
 
       // 필수 데이터 확인
-      if (!ticketId || !name || !studentId || !phone || !req.file) {
+      if (!ticketId || !phone || !req.file) {
         return res.status(400).json({
           isSuccess: false,
           code: "ERROR-0002",
@@ -55,10 +53,10 @@ router.post(
         });
       }
 
-      // 저장된 이미지 파일 경로 생성
-      const imageUrl = `${req.protocol}://${req.get(
-        "host"
-      )}/uploads/paymentPictures${req.file.filename}`;
+      // ✅ 저장된 이미지 파일의 정적 접근 URL 생성
+      const imageUrl = `${req.protocol}://${req.get("host")}/paymentPictures/${
+        req.file.filename
+      }`;
 
       // 결제 정보 생성 및 DB 저장
       const newPayment = new Payment({
@@ -66,8 +64,8 @@ router.post(
         name,
         studentId,
         phone,
-        major, // 전공 추가
-        paymentPicture: imageUrl, // DB에는 URL 저장
+        major,
+        paymentPicture: imageUrl,
       });
 
       await newPayment.save();

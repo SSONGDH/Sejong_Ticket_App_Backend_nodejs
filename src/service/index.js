@@ -30,9 +30,11 @@ import ticketDeleteRoutes from "../routes/ticket/ticketDelete.js";
 import fcmTokenRoutes from "../routes/FCM/fcmTokenAdd.js"; // ✅ FCM 토큰 저장 API 추가
 import cronJob from "../jobs/cronJob.js"; // ✅ 크론 작업 실행
 import cookieParser from "cookie-parser"; // 쿠키 파서 미들웨어
+import { swaggerUi, specs } from "../../swagger/swagger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+//console.log("✅ Swagger apis 경로:", path.join(__dirname, "../routes/**/*.js"));
 
 // dotenv 환경 변수 로드
 dotenv.config();
@@ -46,6 +48,7 @@ app.use(cors()); // 모든 도메인에서의 요청 허용
 
 // ✅ 미들웨어 설정
 app.use(bodyParser.json());
+
 app.use(
   "/eventUploads",
   express.static(
@@ -57,7 +60,10 @@ app.use(
   "/paymentPictures",
   express.static(path.join(__dirname, "..", "..", "uploads", "paymentPictures"))
 );
+
 app.use(cookieParser()); // cookie-parser 미들웨어 사용
+// ✅ Swagger 라우트 설정
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // ✅ 라우트 등록
 app.use(authRouter);
