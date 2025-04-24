@@ -55,7 +55,7 @@ app.use(
     path.join(__dirname, "..", "..", "uploads", "eventPlacePictures")
   )
 );
-//console.log("gdd", __dirname);
+
 app.use(
   "/paymentPictures",
   express.static(path.join(__dirname, "..", "..", "uploads", "paymentPictures"))
@@ -90,7 +90,7 @@ app.use(modifyTicketDetailRoutes);
 app.use(ticketDeleteRoutes);
 // app.use(fcmTokenRoutes);
 
-//cronJob(); // ✅ 크론 작업 실행
+cronJob(); // ✅ 크론 작업 실행
 
 // ✅ 서버 시작
 app.listen(port, "0.0.0.0", () => {
