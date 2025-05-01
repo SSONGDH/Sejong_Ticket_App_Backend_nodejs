@@ -1,14 +1,19 @@
+// firebaseConfig.js
 import admin from "firebase-admin";
-import dotenv from "dotenv";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 
-dotenv.config();
-
-// 환경 변수에서 Base64로 인코딩된 서비스 계정 키를 가져와 디코딩
-const serviceAccount = JSON.parse(
-  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_KEY, "base64").toString(
-    "utf-8"
-  )
+// 현재 디렉토리 경로 처리
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const serviceAccountPath = path.resolve(
+  __dirname,
+  "../../firebase/sejong-passtime-firebase-adminsdk-fbsvc-3cf679ebfa.json"
 );
+
+// JSON 직접 읽어서 파싱 (file:// 문제 없이 동작)
+const rawJson = await fs.readFile(serviceAccountPath, "utf-8");
+const serviceAccount = JSON.parse(rawJson);
 
 // Firebase Admin SDK 초기화
 admin.initializeApp({

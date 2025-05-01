@@ -43,7 +43,7 @@ router.post("/refund/request", async (req, res) => {
     // 사용자 데이터를 가져오고 해당 사용자의 tickets 필드에 ticketId가 있는지 확인
     const user = await User.findOne({ studentId });
 
-    if (!user) {
+    if (!user) {ㄴ
       return res.status(404).json({
         isSuccess: false,
         code: "ERROR-0003",

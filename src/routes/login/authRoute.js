@@ -41,7 +41,7 @@ router.post("/login", async (req, res) => {
         name,
         studentId,
         major, // department -> major로 수정
-        gradeLevel, // gradeLevel 추가
+        gradeLevel, // gradeLevel m[추가
         tickets: [], // 기본 값으로 빈 배열
       });
     } else {

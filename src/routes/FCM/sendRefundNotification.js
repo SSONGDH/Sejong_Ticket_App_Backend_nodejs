@@ -12,7 +12,7 @@ const sendRefundNotification = async (userId) => {
       token: user.fcmToken,
       notification: {
         title: "환불 승인 완료",
-        body: "환불이 승인되었습니다. 계좌를 확인해주세요!",
+        body: "환불이 승인되었습니다. 방문날짜를 확인해주세요",
       },
       data: {
         type: "REFUND_APPROVED",

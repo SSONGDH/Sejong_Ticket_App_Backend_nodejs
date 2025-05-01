@@ -1,4 +1,4 @@
-//import admin from "../../config/firebaseConfig.js";
+import admin from "../../config/firebaseConfig.js";
 import User from "../../models/userModel.js"; // 유저 모델
 
 const sendTicketApprovalNotification = async (userId, eventTitle) => {
