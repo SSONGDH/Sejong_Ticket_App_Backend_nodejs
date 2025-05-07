@@ -1,6 +1,7 @@
 import express from "express";
 import Payment from "../../models/paymentModel.js"; // Payment 모델
 import User from "../../models/userModel.js"; // User 모델
+import sendTicketApprovalNotification from "../../routes/FCM/sendTicketApprovalNotification.js"; // 티켓 승인 알림 전송 함수
 
 const router = express.Router();
 
@@ -51,6 +52,10 @@ router.put("/payment/paymentPermission", async (req, res) => {
       user.tickets.push(payment.ticketId);
       await user.save();
     }
+
+    // ✅ 결제 승인 후 티켓 승인 알림 전송
+    const eventTitle = payment.ticketId ? "티켓 이벤트 제목" : "기타 이벤트"; // 예시로 티켓 제목을 사용
+    await sendTicketApprovalNotification(user._id, eventTitle);
 
     return res.status(200).json({
       isSuccess: true,

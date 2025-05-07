@@ -4,6 +4,8 @@ import Ticket from "../../models/ticketModel.js"; // 티켓 모델
 
 const sendEventReminderNotification = async (eventId) => {
   try {
+    console.log(`📅 이벤트 알림 함수 호출됨: ${eventId}`); // 호출 여부 확인용 로그
+
     // 해당 이벤트의 티켓 정보 가져오기
     const ticket = await Ticket.findById(eventId);
     if (!ticket) return;

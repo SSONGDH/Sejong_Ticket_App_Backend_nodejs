@@ -1,5 +1,6 @@
 import express from "express";
 import Refund from "../../models/refundModel.js"; // Refund 모델 불러오기
+import sendRefundNotification from "../../routes/FCM/sendRefundNotification.js"; // 알림 전송 함수 불러오기
 
 const router = express.Router();
 
@@ -33,6 +34,9 @@ router.put("/refund/refundPermission", async (req, res) => {
     // 2️⃣ refundPermissionStatus를 TRUE로 변경
     refund.refundPermissionStatus = true;
     await refund.save();
+
+    // 3️⃣ 환불 승인 알림 전송
+    await sendRefundNotification(refund.userId); // 환불을 요청한 유저에게 알림 전송
 
     return res.status(200).json({
       isSuccess: true,
