@@ -88,7 +88,7 @@ app.use(paymentDenyRoutes);
 app.use(ticketRefundDetailRoutes);
 app.use(modifyTicketDetailRoutes);
 app.use(ticketDeleteRoutes);
-// app.use(fcmTokenRoutes);
+app.use(fcmTokenRoutes);
 
 cronJob(); // ✅ 크론 작업 실행
 

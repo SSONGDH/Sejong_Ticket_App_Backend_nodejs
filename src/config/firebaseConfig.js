@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serviceAccountPath = path.resolve(
   __dirname,
-  "../../firebase/sejong-passtime-firebase-adminsdk-fbsvc-3cf679ebfa.json"
+  "../../firebase/passtime-95bad-firebase-adminsdk-fbsvc-7b019cd11f.json"
 );
 
 // JSON 직접 읽어서 파싱 (file:// 문제 없이 동작)

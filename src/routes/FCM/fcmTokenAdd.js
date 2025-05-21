@@ -13,8 +13,8 @@ router.use(cookieParser()); // 쿠키 사용 설정
  */
 router.post("/fcm/tokenAdd", async (req, res) => {
   // ✅ 쿠키에서 SSO 토큰 가져오기
-  const ssotoken = req.cookies.ssotoken; // HTTP-Only 쿠키에서 SSO 토큰을 가져옵니다.
-  const { fcmToken } = req.body; // FCM 토큰 가져오기
+  const ssotoken = req.cookies.ssotoken;
+  const { fcmToken } = req.body;
 
   if (!ssotoken) {
     return res.status(400).json({
@@ -33,7 +33,6 @@ router.post("/fcm/tokenAdd", async (req, res) => {
   }
 
   try {
-    // 1️⃣ SSO 토큰 검증 -> 유저 정보 가져오기
     const userProfile = await verifySSOService.verifySSOToken(ssotoken);
 
     if (!userProfile || !userProfile.studentId) {
@@ -44,7 +43,6 @@ router.post("/fcm/tokenAdd", async (req, res) => {
       });
     }
 
-    // 2️⃣ 유저 찾기 (학번 기준)
     const user = await User.findOne({ studentId: userProfile.studentId });
 
     if (!user) {
@@ -55,7 +53,6 @@ router.post("/fcm/tokenAdd", async (req, res) => {
       });
     }
 
-    // 3️⃣ FCM 토큰 저장
     user.fcmToken = fcmToken;
     await user.save();
 
