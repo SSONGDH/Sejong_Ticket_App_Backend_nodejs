@@ -38,8 +38,8 @@ const startCronJob = () => {
       }
 
       // 2️⃣ 이벤트가 종료되었으면 상태 변경
-      if (eventEndDate < now && event.status !== "종료") {
-        event.status = "종료";
+      if (eventEndDate < now && event.status !== "만료됨") {
+        event.status = "만료됨";
         await event.save();
         console.log(`📛 [CRON] 티켓 종료 처리 완료: ${event.eventTitle}`);
       }
