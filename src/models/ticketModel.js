@@ -19,6 +19,10 @@ const ticketSchema = new mongoose.Schema(
     eventCode: String,
     eventPlacePicture: String,
     status: String,
+    reminderSent: {
+      type: Boolean,
+      default: false, // 처음에는 알림을 안 보냈으니까 false
+    },
   },
   { timestamps: true }
 );

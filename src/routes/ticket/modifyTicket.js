@@ -1,26 +1,26 @@
 import express from "express";
 import multer from "multer";
-import moment from "moment"; // 날짜 변환을 위해 moment.js 추가
-import Ticket from "../../models/ticketModel.js"; // 티켓 모델 불러오기
+import moment from "moment";
+import Ticket from "../../models/ticketModel.js";
 
 const router = express.Router();
 
 // ✅ 이미지 업로드를 위한 multer 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/eventPlacePictures/"); // 실제 저장 위치
+    cb(null, "uploads/eventPlacePictures/");
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname); // 고유한 파일명 생성
+    cb(null, Date.now() + "-" + file.originalname);
   },
 });
 
 const upload = multer({ storage: storage });
 
-// ✅ 티켓 수정 API (사진 포함)
+// ✅ 티켓 수정 API
 router.put(
   "/ticket/modifyTicket",
-  upload.single("eventPlacePicture"), // 사진 파일을 받기 위해 multer 적용
+  upload.single("eventPlacePicture"),
   async (req, res) => {
     const {
       _id,
@@ -31,7 +31,7 @@ router.put(
       eventPlace,
       eventPlaceComment,
       eventComment,
-      eventCode, // 이벤트 코드 추가
+      eventCode,
     } = req.body;
 
     if (!_id) {
@@ -56,7 +56,7 @@ router.put(
         });
       }
 
-      // 시간 형식이 "HH:mm:ss" 이므로 변환 후 저장
+      // 시간 포맷 변환
       const formattedStartTime = eventStartTime
         ? moment(eventStartTime, "HH:mm:ss").format("HH:mm:ss")
         : existingTicket.eventStartTime;
@@ -65,7 +65,13 @@ router.put(
         ? moment(eventEndTime, "HH:mm:ss").format("HH:mm:ss")
         : existingTicket.eventEndTime;
 
-      // 이미지 업로드 시 URL 업데이트
+      // 시작 시간이 기존과 다르면 reminderSent 초기화
+      let reminderSent = existingTicket.reminderSent;
+      if (formattedStartTime !== existingTicket.eventStartTime) {
+        reminderSent = false;
+      }
+
+      // 이미지 처리
       const eventPlacePicture = req.file
         ? `${req.protocol}://${req.get("host")}/eventUploads/${
             req.file.filename
@@ -85,6 +91,7 @@ router.put(
           eventComment,
           eventCode,
           eventPlacePicture,
+          reminderSent,
         },
         { new: true }
       );
