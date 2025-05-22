@@ -11,35 +11,29 @@ router.use(cookieParser()); // 쿠키 사용 설정
 
 // 티켓 상태별로 조회하여 반환하는 함수
 async function getTicketStatus(ticketId) {
-  // 1️⃣ Refunds DB에서 해당 티켓의 환불 상태 조회
+  // 🔹 티켓 자체 상태 확인
+  const ticket = await Ticket.findById(ticketId);
+  if (!ticket) return "상태 없음";
+
+  // ✅ 티켓 상태가 "만료됨"이면 우선 반환
+  if (ticket.status === "만료됨") {
+    return "만료됨";
+  }
+
+  // 🔹 Refunds DB 조회
   const refund = await Refund.findOne({ ticketId });
-
   if (refund) {
-    // 환불중 상태
-    if (refund.refundPermissionStatus === false) {
-      return "환불중";
-    }
-    // 환불됨 상태
-    if (refund.refundPermissionStatus === true) {
-      return "환불됨";
-    }
+    if (refund.refundPermissionStatus === false) return "환불중";
+    if (refund.refundPermissionStatus === true) return "환불됨";
   }
 
-  // 2️⃣ Payments DB에서 해당 티켓의 결제 상태 조회
+  // 🔹 Payments DB 조회
   const payment = await Payment.findOne({ ticketId });
-
   if (payment) {
-    // 미승인 상태
-    if (payment.paymentPermissionStatus === false) {
-      return "미승인";
-    }
-    // 승인됨 상태
-    if (payment.paymentPermissionStatus === true) {
-      return "승인됨";
-    }
+    if (payment.paymentPermissionStatus === false) return "미승인";
+    if (payment.paymentPermissionStatus === true) return "승인됨";
   }
 
-  // 상태가 없을 경우 기본값
   return "상태 없음";
 }
 

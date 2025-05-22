@@ -18,12 +18,16 @@ const startCronJob = () => {
       const eventStartDate = moment(
         `${event.eventDay} ${event.eventStartTime}`,
         "YYYY-MM-DD HH:mm:ss"
-      ).toDate();
+      );
 
-      const eventEndDate = moment(
+      let eventEndDate = moment(
         `${event.eventDay} ${event.eventEndTime}`,
         "YYYY-MM-DD HH:mm:ss"
-      ).toDate();
+      );
+
+      if (eventEndDate.isBefore(eventStartDate)) {
+        eventEndDate.add(1, "days");
+      }
 
       // 1️⃣ 알림을 아직 안 보냈고, 이벤트 시작이 1시간 이내인 경우
       if (
