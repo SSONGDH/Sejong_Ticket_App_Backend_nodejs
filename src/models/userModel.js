@@ -1,11 +1,5 @@
-// userModel.js
 import mongoose from "mongoose";
-
-// userDB에 연결할 연결 객체 생성
-const UserDB = mongoose.createConnection(process.env.MONGO_USER_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+import db from "../config/db.js"; // 통합 DB 연결 import
 
 const userSchema = new mongoose.Schema(
   {
@@ -15,13 +9,13 @@ const userSchema = new mongoose.Schema(
     gradeLevel: String,
     tickets: [String],
     refunds: [String],
-    admin: { type: Boolean, default: false }, // admin 필드 추가, 기본값은 false
-    fcmToken: { type: String, default: null }, // FCM 토큰 저장 필드 추가
+    admin: { type: Boolean, default: false },
+    fcmToken: { type: String, default: null },
   },
   { timestamps: true }
 );
 
-// 'UserDB' 연결을 사용하여 모델을 정의
-const User = UserDB.model("User", userSchema);
+// db 연결에서 모델 생성
+const User = db.model("User", userSchema);
 
 export default User;

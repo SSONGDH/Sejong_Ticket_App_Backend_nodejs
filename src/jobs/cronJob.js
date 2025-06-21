@@ -1,7 +1,7 @@
 import cron from "node-cron";
 import moment from "moment";
-import sendEventReminderNotification from "../routes/FCM/sendEventReminderNotification.js";
-import deleteExpiredTickets from "../service/deleteExpiredTickets.js";
+import sendEventReminderNotification from "../routes/FCM/fcmNotificationRoute.js";
+import deleteExpiredTickets from "../services/deleteExpiredTickets.js";
 import Ticket from "../models/ticketModel.js";
 
 const startCronJob = () => {

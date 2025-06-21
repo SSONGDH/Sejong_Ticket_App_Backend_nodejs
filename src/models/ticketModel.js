@@ -1,12 +1,6 @@
 import mongoose from "mongoose";
+import db from "../config/db.js"; // 통합 DB 연결 import
 
-// ticketDB에 연결하기 위한 연결 객체 생성
-const ticketDB = mongoose.createConnection(process.env.MONGO_TICKET_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-// ticketDB에서 사용할 스키마 정의
 const ticketSchema = new mongoose.Schema(
   {
     eventTitle: String,
@@ -21,13 +15,12 @@ const ticketSchema = new mongoose.Schema(
     status: String,
     reminderSent: {
       type: Boolean,
-      default: false, // 처음에는 알림을 안 보냈으니까 false
+      default: false,
     },
   },
   { timestamps: true }
 );
 
-// ticketDB에서 사용할 모델 정의
-const Ticket = ticketDB.model("Ticket", ticketSchema);
+const Ticket = db.model("Ticket", ticketSchema);
 
 export default Ticket;
