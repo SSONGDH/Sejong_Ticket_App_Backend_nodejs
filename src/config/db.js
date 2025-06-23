@@ -1,9 +1,12 @@
-import mongoose from "mongoose";
 import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config(); // 이 줄이 꼭 필요합니다!!
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+
+import mongoose from "mongoose";
 
 const mongoURI = process.env.MONGO_URI;
+console.log("mongoURI in db.js:", mongoURI);
 
 const db = mongoose.createConnection(mongoURI, {
   useNewUrlParser: true,
