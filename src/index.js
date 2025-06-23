@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
@@ -36,7 +36,7 @@ app.use("/", routes);
 cronJob();
 
 app.listen(port, "0.0.0.0", () => {
-  console.log(`✅ Server is running on http://localhost:${port}`);
+  console.log(`✅ Server is running`);
   connectToDatabase();
 });
 
