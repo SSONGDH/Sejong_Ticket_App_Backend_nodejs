@@ -1,6 +1,7 @@
+// cron/startCronJob.js
 import cron from "node-cron";
 import moment from "moment-timezone";
-import sendEventReminderNotification from "../routes/FCM/fcmNotificationRoute.js";
+import sendEventReminderNotification from "../services/FCM/sendEventReminderNotification.js";
 import deleteExpiredTickets from "../services/deleteExpiredTickets.js";
 import Ticket from "../models/ticketModel.js";
 
@@ -35,7 +36,8 @@ const startCronJob = () => {
     );
 
     const upcomingEvents = await Ticket.find();
-    let notifiedAny = false;
+
+    let matchCount = 0;
 
     for (const event of upcomingEvents) {
       const eventStartDate = moment.tz(
@@ -54,11 +56,24 @@ const startCronJob = () => {
         eventEndDate.add(1, "days");
       }
 
-      if (
-        !event.reminderSent &&
-        eventStartDate.isSameOrAfter(now) &&
-        eventStartDate.isSameOrBefore(oneHourLater)
-      ) {
+      if (eventStartDate.isBefore(now)) {
+        console.log(
+          now.format("YYYY-MM-DD HH:mm:ss"),
+          `⏱️ [SKIP] 이미 시작된 이벤트: ${event.eventTitle}`
+        );
+        continue;
+      }
+
+      if (eventStartDate.isAfter(oneHourLater)) {
+        console.log(
+          now.format("YYYY-MM-DD HH:mm:ss"),
+          `⌛ [SKIP] 1시간 이상 남은 이벤트: ${event.eventTitle}`
+        );
+        continue;
+      }
+
+      // 🔔 알림 전송 조건 충족
+      if (!event.reminderSent) {
         try {
           await sendEventReminderNotification(event._id);
           event.reminderSent = true;
@@ -67,43 +82,17 @@ const startCronJob = () => {
             moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
             `📨 [CRON] 알림 전송 완료: ${event.eventTitle}`
           );
-          notifiedAny = true;
         } catch (err) {
           console.error(
             moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
             `❌ [CRON] 알림 전송 실패: ${event.eventTitle} - ${err.message}`
           );
         }
-      } else {
-        if (event.reminderSent) {
-          console.log(
-            moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-            `🔕 [SKIP] 이미 알림 전송됨: ${event.eventTitle}`
-          );
-        } else if (eventStartDate.isBefore(now)) {
-          console.log(
-            moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-            `⏱️ [SKIP] 이미 시작된 이벤트: ${event.eventTitle}`
-          );
-        } else if (eventStartDate.isAfter(oneHourLater)) {
-          console.log(
-            moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-            `⌛ [SKIP] 1시간 이상 남은 이벤트: ${event.eventTitle}`
-          );
-        }
-      }
-
-      if (eventEndDate.isBefore(now) && event.status !== "만료됨") {
-        event.status = "만료됨";
-        await event.save();
-        console.log(
-          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-          `📛 [CRON] 티켓 종료 처리 완료: ${event.eventTitle}`
-        );
+        matchCount++;
       }
     }
 
-    if (!notifiedAny) {
+    if (matchCount === 0) {
       console.log(
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
         "📭 [CRON] 조건에 맞는 이벤트가 없어 알림 없음"
