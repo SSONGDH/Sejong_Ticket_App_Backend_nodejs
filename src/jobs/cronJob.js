@@ -6,25 +6,6 @@ import deleteExpiredTickets from "../services/deleteExpiredTickets.js";
 import Ticket from "../models/ticketModel.js";
 
 const startCronJob = () => {
-  // 시작 시 DB에 있는 이벤트 제목과 시작시간 로그 출력
-  (async () => {
-    const events = await Ticket.find();
-    console.log(
-      moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-      `📋 DB에 저장된 이벤트 총 ${events.length}개:`
-    );
-    events.forEach((event) => {
-      const startTime = moment
-        .tz(
-          `${event.eventDay} ${event.eventStartTime}`,
-          "YYYY-MM-DD HH:mm:ss",
-          "Asia/Seoul"
-        )
-        .format("YYYY-MM-DD HH:mm:ss");
-      console.log(`- ${event.eventTitle} | 시작시간: ${startTime}`);
-    });
-  })();
-
   // 🕙 매 1분마다 실행
   cron.schedule("*/1 * * * *", async () => {
     const now = moment().tz("Asia/Seoul");
@@ -56,22 +37,6 @@ const startCronJob = () => {
         eventEndDate.add(1, "days");
       }
 
-      if (eventStartDate.isBefore(now)) {
-        console.log(
-          now.format("YYYY-MM-DD HH:mm:ss"),
-          `⏱️ [SKIP] 이미 시작된 이벤트: ${event.eventTitle}`
-        );
-        continue;
-      }
-
-      if (eventStartDate.isAfter(oneHourLater)) {
-        console.log(
-          now.format("YYYY-MM-DD HH:mm:ss"),
-          `⌛ [SKIP] 1시간 이상 남은 이벤트: ${event.eventTitle}`
-        );
-        continue;
-      }
-
       // 🔔 알림 전송 조건 충족
       if (!event.reminderSent) {
         try {
@@ -90,13 +55,6 @@ const startCronJob = () => {
         }
         matchCount++;
       }
-    }
-
-    if (matchCount === 0) {
-      console.log(
-        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-        "📭 [CRON] 조건에 맞는 이벤트가 없어 알림 없음"
-      );
     }
   });
 
