@@ -5,20 +5,6 @@ import Ticket from "../../models/ticketModel.js";
 
 const sendEventReminderNotification = async (eventId) => {
   try {
-    // 추가된 부분: DB에 저장된 모든 이벤트 제목과 시간 로그 출력
-    const allEvents = await Ticket.find();
-    console.log(
-      moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-      `📋 DB에 저장된 이벤트 총 ${allEvents.length}개:`
-    );
-    allEvents.forEach((event) => {
-      console.log(
-        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-        `- ${event.eventTitle} | 날짜: ${event.eventDay} | 시작시간: ${event.eventStartTime} | 종료시간: ${event.eventEndTime}`
-      );
-    });
-
-    // 기존 코드
     console.log(
       moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
       `📅 이벤트 알림 함수 호출됨: ${eventId}`
@@ -65,7 +51,7 @@ const sendEventReminderNotification = async (eventId) => {
         await admin.messaging().send(message);
         console.log(
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-          `✅ ${user.name}에게 이벤트 알림 전송 완료`
+          `✅ ${user.name}에게 이벤트 알림   전송 완료`
         );
       } catch (sendError) {
         console.error(

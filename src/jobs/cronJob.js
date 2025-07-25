@@ -4,7 +4,20 @@ import sendEventReminderNotification from "../routes/FCM/fcmNotificationRoute.js
 import deleteExpiredTickets from "../services/deleteExpiredTickets.js";
 import Ticket from "../models/ticketModel.js";
 
-const startCronJob = () => {
+const startCronJob = async () => {
+  // 시작 전에 DB에 저장된 이벤트 목록과 시작시간 출력
+  const allEvents = await Ticket.find();
+  console.log(
+    moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
+    `📋 DB에 저장된 이벤트 총 ${allEvents.length}개:`
+  );
+  allEvents.forEach((event) => {
+    console.log(
+      moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
+      `- ${event.eventTitle} | 시작시간: ${event.eventDay} ${event.eventStartTime}`
+    );
+  });
+
   // 🕙 매 1분마다 실행
   cron.schedule("*/1 * * * *", async () => {
     console.log(
