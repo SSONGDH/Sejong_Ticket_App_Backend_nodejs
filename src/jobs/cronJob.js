@@ -1,58 +1,66 @@
 import cron from "node-cron";
-import moment from "moment-timezone"; // moment-timezone으로 변경
+import moment from "moment-timezone";
 import sendEventReminderNotification from "../routes/FCM/fcmNotificationRoute.js";
 import deleteExpiredTickets from "../services/deleteExpiredTickets.js";
 import Ticket from "../models/ticketModel.js";
 
-const startCronJob = async () => {
-  // 시작 전에 DB에 저장된 이벤트 목록과 시작시간 출력
-  const allEvents = await Ticket.find();
-  console.log(
-    moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-    `📋 DB에 저장된 이벤트 총 ${allEvents.length}개:`
-  );
-  allEvents.forEach((event) => {
+const startCronJob = () => {
+  // 시작 시 DB에 있는 이벤트 제목과 시작시간 로그 출력
+  (async () => {
+    const events = await Ticket.find();
     console.log(
       moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-      `- ${event.eventTitle} | 시작시간: ${event.eventDay} ${event.eventStartTime}`
+      `📋 DB에 저장된 이벤트 총 ${events.length}개:`
     );
-  });
+    events.forEach((event) => {
+      const startTime = moment
+        .tz(
+          `${event.eventDay} ${event.eventStartTime}`,
+          "YYYY-MM-DD HH:mm:ss",
+          "Asia/Seoul"
+        )
+        .format("YYYY-MM-DD HH:mm:ss");
+      console.log(`- ${event.eventTitle} | 시작시간: ${startTime}`);
+    });
+  })();
 
   // 🕙 매 1분마다 실행
   cron.schedule("*/1 * * * *", async () => {
+    const now = moment().tz("Asia/Seoul");
+    const oneHourLater = now.clone().add(1, "hour");
+
     console.log(
-      moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
+      now.format("YYYY-MM-DD HH:mm:ss"),
       "⏳ [CRON] 이벤트 시작 1시간 전 알림 체크 중..."
     );
-    const now = new Date();
-    const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000); // 현재 시간 + 1시간
 
-    // 모든 티켓 조회
     const upcomingEvents = await Ticket.find();
 
     for (const event of upcomingEvents) {
-      const eventStartDate = moment(
+      const eventStartDate = moment.tz(
         `${event.eventDay} ${event.eventStartTime}`,
-        "YYYY-MM-DD HH:mm:ss"
+        "YYYY-MM-DD HH:mm:ss",
+        "Asia/Seoul"
       );
 
-      let eventEndDate = moment(
+      let eventEndDate = moment.tz(
         `${event.eventDay} ${event.eventEndTime}`,
-        "YYYY-MM-DD HH:mm:ss"
+        "YYYY-MM-DD HH:mm:ss",
+        "Asia/Seoul"
       );
 
       if (eventEndDate.isBefore(eventStartDate)) {
         eventEndDate.add(1, "days");
       }
 
-      // 1️⃣ 알림을 아직 안 보냈고, 이벤트 시작이 1시간 이내인 경우
+      // 알림 조건: 알림 안보냈고, 이벤트 시작시간이 현재 ~ 1시간 이내
       if (
         !event.reminderSent &&
-        eventStartDate >= now &&
-        eventStartDate <= oneHourLater
+        eventStartDate.isSameOrAfter(now) &&
+        eventStartDate.isSameOrBefore(oneHourLater)
       ) {
         await sendEventReminderNotification(event._id);
-        event.reminderSent = true; // 알림 보냈음을 표시
+        event.reminderSent = true;
         await event.save();
         console.log(
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
@@ -60,8 +68,8 @@ const startCronJob = async () => {
         );
       }
 
-      // 2️⃣ 이벤트가 종료되었으면 상태 변경
-      if (eventEndDate < now && event.status !== "만료됨") {
+      // 이벤트 종료 체크
+      if (eventEndDate.isBefore(now) && event.status !== "만료됨") {
         event.status = "만료됨";
         await event.save();
         console.log(
