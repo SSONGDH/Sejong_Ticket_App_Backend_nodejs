@@ -12,6 +12,7 @@ export const modifyTicket = async (body, file, req) => {
     eventPlaceComment,
     eventComment,
     eventCode,
+    affiliation, // ✅ 소속 추가
   } = body;
 
   if (!_id) {
@@ -61,6 +62,7 @@ export const modifyTicket = async (body, file, req) => {
       eventCode,
       eventPlacePicture,
       reminderSent,
+      affiliation, // ✅ 업데이트에 소속 포함
     },
     { new: true }
   );

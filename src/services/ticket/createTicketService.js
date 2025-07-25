@@ -27,6 +27,7 @@ export const createTicket = async (body, file, req) => {
     eventPlaceComment,
     eventComment,
     eventCode,
+    affiliation, // ✅ 소속 필드 추가
   } = body;
 
   if (
@@ -36,7 +37,8 @@ export const createTicket = async (body, file, req) => {
     !eventEndTime ||
     !eventPlace ||
     !eventPlaceComment ||
-    !eventComment
+    !eventComment ||
+    !affiliation // ✅ 필수값 검사에 소속 추가
   ) {
     return {
       status: 400,
@@ -81,6 +83,7 @@ export const createTicket = async (body, file, req) => {
     eventComment,
     eventCode: finalEventCode,
     eventPlacePicture,
+    affiliation, // ✅ DB에 저장
   });
 
   const savedTicket = await newTicket.save();

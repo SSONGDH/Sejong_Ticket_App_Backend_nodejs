@@ -10,7 +10,9 @@ const userSchema = new mongoose.Schema(
     tickets: [String],
     refunds: [String],
     admin: { type: Boolean, default: false },
+    root: { type: Boolean, default: false },
     fcmToken: { type: String, default: null },
+    affiliation: { type: [String], default: null },
   },
   { timestamps: true }
 );

@@ -29,6 +29,10 @@ import paymentDenyRoutes from "./payment/paymentDenyRoute.js";
 import adminConnectionRoutes from "./admin/adminConnection.js";
 import fcmTokenRoutes from "./FCM/fcmTokenAddRoute.js";
 
+import mypageRoutes from "./user/mypageRoute.js";
+
+import affiliationRequestRoutes from "./affiliation/affiliationRequestRoute.js";
+
 const router = express.Router();
 
 // auth
@@ -65,5 +69,9 @@ router.use("/admin", adminConnectionRoutes);
 
 // FCM
 router.use("/fcm", fcmTokenRoutes);
+
+router.use("/user", mypageRoutes);
+
+router.post("/affiliation", affiliationRequestRoutes);
 
 export default router;
