@@ -17,7 +17,7 @@ export const handleAffiliationApproval = async (requestId) => {
 
   const affiliationName = request.affiliationName;
 
-  // createAffiliation: true인 경우에만 새 소속 생성
+  // createAffiliation: true인 경우에만 새 소속 생성 및 유저 affiliation 추가
   if (request.createAffiliation) {
     const existing = await Affiliation.findOne({ name: affiliationName });
     if (!existing) {
@@ -28,6 +28,11 @@ export const handleAffiliationApproval = async (requestId) => {
         admins: request.requestAdmin ? [user._id] : [],
       });
     }
+    // 유저 affiliation 배열에 소속 추가 (중복 없이)
+    if (!user.affiliation) user.affiliation = [];
+    if (!user.affiliation.includes(affiliationName)) {
+      user.affiliation.push(affiliationName);
+    }
   }
 
   // requestAdmin: true면 유저 admin 권한 true로 변경
@@ -37,8 +42,6 @@ export const handleAffiliationApproval = async (requestId) => {
     }
     user.admin[affiliationName] = true;
   }
-
-  // User.affiliation에는 아무것도 추가하지 않음
 
   await user.save();
 
