@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import db from "../config/db.js";
 
 const affiliationRequestSchema = new mongoose.Schema(
   {
@@ -19,8 +20,10 @@ const affiliationRequestSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const AffiliationRequest = mongoose.model(
+// 중요: 기본 mongoose 인스턴스가 아닌 db 인스턴스를 사용
+const AffiliationRequest = db.model(
   "AffiliationRequest",
   affiliationRequestSchema
 );
+
 export default AffiliationRequest;

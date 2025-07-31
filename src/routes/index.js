@@ -74,6 +74,6 @@ router.use("/fcm", fcmTokenRoutes);
 router.use("/user", mypageRoutes);
 router.use("/user", userAffiliationUpdate);
 
-router.post("/affiliation", affiliationRequestRoutes);
+router.use("/affiliation", affiliationRequestRoutes);
 
 export default router;
