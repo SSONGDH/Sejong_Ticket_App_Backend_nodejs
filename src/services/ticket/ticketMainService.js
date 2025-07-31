@@ -2,6 +2,10 @@ import Ticket from "../../models/ticketModel.js";
 import Refund from "../../models/refundModel.js";
 import Payment from "../../models/paymentModel.js";
 import User from "../../models/userModel.js";
+import moment from "moment";
+import "moment/locale/ko"; // 한글 요일 지원
+
+moment.locale("ko"); // 전역 로케일 설정
 
 export const getTicketStatus = async (ticketId) => {
   const ticket = await Ticket.findById(ticketId);
@@ -38,11 +42,30 @@ export const getUserTicketsWithStatus = async (studentId) => {
     return null;
   }
 
-  // 각 티켓 상태 조회
   const ticketStatuses = await Promise.all(
     tickets.map(async (ticket) => {
       const status = await getTicketStatus(ticket._id);
-      return { ...ticket.toObject(), status };
+
+      // 날짜, 시간 포맷 변경
+      const formattedEventDay = moment(ticket.eventDay).format(
+        "YYYY.MM.DD(ddd)"
+      );
+      const formattedStartTime = moment(ticket.eventStartTime, [
+        "HH:mm:ss",
+        "HH:mm",
+      ]).format("HH:mm");
+      const formattedEndTime = moment(ticket.eventEndTime, [
+        "HH:mm:ss",
+        "HH:mm",
+      ]).format("HH:mm");
+
+      return {
+        ...ticket.toObject(),
+        eventDay: formattedEventDay,
+        eventStartTime: formattedStartTime,
+        eventEndTime: formattedEndTime,
+        status,
+      };
     })
   );
 

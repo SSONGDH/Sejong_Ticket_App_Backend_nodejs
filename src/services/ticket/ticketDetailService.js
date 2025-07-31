@@ -1,4 +1,8 @@
 import Ticket from "../../models/ticketModel.js";
+import moment from "moment";
+import "moment/locale/ko"; // 한글 요일 지원
+
+moment.locale("ko"); // 한글 요일 출력 설정
 
 export const getTicketDetail = async (ticketId) => {
   const ticket = await Ticket.findById(ticketId, {
@@ -21,10 +25,28 @@ export const getTicketDetail = async (ticketId) => {
     };
   }
 
+  // 날짜와 시간 포맷 변경
+  const formattedEventDay = moment(ticket.eventDay).format("YYYY.MM.DD(ddd)");
+  const formattedStartTime = moment(ticket.eventStartTime, [
+    "HH:mm:ss",
+    "HH:mm",
+  ]).format("HH:mm");
+  const formattedEndTime = moment(ticket.eventEndTime, [
+    "HH:mm:ss",
+    "HH:mm",
+  ]).format("HH:mm");
+
+  const formattedTicket = {
+    ...ticket.toObject(),
+    eventDay: formattedEventDay,
+    eventStartTime: formattedStartTime,
+    eventEndTime: formattedEndTime,
+  };
+
   return {
     status: 200,
     code: "SUCCESS-0000",
     message: "요청에 성공하였습니다.",
-    result: ticket,
+    result: formattedTicket,
   };
 };
