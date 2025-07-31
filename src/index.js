@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import { exec } from "child_process";
 
 import db from "./config/db.js";
 import routes from "./routes/index.js"; // 메인 API 라우터
@@ -35,19 +36,31 @@ app.use(
 app.use("/", routes);
 
 // --- Webhook 서버 라우트 추가 ---
-app.post("/webhook", async (req, res) => {
+app.post("/webhook", express.json(), (req, res) => {
   try {
-    // TODO: 필요에 따라 인증 검증 코드 작성
     console.log(`[Webhook] Payload received:`, req.body);
 
-    // 예) push 이벤트 감지 시 처리
     const eventType = req.headers["x-github-event"];
     if (eventType === "push") {
-      console.log("GitHub push event received!");
-      // 여기에 git pull 명령 실행 등 자동 배포 로직 작성 가능
-    }
+      console.log(
+        "🔔 GitHub push event received. Pulling latest code and restarting server..."
+      );
 
-    res.status(200).send("Webhook received");
+      exec(
+        "git pull origin master && pm2 restart SEJONG-PASSTIME",
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error(`❌ 자동배포 실패: ${error.message}`);
+            return res.status(500).send("자동배포 실패");
+          }
+          console.log(`✅ 자동배포 성공:\n${stdout}`);
+          if (stderr) console.error(`stderr: ${stderr}`);
+          res.status(200).send("자동배포 성공");
+        }
+      );
+    } else {
+      res.status(200).send("이벤트 무시됨");
+    }
   } catch (error) {
     console.error("Webhook error:", error);
     res.status(500).send("Webhook error");
