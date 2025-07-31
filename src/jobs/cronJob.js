@@ -13,7 +13,7 @@ const startCronJob = () => {
 
     console.log(
       now.format("YYYY-MM-DD HH:mm:ss"),
-      "⏳ [CRON] 이벤트 시작 1시간 전 알림 체크 중..."
+      "이벤트 시작 1시간 전 알림 체크 중..."
     );
 
     const upcomingEvents = await Ticket.find();
@@ -45,12 +45,12 @@ const startCronJob = () => {
           await event.save();
           console.log(
             moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-            `📨 [CRON] 알림 전송 완료: ${event.eventTitle}`
+            `알림 전송 완료: ${event.eventTitle}`
           );
         } catch (err) {
           console.error(
             moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-            `❌ [CRON] 알림 전송 실패: ${event.eventTitle} - ${err.message}`
+            `알림 전송 실패: ${event.eventTitle} - ${err.message}`
           );
         }
         matchCount++;
@@ -62,7 +62,7 @@ const startCronJob = () => {
   cron.schedule("0 0 * * *", async () => {
     console.log(
       moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-      "🌙 [CRON] 자정 - 만료 티켓 삭제 작업 시작"
+      "만료 티켓 삭제 작업 시작"
     );
     await deleteExpiredTickets();
   });
