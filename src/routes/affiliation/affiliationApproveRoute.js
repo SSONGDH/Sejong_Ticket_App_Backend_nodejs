@@ -1,5 +1,5 @@
 import express from "express";
-import { approveAffiliationRequest } from "../../controllers/affiliation/affiliationApproveController";
+import { approveAffiliationRequest } from "../../controllers/affiliation/affiliationApproveController.js";
 
 const router = express.Router();
 
