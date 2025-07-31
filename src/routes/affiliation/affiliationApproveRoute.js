@@ -3,7 +3,7 @@ import { approveAffiliationRequest } from "../controllers/affiliationApproveCont
 
 const router = express.Router();
 
-// 승인 요청 처리 라우트
-router.post("/approve/:requestId", approveAffiliationRequest);
+// 쿼리 파라미터로 받도록 경로 수정
+router.post("/approve", approveAffiliationRequest);
 
 export default router;

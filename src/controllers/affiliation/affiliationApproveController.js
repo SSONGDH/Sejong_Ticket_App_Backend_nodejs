@@ -1,8 +1,11 @@
-import { handleAffiliationApproval } from "../services/affiliationApproveService.js";
-
 export const approveAffiliationRequest = async (req, res) => {
   try {
-    const { requestId } = req.params;
+    const requestId = req.query.requestId; // 쿼리 파라미터로 받음
+
+    if (!requestId) {
+      return res.status(400).json({ message: "requestId가 필요합니다." });
+    }
+
     const result = await handleAffiliationApproval(requestId);
     res.status(200).json(result);
   } catch (err) {
