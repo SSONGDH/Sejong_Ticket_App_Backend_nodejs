@@ -20,16 +20,11 @@ export const postAffiliationRequest = async (req, res) => {
       });
     }
 
-    const {
-      phoneNumber,
-      affiliationName,
-      createAffiliation,
-      requestAdmin,
-      comment,
-    } = req.body;
+    const { phone, affiliationName, createAffiliation, requestAdmin, comment } =
+      req.body;
 
     if (
-      !phoneNumber ||
+      !phone ||
       !affiliationName ||
       createAffiliation == null ||
       requestAdmin == null
@@ -44,7 +39,7 @@ export const postAffiliationRequest = async (req, res) => {
       name: userProfile.name,
       major: userProfile.major,
       studentId: userProfile.studentId,
-      phoneNumber,
+      phone,
       affiliationName,
       createAffiliation,
       requestAdmin,
