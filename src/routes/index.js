@@ -30,6 +30,7 @@ import adminConnectionRoutes from "./admin/adminConnection.js";
 import fcmTokenRoutes from "./FCM/fcmTokenAddRoute.js";
 
 import mypageRoutes from "./user/mypageRoute.js";
+import userAffiliationUpdate from "./user/userAffiliationUpdate.js";
 
 import affiliationRequestRoutes from "./affiliation/affiliationRequestRoute.js";
 
@@ -71,6 +72,7 @@ router.use("/admin", adminConnectionRoutes);
 router.use("/fcm", fcmTokenRoutes);
 
 router.use("/user", mypageRoutes);
+router.use("/user", userAffiliationUpdate);
 
 router.post("/affiliation", affiliationRequestRoutes);
 
