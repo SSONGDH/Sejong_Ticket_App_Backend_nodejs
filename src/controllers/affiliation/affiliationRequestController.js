@@ -20,7 +20,7 @@ export const postAffiliationRequest = async (req, res) => {
       });
     }
 
-    const { phone, affiliationName, createAffiliation, requestAdmin, comment } =
+    const { phone, affiliationName, createAffiliation, requestAdmin } =
       req.body;
 
     if (
@@ -43,7 +43,6 @@ export const postAffiliationRequest = async (req, res) => {
       affiliationName,
       createAffiliation,
       requestAdmin,
-      comment: comment || "",
     };
 
     const saved = await submitAffiliationRequest(requestData);
