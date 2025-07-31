@@ -10,7 +10,6 @@ const affiliationRequestSchema = new mongoose.Schema(
     affiliationName: { type: String, required: true }, // 만들고자 하는 소속 이름
     createAffiliation: { type: Boolean, required: true },
     requestAdmin: { type: Boolean, required: true },
-    comment: { type: String, default: "" }, // 비고
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
