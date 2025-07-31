@@ -1,4 +1,4 @@
-import { handleAffiliationApproval } from "../../services/affiliationApproveService.js";
+import { handleAffiliationApproval } from "../../services/affiliation/affiliationApproveService.js";
 
 export const approveAffiliationRequest = async (req, res) => {
   try {
