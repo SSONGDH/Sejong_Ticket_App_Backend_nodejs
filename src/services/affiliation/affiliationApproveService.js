@@ -1,6 +1,6 @@
 import AffiliationRequest from "../../models/affiliationRequestModel.js";
 import User from "../../models/userModel.js";
-import Affiliation from "../../models/affiliationModel.js"; // 새로 추가
+import Affiliation from "../../models/affiliationModel.js";
 
 export const handleAffiliationApproval = async (requestId) => {
   const request = await AffiliationRequest.findById(requestId);
@@ -17,23 +17,8 @@ export const handleAffiliationApproval = async (requestId) => {
 
   const affiliationName = request.affiliationName;
 
-  // 소속 추가 (중복 없이)
-  if (!user.affiliation) user.affiliation = [];
-  if (!user.affiliation.includes(affiliationName)) {
-    user.affiliation.push(affiliationName);
-  }
-
-  // 관리자인 경우 admin 필드에 추가 (구조: { 소속: true } 형태)
-  if (request.requestAdmin) {
-    if (!user.admin || typeof user.admin !== "object") {
-      user.admin = {};
-    }
-    user.admin[affiliationName] = true;
-  }
-
-  // 소속 DB에 저장 / 업데이트
+  // createAffiliation: true인 경우에만 새 소속 생성
   if (request.createAffiliation) {
-    // 새 소속 생성
     const existing = await Affiliation.findOne({ name: affiliationName });
     if (!existing) {
       // 새 소속 생성 시 멤버 수는 1명 (승인된 유저)
@@ -42,32 +27,18 @@ export const handleAffiliationApproval = async (requestId) => {
         membersCount: 1,
         admins: request.requestAdmin ? [user._id] : [],
       });
-    } else {
-      // 이미 존재하면 멤버 수 +1, 관리자 권한이 있으면 admins에 추가
-      if (!existing.admins.includes(user._id) && request.requestAdmin) {
-        existing.admins.push(user._id);
-      }
-      existing.membersCount += 1;
-      await existing.save();
-    }
-  } else {
-    // 기존 소속이라면 멤버 수 +1, 관리자 권한 있으면 admins에 추가
-    const existing = await Affiliation.findOne({ name: affiliationName });
-    if (existing) {
-      if (!existing.admins.includes(user._id) && request.requestAdmin) {
-        existing.admins.push(user._id);
-      }
-      existing.membersCount += 1;
-      await existing.save();
-    } else {
-      // 기존 소속인데 DB에 없으면 새로 생성 (멤버 1명)
-      await Affiliation.create({
-        name: affiliationName,
-        membersCount: 1,
-        admins: request.requestAdmin ? [user._id] : [],
-      });
     }
   }
+
+  // requestAdmin: true면 유저 admin 권한 true로 변경
+  if (request.requestAdmin) {
+    if (!user.admin || typeof user.admin !== "object") {
+      user.admin = {};
+    }
+    user.admin[affiliationName] = true;
+  }
+
+  // User.affiliation에는 아무것도 추가하지 않음
 
   await user.save();
 
