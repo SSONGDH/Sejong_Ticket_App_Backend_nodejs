@@ -23,7 +23,9 @@ export const getTicketRefundDetail = async (ticketId) => {
     eventName: ticket.eventTitle,
     visitDate: refund.visitDate,
     visitTime: refund.visitTime,
-    refundPermissionStatus: refund.refundPermissionStatus ? "승인됨" : "미승인",
+    refundPermissionStatus: refund.refundPermissionStatus
+      ? "사용 가능"
+      : "사용 불가",
     refundReason: refund.refundReason,
     _id: refund._id,
   };

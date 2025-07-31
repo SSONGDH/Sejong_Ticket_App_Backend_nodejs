@@ -23,8 +23,8 @@ export const getTicketStatus = async (ticketId) => {
 
   const payment = await Payment.findOne({ ticketId });
   if (payment) {
-    if (payment.paymentPermissionStatus === false) return "미승인";
-    if (payment.paymentPermissionStatus === true) return "승인됨";
+    if (payment.paymentPermissionStatus === false) return "사용 불가";
+    if (payment.paymentPermissionStatus === true) return "사용 가능";
   }
 
   return "상태 없음";
