@@ -35,6 +35,8 @@ import userAffiliationUpdate from "./user/userAffiliationUpdate.js";
 import affiliationRequestRoutes from "./affiliation/affiliationRequestRoute.js";
 import affiliationApproveRoutes from "./affiliation/affiliationApproveRoute.js";
 
+import rootConnectionRoutes from "./root/rootConnection.js";
+
 const router = express.Router();
 
 // auth
@@ -68,6 +70,8 @@ router.use("/payment", paymentDenyRoutes);
 
 // admin
 router.use("/admin", adminConnectionRoutes);
+
+router.use("/root", rootConnectionRoutes);
 
 // FCM
 router.use("/fcm", fcmTokenRoutes);
