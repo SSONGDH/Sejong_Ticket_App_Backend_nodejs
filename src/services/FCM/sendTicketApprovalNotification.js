@@ -15,6 +15,14 @@ const sendTicketApprovalNotification = async (userId, eventTitle) => {
       return;
     }
 
+    // 🔽 알림 설정이 꺼져있는 경우 전송하지 않음
+    if (!user.notification) {
+      console.log(
+        `⚠️ ${user.name}의 알림 설정이 비활성화되어 있어 알림을 전송하지 않습니다.`
+      );
+      return;
+    }
+
     const message = {
       token: user.fcmToken,
       notification: {

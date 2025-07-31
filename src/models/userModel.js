@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
     root: { type: Boolean, default: false },
     fcmToken: { type: String, default: null },
     affiliation: { type: [String], default: null },
+    notification: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

@@ -13,6 +13,11 @@ const sendRefundNotification = async (userId) => {
       return;
     }
 
+    if (!user.notification) {
+      console.log(`🔕 유저가 알림 수신을 꺼둠: userId=${userId}`);
+      return;
+    }
+
     const message = {
       token: user.fcmToken,
       notification: {

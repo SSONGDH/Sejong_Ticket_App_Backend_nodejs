@@ -26,10 +26,10 @@ const sendEventReminderNotification = async (eventId) => {
     );
 
     for (const user of users) {
-      if (!user.fcmToken) {
+      if (!user.fcmToken || user.notification !== true) {
         console.log(
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-          `⚠️ 사용자 ${user.name}의 FCM 토큰이 없습니다.`
+          `⚠️ 사용자 ${user.name}은 알림 설정이 꺼져있거나 FCM 토큰이 없습니다.`
         );
         continue;
       }
