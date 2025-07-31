@@ -1,5 +1,5 @@
 import AffiliationRequest from "../../models/affiliationRequestModel.js";
-import User from "../models/userModel.js";
+import User from "../../models/userModel.js";
 
 export const handleAffiliationApproval = async (requestId) => {
   const request = await AffiliationRequest.findById(requestId);
