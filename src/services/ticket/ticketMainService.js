@@ -3,7 +3,7 @@ import Refund from "../../models/refundModel.js";
 import Payment from "../../models/paymentModel.js";
 import User from "../../models/userModel.js";
 import moment from "moment";
-import "moment/locale/ko"; // 한글 요일 지원
+import "moment/locale/ko.js"; // 한글 요일 지원
 
 moment.locale("ko"); // 전역 로케일 설정
 

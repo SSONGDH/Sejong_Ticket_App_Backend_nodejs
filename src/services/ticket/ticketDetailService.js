@@ -1,6 +1,6 @@
 import Ticket from "../../models/ticketModel.js";
 import moment from "moment";
-import "moment/locale/ko"; // 한글 요일 지원
+import "moment/locale/ko.js"; // 한글 요일 지원
 
 moment.locale("ko"); // 한글 요일 출력 설정
 
