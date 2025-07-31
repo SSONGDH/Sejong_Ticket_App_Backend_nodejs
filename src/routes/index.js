@@ -33,6 +33,7 @@ import mypageRoutes from "./user/mypageRoute.js";
 import userAffiliationUpdate from "./user/userAffiliationUpdate.js";
 
 import affiliationRequestRoutes from "./affiliation/affiliationRequestRoute.js";
+import affiliationApproveRoutes from "./affiliation/affiliationApproveRoute.js";
 
 const router = express.Router();
 
@@ -75,5 +76,6 @@ router.use("/user", mypageRoutes);
 router.use("/user", userAffiliationUpdate);
 
 router.use("/affiliation", affiliationRequestRoutes);
+router.use("/affiliation", affiliationApproveRoutes);
 
 export default router;
