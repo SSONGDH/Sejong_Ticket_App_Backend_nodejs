@@ -37,6 +37,8 @@ import affiliationApproveRoutes from "./affiliation/affiliationApproveRoute.js";
 
 import rootConnectionRoutes from "./root/rootConnection.js";
 
+import notificationRoutes from "./notification/notificationRoute.js";
+
 const router = express.Router();
 
 // auth
@@ -81,5 +83,7 @@ router.use("/user", userAffiliationUpdate);
 
 router.use("/affiliation", affiliationRequestRoutes);
 router.use("/affiliation", affiliationApproveRoutes);
+
+router.use("/notification", notificationRoutes);
 
 export default router;
