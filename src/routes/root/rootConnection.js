@@ -1,5 +1,5 @@
 import express from "express";
-import { rootConnection } from "../../../controllers/root/rootConnectionController.js";
+import { rootConnection } from "../../controllers/root/rootConnectionController.js";
 
 const router = express.Router();
 
