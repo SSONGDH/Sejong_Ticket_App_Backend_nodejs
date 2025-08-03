@@ -18,12 +18,16 @@ const upload = multer({ storage });
 
 router.post(
   "/createTicket",
-  upload.single("eventPlacePicture"),
   (req, res, next) => {
-    console.log("Current working directory:", process.cwd());
-    console.log("Uploaded file info:", req.file);
+    console.log("Request received");
     next();
   },
-  createTicketController
+  upload.single("eventPlacePicture"),
+  (req, res, next) => {
+    console.log("After multer");
+    console.log("req.file:", req.file);
+    res.json({ message: "Upload received" });
+  }
 );
+
 export default router;
