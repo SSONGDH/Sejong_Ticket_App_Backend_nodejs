@@ -24,8 +24,6 @@ router.post(
   },
   upload.single("eventPlacePicture"),
   (req, res, next) => {
-    console.log("After multer");
-    console.log("req.file:", req.file);
     res.json({ message: "Upload received" });
   }
 );
