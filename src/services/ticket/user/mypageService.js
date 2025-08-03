@@ -1,5 +1,5 @@
-import User from "../../models/userModel.js";
-import Affiliation from "../../models/affiliationModel.js"; // 소속 모델 추가
+import User from "../../../models/userModel.js";
+import Affiliation from "../../../models/affiliationModel.js"; // 소속 모델 추가
 
 // 학생ID로 마이페이지 정보 조회
 export const getMyPageInfoByStudentId = async (studentId) => {
