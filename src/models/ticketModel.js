@@ -13,6 +13,10 @@ const ticketSchema = new mongoose.Schema(
     eventCode: String,
     eventPlacePicture: String,
     status: String,
+    affiliation: {
+      type: String,
+      required: true,
+    },
     reminderSent: {
       type: Boolean,
       default: false,
