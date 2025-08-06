@@ -4,7 +4,7 @@ import { createTicketController } from "../../controllers/ticket/createTicketCon
 
 const router = express.Router();
 
-// 이미지 저장 설정
+// Multer 이미지 저장 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/eventPlacePictures/");
@@ -18,14 +18,13 @@ const upload = multer({ storage });
 
 router.post(
   "/createTicket",
-  (req, res, next) => {
-    console.log("Request received");
-    next();
-  },
   upload.single("eventPlacePicture"),
   (req, res, next) => {
-    res.json({ message: "Upload received" });
-  }
+    console.log("Request received");
+    console.log("Uploaded file info:", req.file);
+    next();
+  },
+  createTicketController
 );
 
 export default router;
