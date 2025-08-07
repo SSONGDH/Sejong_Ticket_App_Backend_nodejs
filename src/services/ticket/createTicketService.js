@@ -31,6 +31,7 @@ export const createTicket = async (body, file, req) => {
     naverPlace, // ✅ 네이버 장소 필드
   } = body;
 
+  console.log("📍 naverPlace 값:", naverPlace); // <-- 여기에 추가
   // 필수값 검사
   if (
     !eventTitle ||
