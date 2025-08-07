@@ -1,3 +1,22 @@
+import Ticket from "../../models/ticketModel.js";
+import moment from "moment";
+
+/**
+ * 중복되지 않는 랜덤 eventCode 생성
+ */
+const generateUniqueEventCode = async () => {
+  let uniqueCode;
+  let isUnique = false;
+
+  while (!isUnique) {
+    uniqueCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const existingTicket = await Ticket.findOne({ eventCode: uniqueCode });
+    if (!existingTicket) isUnique = true;
+  }
+
+  return uniqueCode;
+};
+
 export const createTicket = async (body, file, req) => {
   const {
     eventTitle,
@@ -8,8 +27,7 @@ export const createTicket = async (body, file, req) => {
     eventPlaceComment,
     eventComment,
     eventCode,
-    affiliation,
-    kakaoplace, // ✅ 추가
+    affiliation, // ✅ 소속 필드 추가
   } = body;
 
   if (
@@ -20,7 +38,7 @@ export const createTicket = async (body, file, req) => {
     !eventPlace ||
     !eventPlaceComment ||
     !eventComment ||
-    !affiliation
+    !affiliation // ✅ 필수값 검사에 소속 추가
   ) {
     return {
       status: 400,
@@ -65,8 +83,7 @@ export const createTicket = async (body, file, req) => {
     eventComment,
     eventCode: finalEventCode,
     eventPlacePicture,
-    affiliation,
-    kakaoplace: kakaoplace || null, // ✅ 추가
+    affiliation, // ✅ DB에 저장
   });
 
   const savedTicket = await newTicket.save();
