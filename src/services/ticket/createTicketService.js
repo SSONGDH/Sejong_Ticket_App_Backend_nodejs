@@ -27,9 +27,11 @@ export const createTicket = async (body, file, req) => {
     eventPlaceComment,
     eventComment,
     eventCode,
-    affiliation, // ✅ 소속 필드 추가
+    affiliation, // ✅ 소속 필드
+    naverPlace, // ✅ 네이버 장소 필드
   } = body;
 
+  // 필수값 검사
   if (
     !eventTitle ||
     !eventDay ||
@@ -38,7 +40,7 @@ export const createTicket = async (body, file, req) => {
     !eventPlace ||
     !eventPlaceComment ||
     !eventComment ||
-    !affiliation // ✅ 필수값 검사에 소속 추가
+    !affiliation
   ) {
     return {
       status: 400,
@@ -47,6 +49,7 @@ export const createTicket = async (body, file, req) => {
     };
   }
 
+  // 중복 이벤트 코드 검사 또는 생성
   let finalEventCode = eventCode?.trim() || null;
 
   if (finalEventCode) {
@@ -62,6 +65,7 @@ export const createTicket = async (body, file, req) => {
     finalEventCode = await generateUniqueEventCode();
   }
 
+  // 시간 포맷
   const formattedEventStartTime = moment(eventStartTime, "HH:mm:ss").format(
     "HH:mm:ss"
   );
@@ -69,10 +73,12 @@ export const createTicket = async (body, file, req) => {
     "HH:mm:ss"
   );
 
+  // 이미지 URL
   const eventPlacePicture = file
     ? `${req.protocol}://${req.get("host")}/eventUploads/${file.filename}`
     : null;
 
+  // 새 티켓 생성
   const newTicket = new Ticket({
     eventTitle,
     eventDay,
@@ -83,7 +89,8 @@ export const createTicket = async (body, file, req) => {
     eventComment,
     eventCode: finalEventCode,
     eventPlacePicture,
-    affiliation, // ✅ DB에 저장
+    affiliation,
+    naverPlace, // ✅ 네이버 장소 정보 저장
   });
 
   const savedTicket = await newTicket.save();
