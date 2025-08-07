@@ -21,7 +21,7 @@ const ticketSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    kakaoPlace: {
+    naverPlace: {
       place_name: String,
       address_name: String,
       x: String, // 또는 Number로 저장하고 싶으면 Number로 변경 가능
