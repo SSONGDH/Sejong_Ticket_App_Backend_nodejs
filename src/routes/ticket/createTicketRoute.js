@@ -20,8 +20,6 @@ router.post(
   "/createTicket",
   upload.single("eventPlacePicture"),
   (req, res, next) => {
-    console.log("Request received");
-    console.log("Uploaded file info:", req.file);
     next();
   },
   createTicketController
