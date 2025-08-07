@@ -18,7 +18,7 @@ const generateUniqueEventCode = async () => {
 };
 
 export const createTicket = async (body, file, req) => {
-  const {
+  let {
     eventTitle,
     eventDay,
     eventStartTime,
@@ -28,11 +28,19 @@ export const createTicket = async (body, file, req) => {
     eventComment,
     eventCode,
     affiliation, // ✅ 소속 필드
-    naverPlace, // ✅ 네이버 장소 필드
+    kakaoPlace, // ✅ 네이버 장소 필드
   } = body;
 
-  console.log("naverPlace 타입:", typeof naverPlace);
-  console.log("📍 naverPlace 값:", naverPlace); // <-- 여기에 추가
+  // kakaoPlace가 문자열이면 JSON.parse로 변환
+  if (typeof kakaoPlace === "string") {
+    try {
+      kakaoPlace = JSON.parse(kakaoPlace);
+    } catch (error) {
+      console.error("⚠️ kakaoPlace JSON 파싱 오류:", error);
+      kakaoPlace = null;
+    }
+  }
+
   // 필수값 검사
   if (
     !eventTitle ||
@@ -51,7 +59,7 @@ export const createTicket = async (body, file, req) => {
     };
   }
 
-  // 중복 이벤트 코드 검사 또는 생성
+  // 이벤트 코드 중복 검사 또는 생성
   let finalEventCode = eventCode?.trim() || null;
 
   if (finalEventCode) {
@@ -67,7 +75,7 @@ export const createTicket = async (body, file, req) => {
     finalEventCode = await generateUniqueEventCode();
   }
 
-  // 시간 포맷
+  // 시간 포맷팅
   const formattedEventStartTime = moment(eventStartTime, "HH:mm:ss").format(
     "HH:mm:ss"
   );
@@ -75,12 +83,12 @@ export const createTicket = async (body, file, req) => {
     "HH:mm:ss"
   );
 
-  // 이미지 URL
+  // 이미지 URL 생성
   const eventPlacePicture = file
     ? `${req.protocol}://${req.get("host")}/eventUploads/${file.filename}`
     : null;
 
-  // 새 티켓 생성
+  // 새 티켓 생성 및 저장
   const newTicket = new Ticket({
     eventTitle,
     eventDay,
@@ -92,7 +100,7 @@ export const createTicket = async (body, file, req) => {
     eventCode: finalEventCode,
     eventPlacePicture,
     affiliation,
-    naverPlace, // ✅ 네이버 장소 정보 저장
+    kakaoPlace, // 네이버 장소 정보
   });
 
   const savedTicket = await newTicket.save();

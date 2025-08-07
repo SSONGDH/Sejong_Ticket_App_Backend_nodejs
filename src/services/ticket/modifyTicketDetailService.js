@@ -28,7 +28,7 @@ export const createTicket = async (body, file, req) => {
     eventComment,
     eventCode,
     affiliation,
-    naverPlace, // 전체 객체를 받음
+    kakaoPlace, // 전체 객체를 받음
   } = body;
 
   if (
@@ -48,14 +48,14 @@ export const createTicket = async (body, file, req) => {
     };
   }
 
-  // naverPlace는 optional이지만, 만약 들어온다면 구조 체크 (간단히)
-  const validnaverPlace =
-    naverPlace &&
-    typeof naverPlace === "object" &&
-    naverPlace.place_name &&
-    naverPlace.address_name &&
-    naverPlace.x &&
-    naverPlace.y;
+  // kakaoPlace는 optional이지만, 만약 들어온다면 구조 체크 (간단히)
+  const validkakaoPlace =
+    kakaoPlace &&
+    typeof kakaoPlace === "object" &&
+    kakaoPlace.place_name &&
+    kakaoPlace.address_name &&
+    kakaoPlace.x &&
+    kakaoPlace.y;
 
   let finalEventCode = eventCode?.trim() || null;
 
@@ -94,7 +94,7 @@ export const createTicket = async (body, file, req) => {
     eventCode: finalEventCode,
     eventPlacePicture,
     affiliation,
-    naverPlace: validnaverPlace ? naverPlace : null,
+    kakaoPlace: validkakaoPlace ? kakaoPlace : null,
   });
 
   const savedTicket = await newTicket.save();
@@ -127,7 +127,7 @@ export const getTicketDetailById = async (ticketId) => {
     eventPlacePicture: 1,
     eventCode: 1,
     affiliation: 1,
-    naverPlace: 1,
+    kakaoPlace: 1,
   });
 
   if (!ticket) {
