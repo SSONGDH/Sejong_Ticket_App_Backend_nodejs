@@ -12,7 +12,8 @@ export const modifyTicket = async (body, file, req) => {
     eventPlaceComment,
     eventComment,
     eventCode,
-    affiliation, // ✅ 소속 추가
+    affiliation, // ✅ 소속
+    kakaoPlace, // ✅ 카카오 장소 정보
   } = body;
 
   if (!_id) {
@@ -62,7 +63,8 @@ export const modifyTicket = async (body, file, req) => {
       eventCode,
       eventPlacePicture,
       reminderSent,
-      affiliation, // ✅ 업데이트에 소속 포함
+      affiliation,
+      kakaoPlace: kakaoPlace || existingTicket.kakaoPlace, // ✅ 업데이트에 kakaoPlace 포함
     },
     { new: true }
   );

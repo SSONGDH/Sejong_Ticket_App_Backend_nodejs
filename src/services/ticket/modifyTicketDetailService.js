@@ -19,6 +19,8 @@ export const getTicketDetailById = async (ticketId) => {
     eventPlaceComment: 1,
     eventPlacePicture: 1,
     eventCode: 1,
+    affiliation: 1, // ✅ 소속 추가
+    kakaoPlace: 1, // ✅ 카카오 장소 정보 추가
   });
 
   if (!ticket) {
