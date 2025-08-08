@@ -31,6 +31,26 @@ export const createTicket = async (body) => {
     kakaoPlace,
   } = body;
 
+  // 누락 필드 리스트 만들기
+  const missingFields = [];
+  if (!eventTitle) missingFields.push("eventTitle");
+  if (!eventDay) missingFields.push("eventDay");
+  if (!eventStartTime) missingFields.push("eventStartTime");
+  if (!eventEndTime) missingFields.push("eventEndTime");
+  if (!eventPlace) missingFields.push("eventPlace");
+  if (!eventPlaceComment) missingFields.push("eventPlaceComment");
+  if (!eventComment) missingFields.push("eventComment");
+  if (!affiliation) missingFields.push("affiliation");
+
+  if (missingFields.length > 0) {
+    console.error(`❗ 필수 필드 누락: [${missingFields.join(", ")}]`);
+    return {
+      status: 400,
+      code: "ERROR-0003",
+      message: `다음 필드를 채워주세요: ${missingFields.join(", ")}`,
+    };
+  }
+
   // kakaoPlace가 문자열이면 JSON.parse로 변환
   if (typeof kakaoPlace === "string") {
     try {
@@ -39,24 +59,6 @@ export const createTicket = async (body) => {
       console.error("⚠️ kakaoPlace JSON 파싱 오류:", error);
       kakaoPlace = null;
     }
-  }
-
-  // 필수값 검사
-  if (
-    !eventTitle ||
-    !eventDay ||
-    !eventStartTime ||
-    !eventEndTime ||
-    !eventPlace ||
-    !eventPlaceComment ||
-    !eventComment ||
-    !affiliation
-  ) {
-    return {
-      status: 400,
-      code: "ERROR-0003",
-      message: "모든 필드를 채워주세요.",
-    };
   }
 
   // 이벤트 코드 생성 또는 중복 검사
