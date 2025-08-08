@@ -17,7 +17,7 @@ const generateUniqueEventCode = async () => {
   return uniqueCode;
 };
 
-export const createTicket = async (body, req) => {
+export const createTicket = async (body) => {
   let {
     eventTitle,
     eventDay,
@@ -27,8 +27,8 @@ export const createTicket = async (body, req) => {
     eventPlaceComment,
     eventComment,
     eventCode,
-    affiliation, // ✅ 소속 필드
-    kakaoPlace, // ✅ 장소 정보
+    affiliation,
+    kakaoPlace,
   } = body;
 
   // kakaoPlace가 문자열이면 JSON.parse로 변환
@@ -59,7 +59,7 @@ export const createTicket = async (body, req) => {
     };
   }
 
-  // 이벤트 코드 중복 검사 또는 생성
+  // 이벤트 코드 생성 또는 중복 검사
   let finalEventCode = eventCode?.trim() || null;
 
   if (finalEventCode) {
@@ -83,7 +83,7 @@ export const createTicket = async (body, req) => {
     "HH:mm:ss"
   );
 
-  // 새 티켓 생성 및 저장 (✅ eventPlacePicture 제거됨)
+  // 새 티켓 생성
   const newTicket = new Ticket({
     eventTitle,
     eventDay,
