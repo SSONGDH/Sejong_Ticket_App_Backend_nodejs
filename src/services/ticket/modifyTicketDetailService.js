@@ -17,7 +17,7 @@ const generateUniqueEventCode = async () => {
   return uniqueCode;
 };
 
-export const createTicket = async (body, file, req) => {
+export const createTicket = async (body) => {
   const {
     eventTitle,
     eventDay,
@@ -79,9 +79,7 @@ export const createTicket = async (body, file, req) => {
     "HH:mm:ss"
   );
 
-  const eventPlacePicture = file
-    ? `${req.protocol}://${req.get("host")}/eventUploads/${file.filename}`
-    : null;
+  // 사진 관련 필드 제거됨
 
   const newTicket = new Ticket({
     eventTitle,
@@ -92,7 +90,6 @@ export const createTicket = async (body, file, req) => {
     eventPlaceComment,
     eventComment,
     eventCode: finalEventCode,
-    eventPlacePicture,
     affiliation,
     kakaoPlace: validkakaoPlace ? kakaoPlace : null,
   });
@@ -124,7 +121,6 @@ export const getTicketDetailById = async (ticketId) => {
     eventPlace: 1,
     eventComment: 1,
     eventPlaceComment: 1,
-    eventPlacePicture: 1,
     eventCode: 1,
     affiliation: 1,
     kakaoPlace: 1,

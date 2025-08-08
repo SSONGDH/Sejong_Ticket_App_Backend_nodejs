@@ -13,7 +13,7 @@ export const getTicketDetail = async (ticketId) => {
     eventPlace: 1,
     eventComment: 1,
     eventPlaceComment: 1,
-    eventPlacePicture: 1,
+
     affiliation: 1, // ✅ 추가
     kakaoPlace: 1, // ✅ 추가
   });

@@ -1,7 +1,7 @@
 import Ticket from "../../models/ticketModel.js";
 import moment from "moment";
 
-export const modifyTicket = async (body, file, req) => {
+export const modifyTicket = async (body, req) => {
   const {
     _id,
     eventTitle,
@@ -46,10 +46,6 @@ export const modifyTicket = async (body, file, req) => {
     reminderSent = false;
   }
 
-  const eventPlacePicture = file
-    ? `${req.protocol}://${req.get("host")}/eventUploads/${file.filename}`
-    : existingTicket.eventPlacePicture;
-
   const updatedTicket = await Ticket.findByIdAndUpdate(
     _id,
     {
@@ -61,7 +57,6 @@ export const modifyTicket = async (body, file, req) => {
       eventPlaceComment,
       eventComment,
       eventCode,
-      eventPlacePicture,
       reminderSent,
       affiliation,
       kakaoPlace: kakaoPlace || existingTicket.kakaoPlace, // ✅ 업데이트에 kakaoPlace 포함
