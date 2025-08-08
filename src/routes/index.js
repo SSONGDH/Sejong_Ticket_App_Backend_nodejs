@@ -34,6 +34,7 @@ import userAffiliationUpdate from "./user/userAffiliationUpdate.js";
 
 import affiliationRequestRoutes from "./affiliation/affiliationRequestRoute.js";
 import affiliationApproveRoutes from "./affiliation/affiliationApproveRoute.js";
+import affiliationListRoutes from "./affiliation/affiliationListRoute.js";
 
 import rootConnectionRoutes from "./root/rootConnection.js";
 
@@ -83,6 +84,7 @@ router.use("/user", userAffiliationUpdate);
 
 router.use("/affiliation", affiliationRequestRoutes);
 router.use("/affiliation", affiliationApproveRoutes);
+router.use("/affiliation", affiliationListRoutes);
 
 router.use("/notification", notificationRoutes);
 

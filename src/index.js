@@ -23,11 +23,6 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// 정적 파일 경로 설정
-app.use(
-  "/eventUploads",
-  express.static(path.join(__dirname, "..", "uploads", "eventPlacePictures"))
-);
 app.use(
   "/paymentPictures",
   express.static(path.join(__dirname, "..", "uploads", "paymentPictures"))
