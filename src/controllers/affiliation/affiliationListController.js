@@ -1,4 +1,4 @@
-import { getAllAffiliations } from "../../services/affiliation/AffiliationListService.js";
+import { getAllAffiliations } from "../../services/affiliation/affiliationListService.js";
 
 export const getAffiliationListController = async (req, res) => {
   try {
