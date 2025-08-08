@@ -11,7 +11,6 @@ const ticketSchema = new mongoose.Schema(
     eventPlaceComment: String,
     eventComment: String,
     eventCode: String,
-    eventPlacePicture: String,
     status: String,
     affiliation: {
       type: String,

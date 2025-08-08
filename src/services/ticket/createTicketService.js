@@ -17,7 +17,7 @@ const generateUniqueEventCode = async () => {
   return uniqueCode;
 };
 
-export const createTicket = async (body, file, req) => {
+export const createTicket = async (body, req) => {
   let {
     eventTitle,
     eventDay,
@@ -28,7 +28,7 @@ export const createTicket = async (body, file, req) => {
     eventComment,
     eventCode,
     affiliation, // ✅ 소속 필드
-    kakaoPlace, // ✅ 네이버 장소 필드
+    kakaoPlace, // ✅ 장소 정보
   } = body;
 
   // kakaoPlace가 문자열이면 JSON.parse로 변환
@@ -83,12 +83,7 @@ export const createTicket = async (body, file, req) => {
     "HH:mm:ss"
   );
 
-  // 이미지 URL 생성
-  const eventPlacePicture = file
-    ? `${req.protocol}://${req.get("host")}/eventUploads/${file.filename}`
-    : null;
-
-  // 새 티켓 생성 및 저장
+  // 새 티켓 생성 및 저장 (✅ eventPlacePicture 제거됨)
   const newTicket = new Ticket({
     eventTitle,
     eventDay,
@@ -98,9 +93,8 @@ export const createTicket = async (body, file, req) => {
     eventPlaceComment,
     eventComment,
     eventCode: finalEventCode,
-    eventPlacePicture,
     affiliation,
-    kakaoPlace, // 네이버 장소 정보
+    kakaoPlace,
   });
 
   const savedTicket = await newTicket.save();

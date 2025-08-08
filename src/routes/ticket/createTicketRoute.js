@@ -1,28 +1,8 @@
 import express from "express";
-import multer from "multer";
 import { createTicketController } from "../../controllers/ticket/createTicketController.js";
 
 const router = express.Router();
 
-// Multer 이미지 저장 설정
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/eventPlacePictures/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-const upload = multer({ storage });
-
-router.post(
-  "/createTicket",
-  upload.single("eventPlacePicture"),
-  (req, res, next) => {
-    next();
-  },
-  createTicketController
-);
+router.post("/createTicket", createTicketController);
 
 export default router;

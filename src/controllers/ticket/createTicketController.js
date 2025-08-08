@@ -2,7 +2,8 @@ import { createTicket } from "../../services/ticket/createTicketService.js";
 
 export const createTicketController = async (req, res) => {
   try {
-    const response = await createTicket(req.body, req.file, req);
+    const response = await createTicket(req.body, req);
+
     return res.status(response.status).json({
       isSuccess: response.status === 201,
       code: response.code,
