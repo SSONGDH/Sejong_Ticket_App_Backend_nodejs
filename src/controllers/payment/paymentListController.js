@@ -1,8 +1,8 @@
-import { getPaymentList } from "../../services/payment/paymentListService.js";
+import { getPaymentListByAdmin } from "../../services/payment/paymentListService.js";
 
 export const paymentListController = async (req, res) => {
   try {
-    const result = await getPaymentList();
+    const result = await getPaymentListByAdmin();
 
     if (!result) {
       return res.status(404).json({

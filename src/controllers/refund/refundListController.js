@@ -1,8 +1,8 @@
-import { getRefundList } from "../../services/refund/refundListService.js";
+import { getRefundListByAdmin } from "../../services/refund/refundListService.js";
 
 export const refundListController = async (req, res) => {
   try {
-    const result = await getRefundList();
+    const result = await getRefundListByAdmin();
 
     if (!result) {
       return res.status(404).json({
