@@ -13,6 +13,7 @@ import modifyTicketRoutes from "./ticket/modifyTicketRoute.js";
 import ticketRefundDetailRoutes from "./ticket/ticketRefundDetailRoute.js";
 import modifyTicketDetailRoutes from "./ticket/modifyTicketDetailRoute.js";
 import ticketDeleteRoutes from "./ticket/ticketDeleteRoute.js";
+import ticketManageMainRoutes from "./ticket/ticketManageMainRoute.js";
 
 import refundRequestRoutes from "./refund/refundRequestRoute.js";
 import refundListRoutes from "./refund/refundListRoute.js";
@@ -56,6 +57,7 @@ router.use("/ticket", modifyTicketRoutes);
 router.use("/ticket", ticketRefundDetailRoutes);
 router.use("/ticket", modifyTicketDetailRoutes);
 router.use("/ticket", ticketDeleteRoutes);
+router.use("/ticket", ticketManageMainRoutes);
 
 // refund
 router.use("/refund", refundRequestRoutes);
