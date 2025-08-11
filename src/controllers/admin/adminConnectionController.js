@@ -24,7 +24,13 @@ export const adminConnection = async (req, res) => {
       });
     }
 
-    if (user.admin === false) {
+    // root는 전체 관리자, 또는 affiliations 중 하나라도 admin:true면 통과
+    const hasAnyAdminRole =
+      user.root === true ||
+      (Array.isArray(user.affiliations) &&
+        user.affiliations.some((aff) => aff.admin === true));
+
+    if (!hasAnyAdminRole) {
       return res.status(403).json({
         isSuccess: false,
         code: "ERROR-0003",

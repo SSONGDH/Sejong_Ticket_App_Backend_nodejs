@@ -5,7 +5,7 @@ const affiliationSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true }, // 소속 이름
     membersCount: { type: Number, default: 0 }, // 멤버 수
-    admins: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // 관리자 유저 리스트
+    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // 모든 멤버
   },
   { timestamps: true }
 );

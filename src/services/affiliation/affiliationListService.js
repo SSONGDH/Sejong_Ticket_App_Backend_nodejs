@@ -1,17 +1,38 @@
 import Affiliation from "../../models/affiliationModel.js";
+import User from "../../models/userModel.js";
 
 export const getAllAffiliations = async () => {
   try {
-    // 소속 모두 조회, admins 필드는 ObjectId 배열로 반환됨
+    // 모든 소속 조회 (members 필드 포함)
     const affiliations = await Affiliation.find({})
-      .populate("admins", "name email") // 필요하면 유저 필드 선택 가능 (예: name, email)
+      .populate("members", "name studentId affiliations") // 멤버 기본 정보 + affiliations 배열
       .sort({ createdAt: -1 });
+
+    // 관리자 여부 추가
+    const affiliationsWithAdmins = affiliations.map((aff) => {
+      const admins = aff.members.filter((member) => {
+        const affData = member.affiliations?.find(
+          (a) => a.id?.toString() === aff._id.toString()
+        );
+        return affData?.admin === true;
+      });
+
+      return {
+        _id: aff._id,
+        name: aff.name,
+        membersCount: aff.membersCount,
+        members: aff.members,
+        admins, // 관리자 멤버 배열
+        createdAt: aff.createdAt,
+        updatedAt: aff.updatedAt,
+      };
+    });
 
     return {
       status: 200,
       code: "SUCCESS-0001",
       message: "소속 리스트 조회 성공",
-      result: affiliations,
+      result: affiliationsWithAdmins,
     };
   } catch (error) {
     console.error("❌ 소속 리스트 조회 중 오류:", error);

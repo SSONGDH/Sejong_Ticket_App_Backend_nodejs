@@ -1,16 +1,38 @@
 import Refund from "../../models/refundModel.js";
 import Ticket from "../../models/ticketModel.js";
+import User from "../../models/userModel.js";
+import Affiliation from "../../models/affiliationModel.js";
 
-export const getRefundList = async () => {
-  const refunds = await Refund.find();
+export const getRefundListByAdmin = async (studentId) => {
+  // 1. 유저 조회
+  const user = await User.findOne({ studentId });
+  if (!user) return [];
 
-  if (!refunds || refunds.length === 0) {
-    return null;
-  }
+  // 2. admin인 소속 ID 조회
+  const adminAffiliations = await Affiliation.find({ admins: user._id });
+  if (!adminAffiliations.length) return [];
 
+  const adminAffiliationIds = adminAffiliations.map((a) => a._id);
+
+  // 3. 해당 소속의 티켓 ID만 가져오기
+  const tickets = await Ticket.find({
+    affiliationId: { $in: adminAffiliationIds },
+  });
+  if (!tickets.length) return [];
+
+  const ticketIds = tickets.map((t) => t._id);
+
+  // 4. 해당 티켓들에 대한 환불만 필터링
+  const refunds = await Refund.find({
+    ticketId: { $in: ticketIds },
+  });
+
+  if (!refunds.length) return [];
+
+  // 5. 티켓 정보 붙여서 결과 반환
   const result = await Promise.all(
     refunds.map(async (refund) => {
-      const ticket = await Ticket.findById(refund.ticketId);
+      const ticket = tickets.find((t) => t._id.equals(refund.ticketId));
       const eventName = ticket ? ticket.eventTitle : "이벤트 정보 없음";
 
       return {

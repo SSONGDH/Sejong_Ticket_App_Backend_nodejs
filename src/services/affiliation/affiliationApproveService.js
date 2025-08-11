@@ -16,31 +16,53 @@ export const handleAffiliationApproval = async (requestId) => {
   if (!user) throw new Error("해당 유저를 찾을 수 없습니다.");
 
   const affiliationName = request.affiliationName;
+  let affiliationDoc;
 
-  // createAffiliation: true인 경우에만 새 소속 생성 및 유저 affiliation 추가
+  // createAffiliation: true면 새 소속 생성
   if (request.createAffiliation) {
-    const existing = await Affiliation.findOne({ name: affiliationName });
-    if (!existing) {
-      // 새 소속 생성 시 멤버 수는 1명 (승인된 유저)
-      await Affiliation.create({
+    affiliationDoc = await Affiliation.findOne({ name: affiliationName });
+    if (!affiliationDoc) {
+      // 새 소속 생성 (멤버 1명)
+      affiliationDoc = await Affiliation.create({
         name: affiliationName,
         membersCount: 1,
-        admins: request.requestAdmin ? [user._id] : [],
+        members: [user._id],
       });
+    } else {
+      // 기존 소속이면 멤버 추가
+      if (!affiliationDoc.members.includes(user._id)) {
+        affiliationDoc.members.push(user._id);
+        affiliationDoc.membersCount = affiliationDoc.members.length;
+        await affiliationDoc.save();
+      }
     }
-    // 유저 affiliation 배열에 소속 추가 (중복 없이)
-    if (!user.affiliation) user.affiliation = [];
-    if (!user.affiliation.includes(affiliationName)) {
-      user.affiliation.push(affiliationName);
+  } else {
+    // 기존 소속 불러오기
+    affiliationDoc = await Affiliation.findOne({ name: affiliationName });
+    if (!affiliationDoc) throw new Error("소속을 찾을 수 없습니다.");
+
+    // 멤버 추가
+    if (!affiliationDoc.members.includes(user._id)) {
+      affiliationDoc.members.push(user._id);
+      affiliationDoc.membersCount = affiliationDoc.members.length;
+      await affiliationDoc.save();
     }
   }
 
-  // requestAdmin: true면 유저 admin 권한 true로 변경
-  if (request.requestAdmin) {
-    if (!user.admin || typeof user.admin !== "object") {
-      user.admin = {};
-    }
-    user.admin[affiliationName] = true;
+  // 유저 affiliations 배열에 소속 추가 (중복 방지)
+  if (!Array.isArray(user.affiliations)) {
+    user.affiliations = [];
+  }
+  const existingAff = user.affiliations.find((a) => a.name === affiliationName);
+  if (!existingAff) {
+    user.affiliations.push({
+      id: affiliationDoc._id,
+      name: affiliationName,
+      admin: !!request.requestAdmin,
+    });
+  } else if (request.requestAdmin) {
+    // 기존 소속이 있으면 admin 권한 업데이트
+    existingAff.admin = true;
   }
 
   await user.save();
@@ -48,7 +70,8 @@ export const handleAffiliationApproval = async (requestId) => {
   return {
     message: "승인이 완료되었습니다.",
     userId: user._id,
-    updatedAffiliation: user.affiliation,
-    isAdmin: user.admin?.[affiliationName] || false,
+    updatedAffiliations: user.affiliations,
+    isAdmin:
+      user.affiliations.find((a) => a.name === affiliationName)?.admin || false,
   };
 };
