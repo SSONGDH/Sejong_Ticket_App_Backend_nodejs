@@ -1,5 +1,5 @@
 import express from "express";
-import { getAdminTickets } from "../controllers/ticketManageMainController.js";
+import { getAdminTickets } from "../../controllers/ticket/ticketManageMainController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
