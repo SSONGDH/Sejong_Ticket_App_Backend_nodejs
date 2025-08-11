@@ -34,15 +34,16 @@ export const getAdminTicketsWithStatus = async (studentId) => {
   const user = await User.findOne({ studentId });
   if (!user) return [];
 
-  // 2. 유저가 관리자인 소속 ID 목록
-  const adminAffiliations = await Affiliation.find({ admins: user._id });
-  if (!adminAffiliations.length) return [];
+  // 2. 유저 affiliations 중 admin이 true인 소속 이름만 추출
+  const adminAffiliationNames = user.affiliations
+    .filter((aff) => aff.admin === true)
+    .map((aff) => aff.name);
 
-  const adminAffiliationIds = adminAffiliations.map((a) => a._id);
+  if (!adminAffiliationNames.length) return [];
 
-  // 3. 티켓 조회 (해당 affiliationId만)
+  // 3. 티켓 조회 (해당 affiliation 이름만)
   const tickets = await Ticket.find({
-    affiliationId: { $in: adminAffiliationIds },
+    affiliation: { $in: adminAffiliationNames },
   });
 
   if (!tickets.length) return [];

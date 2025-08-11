@@ -27,20 +27,11 @@ export const getAdminTickets = async (req, res) => {
 
     const tickets = await getAdminTicketsWithStatus(userProfile.studentId);
 
-    if (!tickets || tickets.length === 0) {
-      return res.status(404).json({
-        isSuccess: false,
-        code: "ERROR-0003",
-        message: "관리 소속 티켓 데이터가 없습니다.",
-        result: [],
-      });
-    }
-
     return res.status(200).json({
       isSuccess: true,
       code: "SUCCESS-0000",
       message: "관리 소속 티켓 조회 성공",
-      result: tickets,
+      result: tickets || [],
     });
   } catch (error) {
     console.error("❌ 관리자 티켓 조회 오류:", error);
