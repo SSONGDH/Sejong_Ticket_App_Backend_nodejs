@@ -1,4 +1,4 @@
-import { getAdminTicketsWithStatus } from "../../services/ticket/ticketManageMainService";
+import { getAdminTicketsWithStatus } from "../../services/ticket/ticketManageMainService.js";
 
 export const getAdminTickets = async (req, res) => {
   try {
