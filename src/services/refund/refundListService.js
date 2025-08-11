@@ -1,7 +1,6 @@
 import Refund from "../../models/refundModel.js";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
-import Affiliation from "../../models/affiliationModel.js";
 
 export const getRefundListByAdmin = async (studentId) => {
   // 1. 유저 조회

@@ -2,6 +2,11 @@ import Payment from "../../models/paymentModel.js";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
 
+/**
+ * 주어진 studentId를 가진 유저가 admin 권한을 가진 소속의 결제 목록을 조회하는 함수
+ * @param {string} studentId
+ * @returns {Array} payments
+ */
 export const getPaymentListByAdmin = async (studentId) => {
   // 1. 유저 조회
   const user = await User.findOne({ studentId });
