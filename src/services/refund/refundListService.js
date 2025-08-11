@@ -8,22 +8,22 @@ export const getRefundListByAdmin = async (studentId) => {
   const user = await User.findOne({ studentId });
   if (!user) return [];
 
-  // 2. 유저가 admin 권한을 가진 소속 ID 목록 추출
-  const adminAffiliationIds = (user.affiliations || [])
+  // 2. admin 권한을 가진 소속 이름 목록 추출
+  const adminAffiliationNames = (user.affiliations || [])
     .filter((aff) => aff.admin)
-    .map((aff) => aff.id);
+    .map((aff) => aff.name);
 
-  if (adminAffiliationIds.length === 0) return [];
+  if (adminAffiliationNames.length === 0) return [];
 
-  // 3. 해당 소속의 티켓 ID만 가져오기
+  // 3. 해당 소속 이름으로 티켓 조회
   const tickets = await Ticket.find({
-    affiliationId: { $in: adminAffiliationIds },
+    affiliation: { $in: adminAffiliationNames },
   });
   if (!tickets.length) return [];
 
   const ticketIds = tickets.map((t) => t._id);
 
-  // 4. 해당 티켓들에 대한 환불만 필터링
+  // 4. 해당 티켓들에 대한 환불 조회
   const refunds = await Refund.find({
     ticketId: { $in: ticketIds },
   });
