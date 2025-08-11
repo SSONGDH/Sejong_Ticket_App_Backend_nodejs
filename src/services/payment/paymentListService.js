@@ -1,20 +1,20 @@
 import Payment from "../../models/paymentModel.js";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
-import Affiliation from "../../models/affiliationModel.js";
 
 export const getPaymentListByAdmin = async (studentId) => {
   // 1. 유저 조회
   const user = await User.findOne({ studentId });
   if (!user) return [];
 
-  // 2. 관리자인 소속 ID 조회
-  const adminAffiliations = await Affiliation.find({ admins: user._id });
-  if (!adminAffiliations.length) return [];
+  // 2. 유저가 admin 권한을 가진 소속 ID 목록 추출
+  const adminAffiliationIds = (user.affiliations || [])
+    .filter((aff) => aff.admin)
+    .map((aff) => aff.id);
 
-  const adminAffiliationIds = adminAffiliations.map((a) => a._id);
+  if (adminAffiliationIds.length === 0) return [];
 
-  // 3. 해당 소속 티켓 ID 조회
+  // 3. 해당 소속 티켓 조회
   const tickets = await Ticket.find({
     affiliationId: { $in: adminAffiliationIds },
   });
@@ -22,7 +22,7 @@ export const getPaymentListByAdmin = async (studentId) => {
 
   const ticketIds = tickets.map((t) => t._id);
 
-  // 4. 티켓 ID에 해당하는 결제만 조회
+  // 4. 티켓에 해당하는 결제 조회
   const payments = await Payment.find({
     ticketId: { $in: ticketIds },
   });

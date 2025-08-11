@@ -8,11 +8,12 @@ export const getRefundListByAdmin = async (studentId) => {
   const user = await User.findOne({ studentId });
   if (!user) return [];
 
-  // 2. admin인 소속 ID 조회
-  const adminAffiliations = await Affiliation.find({ admins: user._id });
-  if (!adminAffiliations.length) return [];
+  // 2. 유저가 admin 권한을 가진 소속 ID 목록 추출
+  const adminAffiliationIds = (user.affiliations || [])
+    .filter((aff) => aff.admin)
+    .map((aff) => aff.id);
 
-  const adminAffiliationIds = adminAffiliations.map((a) => a._id);
+  if (adminAffiliationIds.length === 0) return [];
 
   // 3. 해당 소속의 티켓 ID만 가져오기
   const tickets = await Ticket.find({
@@ -26,28 +27,23 @@ export const getRefundListByAdmin = async (studentId) => {
   const refunds = await Refund.find({
     ticketId: { $in: ticketIds },
   });
-
   if (!refunds.length) return [];
 
   // 5. 티켓 정보 붙여서 결과 반환
-  const result = await Promise.all(
-    refunds.map(async (refund) => {
-      const ticket = tickets.find((t) => t._id.equals(refund.ticketId));
-      const eventName = ticket ? ticket.eventTitle : "이벤트 정보 없음";
+  const result = refunds.map((refund) => {
+    const ticket = tickets.find((t) => t._id.equals(refund.ticketId));
+    const eventName = ticket ? ticket.eventTitle : "이벤트 정보 없음";
 
-      return {
-        name: refund.name,
-        eventName,
-        visitDate: refund.visitDate,
-        visitTime: refund.visitTime,
-        refundPermissionStatus: refund.refundPermissionStatus
-          ? "TRUE"
-          : "FALSE",
-        refundReason: refund.refundReason,
-        _id: refund._id,
-      };
-    })
-  );
+    return {
+      name: refund.name,
+      eventName,
+      visitDate: refund.visitDate,
+      visitTime: refund.visitTime,
+      refundPermissionStatus: refund.refundPermissionStatus ? "TRUE" : "FALSE",
+      refundReason: refund.refundReason,
+      _id: refund._id,
+    };
+  });
 
   return result;
 };
