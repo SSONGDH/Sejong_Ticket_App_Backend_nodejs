@@ -32,6 +32,7 @@ import fcmTokenRoutes from "./FCM/fcmTokenAddRoute.js";
 
 import mypageRoutes from "./user/mypageRoute.js";
 import userAffiliationUpdate from "./user/userAffiliationUpdate.js";
+import notificationStatusRoutes from "./user/notificationStatusRoute.js";
 
 import affiliationRequestRoutes from "./affiliation/affiliationRequestRoute.js";
 import affiliationApproveRoutes from "./affiliation/affiliationApproveRoute.js";
@@ -83,6 +84,7 @@ router.use("/fcm", fcmTokenRoutes);
 
 router.use("/user", mypageRoutes);
 router.use("/user", userAffiliationUpdate);
+router.use("/user", notificationStatusRoutes);
 
 router.use("/affiliation", affiliationRequestRoutes);
 router.use("/affiliation", affiliationApproveRoutes);
