@@ -3,12 +3,13 @@ import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
 
 /**
- * 주어진 studentId를 가진 유저가 admin 권한을 가진 소속의 결제 목록을 조회하는 함수
- * root 계정이면 모든 결제 내역을 반환
+ * 주어진 studentId와 affiliationId를 기준으로 admin 권한의 결제 목록 조회
+ * root 계정이면 모든 결제 내역 반환
  * @param {string} studentId
+ * @param {string} affiliationId
  * @returns {Array} payments
  */
-export const getPaymentListByAdmin = async (studentId) => {
+export const getPaymentListByAdmin = async (studentId, affiliationId) => {
   // 1. 유저 조회
   const user = await User.findOne({ studentId });
   if (!user) return [];
@@ -27,28 +28,28 @@ export const getPaymentListByAdmin = async (studentId) => {
     }));
   }
 
-  // 2. admin 권한 있는 소속 이름 목록 추출
-  const adminAffiliationNames = (user.affiliations || [])
-    .filter((aff) => aff.admin)
-    .map((aff) => aff.name);
+  // 2. id가 일치하는 소속 찾기
+  const targetAffiliation = (user.affiliations || []).find(
+    (aff) => aff.id === affiliationId
+  );
 
-  if (adminAffiliationNames.length === 0) return [];
+  if (!targetAffiliation) return [];
 
-  // 3. 소속 이름으로 티켓 조회
+  // 3. 해당 소속의 name 으로 티켓 조회
   const tickets = await Ticket.find({
-    affiliation: { $in: adminAffiliationNames },
+    affiliation: targetAffiliation.name,
   });
   if (!tickets.length) return [];
 
   const ticketIds = tickets.map((t) => t._id);
 
-  // 4. 티켓 ID에 해당하는 결제 조회
+  // 4. 티켓 ID로 결제 조회
   const payments = await Payment.find({
     ticketId: { $in: ticketIds },
   });
   if (!payments.length) return [];
 
-  // 5. 필요한 필드만 맵핑해서 반환
+  // 5. 필요한 필드만 반환
   return payments.map((payment) => ({
     ticketId: payment.ticketId,
     paymentId: payment._id,

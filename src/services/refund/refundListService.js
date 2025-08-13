@@ -2,7 +2,12 @@ import Refund from "../../models/refundModel.js";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
 
-export const getRefundListByAdmin = async (studentId) => {
+/**
+ * 특정 소속 ID에 해당하는 환불 내역을 반환 (root는 전체 반환)
+ * @param {string} studentId - 유저 학번
+ * @param {string} affiliationId - 필터링할 소속 ID
+ */
+export const getRefundListByAdmin = async (studentId, affiliationId) => {
   // 1. 유저 조회
   const user = await User.findOne({ studentId });
   if (!user) return [];
@@ -35,16 +40,16 @@ export const getRefundListByAdmin = async (studentId) => {
     });
   }
 
-  // 2. admin 권한 있는 소속 이름 목록 추출
-  const adminAffiliationNames = (user.affiliations || [])
-    .filter((aff) => aff.admin)
-    .map((aff) => aff.name);
+  //2. id가 일치하는 소속만 필터
+  const targetAffiliation = (user.affiliations || []).find(
+    (aff) => aff.id === affiliationId
+  );
 
-  if (adminAffiliationNames.length === 0) return [];
+  if (!targetAffiliation) return [];
 
   // 3. 해당 소속 이름으로 티켓 조회
   const tickets = await Ticket.find({
-    affiliation: { $in: adminAffiliationNames },
+    affiliation: targetAffiliation.name,
   });
   if (!tickets.length) return [];
 
