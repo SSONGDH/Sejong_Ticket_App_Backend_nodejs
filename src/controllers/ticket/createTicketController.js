@@ -1,7 +1,7 @@
 import { createTicket } from "../../services/ticket/createTicketService.js";
 
 export const createTicketController = async (req, res) => {
-  console.log("▶️ req.body 전체 내용:", req.body);
+
 
   try {
     const response = await createTicket(req.body);
