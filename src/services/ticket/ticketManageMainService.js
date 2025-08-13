@@ -35,18 +35,18 @@ export const getAdminTicketsWithStatus = async (studentId) => {
 
   let tickets = [];
 
-  // 📌 root면 모든 티켓 조회
+  // root면 모든 티켓 조회
   if (user.root === true) {
     tickets = await Ticket.find({});
   } else {
-    // 2. 유저 affiliations 중 admin이 true인 소속 이름만 추출
+    // admin인 소속 이름만 추출
     const adminAffiliationNames = (user.affiliations || [])
       .filter((aff) => aff.admin === true)
       .map((aff) => aff.name);
 
     if (!adminAffiliationNames.length) return [];
 
-    // 3. 티켓 조회 (해당 affiliation 이름만)
+    // 티켓 조회 (해당 affiliation 이름만)
     tickets = await Ticket.find({
       affiliation: { $in: adminAffiliationNames },
     });
@@ -54,21 +54,29 @@ export const getAdminTicketsWithStatus = async (studentId) => {
 
   if (!tickets.length) return [];
 
-  // 4. 상태, 날짜 포맷
+  // 상태, 날짜 포맷
   const ticketStatuses = await Promise.all(
     tickets.map(async (ticket) => {
       const status = await getTicketStatus(ticket._id);
 
+      // getUserTicketsWithStatus 함수처럼 날짜/시간 포맷 적용
+      const formattedEventDay = moment(ticket.eventDay).format(
+        "YYYY.MM.DD(ddd)"
+      );
+      const formattedStartTime = moment(ticket.eventStartTime, [
+        "HH:mm:ss",
+        "HH:mm",
+      ]).format("HH:mm");
+      const formattedEndTime = moment(ticket.eventEndTime, [
+        "HH:mm:ss",
+        "HH:mm",
+      ]).format("HH:mm");
+
       return {
         ...ticket.toObject(),
-        eventDay: moment(ticket.eventDay).format("YYYY.MM.DD(ddd)"),
-        eventStartTime: moment(ticket.eventStartTime, [
-          "HH:mm:ss",
-          "HH:mm",
-        ]).format("HH:mm"),
-        eventEndTime: moment(ticket.eventEndTime, ["HH:mm:ss", "HH:mm"]).format(
-          "HH:mm"
-        ),
+        eventDay: formattedEventDay,
+        eventStartTime: formattedStartTime,
+        eventEndTime: formattedEndTime,
         status,
       };
     })
