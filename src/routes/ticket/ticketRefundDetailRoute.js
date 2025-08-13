@@ -3,6 +3,6 @@ import { ticketRefundDetailController } from "../../controllers/ticket/ticketRef
 
 const router = express.Router();
 
-router.get("/ticketRefundDetail", ticketRefundDetailController);
+router.get("/refundDetail", ticketRefundDetailController);
 
 export default router;
