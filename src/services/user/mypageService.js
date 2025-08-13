@@ -1,5 +1,5 @@
 import User from "../../models/userModel.js";
-import Affiliation from "../../models/affiliationModel.js"; // 소속 모델 추가
+import Affiliation from "../../models/affiliationModel.js";
 
 // 학생ID로 마이페이지 정보 조회
 export const getMyPageInfoByStudentId = async (studentId) => {
@@ -10,7 +10,7 @@ export const getMyPageInfoByStudentId = async (studentId) => {
   }
 
   const user = await User.findOne({ studentId }).select(
-    "name studentId major affiliation"
+    "name studentId major affiliations"
   );
 
   if (!user) {
@@ -28,7 +28,7 @@ export const getMyPageInfoByStudentId = async (studentId) => {
     name: user.name,
     studentId: user.studentId,
     major: user.major,
-    affiliation: user.affiliation,
+    affiliations: user.affiliations || [],
     totalAffiliation,
   };
 };
@@ -52,9 +52,9 @@ export const updateAffiliationByStudentId = async (
 
   const user = await User.findOneAndUpdate(
     { studentId },
-    { affiliation: affiliationList },
+    { affiliations: affiliationList },
     { new: true, runValidators: true }
-  ).select("affiliation name studentId major");
+  ).select("affiliations name studentId major");
 
   if (!user) {
     const error = new Error("해당 유저를 찾을 수 없습니다.");
