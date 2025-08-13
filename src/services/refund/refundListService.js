@@ -7,6 +7,34 @@ export const getRefundListByAdmin = async (studentId) => {
   const user = await User.findOne({ studentId });
   if (!user) return [];
 
+  // 📌 root면 모든 환불 내역 반환
+  if (user.root === true) {
+    const refunds = await Refund.find({});
+    if (!refunds.length) return [];
+
+    // 티켓 정보 조회
+    const tickets = await Ticket.find({
+      _id: { $in: refunds.map((r) => r.ticketId) },
+    });
+
+    return refunds.map((refund) => {
+      const ticket = tickets.find((t) => t._id.equals(refund.ticketId));
+      const eventName = ticket ? ticket.eventTitle : "이벤트 정보 없음";
+
+      return {
+        name: refund.name,
+        eventName,
+        visitDate: refund.visitDate,
+        visitTime: refund.visitTime,
+        refundPermissionStatus: refund.refundPermissionStatus
+          ? "TRUE"
+          : "FALSE",
+        refundReason: refund.refundReason,
+        _id: refund._id,
+      };
+    });
+  }
+
   // 2. admin 권한 있는 소속 이름 목록 추출
   const adminAffiliationNames = (user.affiliations || [])
     .filter((aff) => aff.admin)
@@ -29,7 +57,7 @@ export const getRefundListByAdmin = async (studentId) => {
   if (!refunds.length) return [];
 
   // 5. 티켓 정보 붙여서 결과 반환
-  const result = refunds.map((refund) => {
+  return refunds.map((refund) => {
     const ticket = tickets.find((t) => t._id.equals(refund.ticketId));
     const eventName = ticket ? ticket.eventTitle : "이벤트 정보 없음";
 
@@ -43,6 +71,4 @@ export const getRefundListByAdmin = async (studentId) => {
       _id: refund._id,
     };
   });
-
-  return result;
 };
