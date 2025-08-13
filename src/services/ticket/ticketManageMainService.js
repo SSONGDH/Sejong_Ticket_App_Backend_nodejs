@@ -2,7 +2,6 @@ import Ticket from "../../models/ticketModel.js";
 import Refund from "../../models/refundModel.js";
 import Payment from "../../models/paymentModel.js";
 import User from "../../models/userModel.js";
-import Affiliation from "../../models/affiliationModel.js";
 import moment from "moment";
 import "moment/locale/ko.js";
 
@@ -34,17 +33,24 @@ export const getAdminTicketsWithStatus = async (studentId) => {
   const user = await User.findOne({ studentId });
   if (!user) return [];
 
-  // 2. 유저 affiliations 중 admin이 true인 소속 이름만 추출
-  const adminAffiliationNames = user.affiliations
-    .filter((aff) => aff.admin === true)
-    .map((aff) => aff.name);
+  let tickets = [];
 
-  if (!adminAffiliationNames.length) return [];
+  // 📌 root면 모든 티켓 조회
+  if (user.root === true) {
+    tickets = await Ticket.find({});
+  } else {
+    // 2. 유저 affiliations 중 admin이 true인 소속 이름만 추출
+    const adminAffiliationNames = (user.affiliations || [])
+      .filter((aff) => aff.admin === true)
+      .map((aff) => aff.name);
 
-  // 3. 티켓 조회 (해당 affiliation 이름만)
-  const tickets = await Ticket.find({
-    affiliation: { $in: adminAffiliationNames },
-  });
+    if (!adminAffiliationNames.length) return [];
+
+    // 3. 티켓 조회 (해당 affiliation 이름만)
+    tickets = await Ticket.find({
+      affiliation: { $in: adminAffiliationNames },
+    });
+  }
 
   if (!tickets.length) return [];
 
