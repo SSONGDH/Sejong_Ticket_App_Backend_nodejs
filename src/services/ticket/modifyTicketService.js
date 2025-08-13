@@ -42,7 +42,10 @@ export const modifyTicket = async (body, req) => {
     : existingTicket.eventEndTime;
 
   let reminderSent = existingTicket.reminderSent;
-  if (formattedStartTime !== existingTicket.eventStartTime) {
+  if (
+    formattedStartTime !== existingTicket.eventStartTime ||
+    eventDay !== existingTicket.eventDay
+  ) {
     reminderSent = false;
   }
 

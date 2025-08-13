@@ -10,11 +10,12 @@ const sendEventReminderNotification = async (eventId) => {
       `📅 이벤트 알림 함수 호출됨: ${eventId}`
     );
 
-    const ticket = await Ticket.findById(eventId);
+    // reminderSent가 false인 티켓만 조회
+    const ticket = await Ticket.findOne({ _id: eventId, reminderSent: false });
     if (!ticket) {
       console.log(
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-        `❌ 이벤트를 찾을 수 없습니다: ${eventId}`
+        `❌ 이벤트를 찾을 수 없거나 이미 알림이 전송됨: ${eventId}`
       );
       return;
     }
@@ -51,7 +52,7 @@ const sendEventReminderNotification = async (eventId) => {
         await admin.messaging().send(message);
         console.log(
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-          `✅ ${user.name}에게 이벤트 알림   전송 완료`
+          `✅ ${user.name}에게 이벤트 알림 전송 완료`
         );
       } catch (sendError) {
         console.error(
@@ -61,13 +62,21 @@ const sendEventReminderNotification = async (eventId) => {
         );
       }
     }
+
+    // 알림 전송 완료 후 reminderSent를 true로 업데이트
+    ticket.reminderSent = true;
+    await ticket.save();
+    console.log(
+      moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
+      `🔔 티켓 ${ticket._id} reminderSent 업데이트 완료`
+    );
   } catch (error) {
     console.error(
       moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
       "❌ 이벤트 알림 전송 전체 실패:",
       error
     );
-    throw error; // 필요시 상위 호출부로 에러 전달
+    throw error;
   }
 };
 
