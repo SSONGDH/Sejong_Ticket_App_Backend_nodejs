@@ -31,6 +31,21 @@ export const addTicketByNFC = async (userProfile, eventCode) => {
     };
   }
 
+  // 🔍 소속 확인 (root는 통과)
+  const isRoot = user.root === true;
+  const hasAffiliation =
+    Array.isArray(user.affiliations) &&
+    user.affiliations.some((aff) => aff.name === ticket.affiliation);
+
+  if (!isRoot && !hasAffiliation) {
+    return {
+      status: 403,
+      code: "ERROR-0006",
+      message: `해당 티켓(${ticket.affiliation}) 소속이 아니므로 추가할 수 없습니다.`,
+    };
+  }
+
+  // 티켓 추가
   if (!user.tickets) {
     user.tickets = [];
   }

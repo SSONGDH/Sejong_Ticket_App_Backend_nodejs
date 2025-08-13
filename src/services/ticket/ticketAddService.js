@@ -49,14 +49,28 @@ export const addTicketForUser = async (eventCode, ssotoken) => {
     };
   }
 
-  // 4️⃣ 유저 티켓 추가
+  // 4️⃣ 소속 확인 (root는 무조건 통과)
+  const isRoot = user.root === true;
+  const hasAffiliation =
+    Array.isArray(user.affiliations) &&
+    user.affiliations.some((aff) => aff.name === ticket.affiliation);
+
+  if (!isRoot && !hasAffiliation) {
+    return {
+      status: 403,
+      code: "ERROR-0006",
+      message: `해당 티켓(${ticket.affiliation}) 소속이 아니므로 추가할 수 없습니다.`,
+    };
+  }
+
+  // 5️⃣ 유저 티켓 추가
   if (!user.tickets) user.tickets = [];
   if (!user.tickets.includes(ticket._id)) {
     user.tickets.push(ticket._id);
     await user.save();
   }
 
-  // 5️⃣ Payment 문서 생성
+  // 6️⃣ Payment 문서 생성
   const newPayment = new Payment({
     ticketId: ticket._id.toString(),
     name: user.name,
