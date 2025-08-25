@@ -8,10 +8,19 @@ import {
  * - GET /affiliationRequests?status=pending
  */
 export const affiliationRequestListController = async (req, res) => {
-  const { status } = req.query;
+  try {
+    const { status } = req.query;
+    const response = await getAffiliationRequests(status);
 
-  const response = await getAffiliationRequests(status);
-  res.status(response.status).json(response);
+    return res.status(response.status).json(response);
+  } catch (error) {
+    console.error("❌ affiliationRequestListController Error:", error);
+    return res.status(500).json({
+      status: 500,
+      message: "서버 에러가 발생했습니다.",
+      error: error.message,
+    });
+  }
 };
 
 /**
@@ -19,8 +28,17 @@ export const affiliationRequestListController = async (req, res) => {
  * - GET /affiliationRequests/:id
  */
 export const affiliationRequestDetailController = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
+    const response = await getAffiliationRequestById(id);
 
-  const response = await getAffiliationRequestById(id);
-  res.status(response.status).json(response);
+    return res.status(response.status).json(response);
+  } catch (error) {
+    console.error("❌ affiliationRequestDetailController Error:", error);
+    return res.status(500).json({
+      status: 500,
+      message: "서버 에러가 발생했습니다.",
+      error: error.message,
+    });
+  }
 };
