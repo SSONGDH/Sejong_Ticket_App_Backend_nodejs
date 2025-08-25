@@ -25,7 +25,13 @@ export const refundListController = async (req, res) => {
       });
     }
 
-    const result = await getRefundListByAdmin(userProfile.studentId);
+    // 🔹 쿼리 파라미터에서 affiliationId 읽기
+    const { affiliationId } = req.query;
+
+    const result = await getRefundListByAdmin(
+      userProfile.studentId,
+      affiliationId
+    );
 
     return res.status(200).json({
       isSuccess: true,
