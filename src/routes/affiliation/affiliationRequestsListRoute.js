@@ -1,4 +1,3 @@
-// src/routes/affiliation/affiliationRequestsListRoute.js
 import express from "express";
 import {
   affiliationRequestListController,

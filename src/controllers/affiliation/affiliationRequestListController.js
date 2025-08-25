@@ -1,4 +1,3 @@
-// src/controllers/affiliation/affiliationRequestListController.js
 import {
   getAffiliationRequests,
   getAffiliationRequestById,
@@ -6,16 +5,16 @@ import {
 
 /**
  * 전체 소속 신청 조회
- * - GET /affiliation/requests?status=pending
+ * - GET /affiliation/affiliationRequestsList?status=pending
  */
-export const affiliationRequestsListController = async (req, res) => {
+export const affiliationRequestListController = async (req, res) => {
   try {
     const { status } = req.query;
     const response = await getAffiliationRequests(status);
 
     return res.status(response.status).json(response);
   } catch (error) {
-    console.error("❌ affiliationRequestsListController Error:", error);
+    console.error("❌ affiliationRequestListController Error:", error);
     return res.status(500).json({
       status: 500,
       message: "서버 에러가 발생했습니다.",
@@ -26,7 +25,7 @@ export const affiliationRequestsListController = async (req, res) => {
 
 /**
  * 특정 신청 상세 조회
- * - GET /affiliation/requests/:id
+ * - GET /affiliation/affiliationRequests/:id
  */
 export const affiliationRequestDetailController = async (req, res) => {
   try {
