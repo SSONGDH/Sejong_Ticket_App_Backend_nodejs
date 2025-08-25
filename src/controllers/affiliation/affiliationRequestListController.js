@@ -6,7 +6,7 @@ import {
 
 /**
  * 전체 소속 신청 조회
- * - GET /affiliationRequests?status=pending
+ * - GET /affiliation/requests?status=pending
  */
 export const affiliationRequestsListController = async (req, res) => {
   try {
@@ -26,7 +26,7 @@ export const affiliationRequestsListController = async (req, res) => {
 
 /**
  * 특정 신청 상세 조회
- * - GET /affiliationRequests/:id
+ * - GET /affiliation/requests/:id
  */
 export const affiliationRequestDetailController = async (req, res) => {
   try {
