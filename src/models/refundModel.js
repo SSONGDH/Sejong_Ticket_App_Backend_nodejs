@@ -11,6 +11,10 @@ const refundSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    studentId: {
+      type: String,
+      required: true,
+    },
     major: {
       type: String,
       required: true,

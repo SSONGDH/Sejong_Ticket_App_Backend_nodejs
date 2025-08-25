@@ -28,6 +28,7 @@ export const getRefundListByAdmin = async (studentId, affiliationId) => {
 
       return {
         name: refund.name,
+        studentId: refund.studentId, // 🔹 학번 추가
         eventName,
         visitDate: refund.visitDate,
         visitTime: refund.visitTime,
@@ -68,6 +69,7 @@ export const getRefundListByAdmin = async (studentId, affiliationId) => {
 
     return {
       name: refund.name,
+      studentId: refund.studentId, // 🔹 학번 추가
       eventName,
       visitDate: refund.visitDate,
       visitTime: refund.visitTime,
