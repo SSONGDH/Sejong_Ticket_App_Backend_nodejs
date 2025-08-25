@@ -43,6 +43,8 @@ import rootConnectionRoutes from "./root/rootConnection.js";
 
 import notificationRoutes from "./notification/notificationRoute.js";
 
+import affiliationRequestsListRoute from "./affiliation/affiliationRequestsListRoute";
+
 const router = express.Router();
 
 // auth
@@ -91,6 +93,7 @@ router.use("/user", adminAffilliationRoutes);
 router.use("/affiliation", affiliationRequestRoutes);
 router.use("/affiliation", affiliationApproveRoutes);
 router.use("/affiliation", affiliationListRoutes);
+router.use("/affiliation", affiliationRequestsListRoute);
 
 router.use("/notification", notificationRoutes);
 
