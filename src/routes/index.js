@@ -43,7 +43,7 @@ import rootConnectionRoutes from "./root/rootConnection.js";
 
 import notificationRoutes from "./notification/notificationRoute.js";
 
-import affiliationRequestsListRoute from "./affiliation/affiliationRequestsListRoute";
+import affiliationRequestsListRoute from "./affiliation/affiliationRequestsListRoute.js";
 
 const router = express.Router();
 

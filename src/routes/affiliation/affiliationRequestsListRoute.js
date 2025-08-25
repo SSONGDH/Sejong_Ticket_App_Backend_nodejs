@@ -1,6 +1,6 @@
 // route/affiliation/affiliationRequestsListRoute.js
 import express from "express";
-import { affiliationRequestsListController } from "../../controllers/affiliation/affiliationRequestsListController.js";
+import { affiliationRequestsListController } from "../../controllers/affiliation/affiliationRequestListController.js";
 
 const router = express.Router();
 
