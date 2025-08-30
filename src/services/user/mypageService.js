@@ -33,7 +33,7 @@ export const getMyPageInfoByStudentId = async (studentId) => {
   };
 };
 
-// 학생ID로 소속 정보 업데이트
+// 학생ID로 소속 정보 업데이트 (admin 값 보존)
 export const updateAffiliationByStudentId = async (
   studentId,
   affiliationList
@@ -50,17 +50,33 @@ export const updateAffiliationByStudentId = async (
     throw error;
   }
 
-  const user = await User.findOneAndUpdate(
-    { studentId },
-    { affiliations: affiliationList },
-    { new: true, runValidators: true }
-  ).select("affiliations name studentId major");
+  // 기존 유저 조회
+  const user = await User.findOne({ studentId }).select(
+    "affiliations name studentId major"
+  );
 
   if (!user) {
     const error = new Error("해당 유저를 찾을 수 없습니다.");
     error.status = 404;
     throw error;
   }
+
+  // admin 값 보존하면서 affiliations 업데이트
+  const updatedAffiliations = affiliationList.map((newAff) => {
+    const oldAff = user.affiliations.find(
+      (aff) => String(aff._id) === String(newAff._id)
+    );
+
+    return {
+      _id: newAff._id,
+      name: newAff.name,
+      // 기존에 admin이 true였다면 유지, 아니면 새 값 사용
+      admin: oldAff?.admin ? true : !!newAff.admin,
+    };
+  });
+
+  user.affiliations = updatedAffiliations;
+  await user.save();
 
   return user;
 };
