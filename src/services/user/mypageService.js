@@ -33,7 +33,7 @@ export const getMyPageInfoByStudentId = async (studentId) => {
   };
 };
 
-// 학생ID로 소속 정보 업데이트 (admin 값 보존)
+// 학생ID로 소속 정보 업데이트 (admin 값 새 값으로 덮어쓰기 가능)
 export const updateAffiliationByStudentId = async (
   studentId,
   affiliationList
@@ -61,17 +61,12 @@ export const updateAffiliationByStudentId = async (
     throw error;
   }
 
-  // admin 값 보존하면서 affiliations 업데이트
+  // admin 값 새 값으로 덮어쓰기
   const updatedAffiliations = affiliationList.map((newAff) => {
-    const oldAff = user.affiliations.find(
-      (aff) => String(aff._id) === String(newAff._id)
-    );
-
     return {
       _id: newAff._id,
       name: newAff.name,
-      // 기존에 admin이 true였다면 유지, 아니면 새 값 사용
-      admin: oldAff?.admin ? true : !!newAff.admin,
+      admin: !!newAff.admin, // 기존 admin 값 무시하고 새 값 사용
     };
   });
 
