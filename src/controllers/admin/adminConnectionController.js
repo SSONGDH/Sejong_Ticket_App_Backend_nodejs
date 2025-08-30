@@ -13,8 +13,13 @@ export const adminConnection = async (req, res) => {
   }
 
   try {
+    // 🔎 SSO 토큰 검증 결과 확인
     const profileData = await verifySSOService.verifySSOToken(ssoToken);
+    console.log("✅ profileData:", profileData);
+
+    // 🔎 DB에서 유저 찾기
     const user = await User.findOne({ studentId: profileData.studentId });
+    console.log("✅ user:", JSON.stringify(user, null, 2));
 
     if (!user) {
       return res.status(404).json({
@@ -24,11 +29,20 @@ export const adminConnection = async (req, res) => {
       });
     }
 
-    // root는 전체 관리자, 또는 affiliations 중 하나라도 admin:true면 통과
+    // 🔎 affiliations 배열 로그 찍기
+    console.log(
+      "✅ user.affiliations:",
+      JSON.stringify(user.affiliations, null, 2)
+    );
+
+    // 권한 여부 확인
     const hasAnyAdminRole =
       user.root === true ||
       (Array.isArray(user.affiliations) &&
         user.affiliations.some((aff) => aff.admin === true));
+
+    console.log("✅ root:", user.root);
+    console.log("✅ hasAnyAdminRole:", hasAnyAdminRole);
 
     if (!hasAnyAdminRole) {
       return res.status(403).json({
