@@ -5,20 +5,23 @@ export const submitAffiliationRequest = async (requestData) => {
   const { studentId, affiliationName, createAffiliation, requestAdmin } =
     requestData;
 
-  // 1. 이미 해당 소속 멤버인지 확인
+  // 1. 유저 조회
   const user = await User.findOne({ studentId });
+
   if (user && Array.isArray(user.affiliations)) {
-    const isAlreadyMember = user.affiliations.some(
-      (aff) => aff.name === affiliationName
+    // 1-1. 이미 소속의 관리자면 신청 막기
+    const isAlreadyAdmin = user.affiliations.some(
+      (aff) => aff.name === affiliationName && aff.admin === true
     );
-    if (isAlreadyMember) {
-      const error = new Error("이미 해당 소속의 멤버입니다.");
+
+    if (isAlreadyAdmin) {
+      const error = new Error("이미 해당 소속의 관리자입니다.");
       error.code = "ALREADY_MEMBER";
       throw error;
     }
   }
 
-  // 2. 중복 요청 여부 확인 (소속명, 생성여부, 권한여부까지 포함, 상태는 pending)
+  // 2. 중복 요청 여부 확인 (소속명, 생성여부, 권한여부, status: pending)
   const existingRequest = await AffiliationRequest.findOne({
     studentId,
     affiliationName,
