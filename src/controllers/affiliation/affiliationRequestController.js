@@ -57,24 +57,20 @@ export const postAffiliationRequest = async (req, res) => {
 
     // 서비스에서 던진 에러를 클라이언트로 그대로 전달
     if (err.code === "ALREADY_MEMBER") {
-      return res.status(400).json({
-        code: err.code,
-        message: err.message,
-      });
+      return res.status(400).json({ code: err.code, message: err.message });
     }
 
     if (err.code === "DUPLICATE_REQUEST") {
-      return res.status(400).json({
-        code: err.code,
-        message: err.message,
-      });
+      return res.status(400).json({ code: err.code, message: err.message });
     }
 
     if (err.code === "AFFILIATION_NAME_EXISTS") {
-      return res.status(400).json({
-        code: err.code,
-        message: err.message,
-      });
+      return res.status(400).json({ code: err.code, message: err.message });
+    }
+
+    // ✅ 새로 추가: 권한 요청인데 소속이 존재하지 않는 경우
+    if (err.code === "AFFILIATION_NOT_FOUND") {
+      return res.status(404).json({ code: err.code, message: err.message });
     }
 
     // 그 외 알 수 없는 에러
