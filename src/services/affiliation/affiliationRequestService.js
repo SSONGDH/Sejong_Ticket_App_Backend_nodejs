@@ -16,7 +16,7 @@ export const submitAffiliationRequest = async (requestData) => {
     );
 
     if (isAlreadyAdmin) {
-      const error = new Error("이미 해당 소속의 관리자입니다.");
+      const error = new Error("이미 해당 소속이 존재합니다.");
       error.code = "ALREADY_MEMBER";
       throw error;
     }
