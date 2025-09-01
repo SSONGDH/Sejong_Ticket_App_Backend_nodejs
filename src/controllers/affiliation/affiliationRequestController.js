@@ -54,6 +54,30 @@ export const postAffiliationRequest = async (req, res) => {
     });
   } catch (err) {
     console.error("❌ 소속 신청 중 오류:", err);
+
+    // 서비스에서 던진 에러를 클라이언트로 그대로 전달
+    if (err.code === "ALREADY_MEMBER") {
+      return res.status(400).json({
+        code: err.code,
+        message: err.message,
+      });
+    }
+
+    if (err.code === "DUPLICATE_REQUEST") {
+      return res.status(400).json({
+        code: err.code,
+        message: err.message,
+      });
+    }
+
+    if (err.code === "AFFILIATION_NAME_EXISTS") {
+      return res.status(400).json({
+        code: err.code,
+        message: err.message,
+      });
+    }
+
+    // 그 외 알 수 없는 에러
     return res.status(500).json({
       code: "ERROR-9999",
       message: "서버 오류가 발생했습니다.",
