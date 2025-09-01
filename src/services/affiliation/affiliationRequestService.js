@@ -37,7 +37,7 @@ export const submitAffiliationRequest = async (requestData) => {
     throw error;
   }
 
-  // 3. 소속명이 이미 DB에 존재하는지 확인 (승인된 Affiliation 포함 + 요청 이력 전체 포함)
+  // 3. 소속 존재 여부 확인
   const nameExistsInRequests = await AffiliationRequest.findOne({
     affiliationName,
   });
@@ -46,10 +46,25 @@ export const submitAffiliationRequest = async (requestData) => {
     name: affiliationName,
   });
 
-  if (nameExistsInRequests || nameExistsInAffiliations) {
-    const error = new Error("이미 해당 소속명이 사용 중입니다.");
-    error.code = "AFFILIATION_NAME_EXISTS";
-    throw error;
+  // ✅ 케이스별 처리
+  if (createAffiliation) {
+    // 새 소속 만들기 → DB에 없어야 함
+    if (nameExistsInRequests || nameExistsInAffiliations) {
+      const error = new Error("이미 해당 소속명이 사용 중입니다.");
+      error.code = "AFFILIATION_NAME_EXISTS";
+      throw error;
+    }
+  }
+
+  if (requestAdmin) {
+    // 관리자 권한 신청 → DB에 반드시 존재해야 함
+    if (!nameExistsInAffiliations) {
+      const error = new Error(
+        "해당 소속이 존재하지 않습니다. 관리자 권한 신청 불가"
+      );
+      error.code = "AFFILIATION_NOT_FOUND";
+      throw error;
+    }
   }
 
   // 4. 새 요청 저장 (status 명시적으로 pending)
