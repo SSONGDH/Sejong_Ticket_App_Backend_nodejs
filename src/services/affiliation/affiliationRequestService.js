@@ -1,5 +1,6 @@
 import AffiliationRequest from "../../models/affiliationRequestModel.js";
 import User from "../../models/userModel.js";
+import Affiliation from "../../models/affiliationModel.js";
 
 export const submitAffiliationRequest = async (requestData) => {
   const { studentId, affiliationName, createAffiliation, requestAdmin } =
@@ -21,7 +22,7 @@ export const submitAffiliationRequest = async (requestData) => {
     }
   }
 
-  // 2. 중복 요청 여부 확인 (소속명, 생성여부, 권한여부, status: pending)
+  // 2. 동일 유저의 중복 요청 여부 확인
   const existingRequest = await AffiliationRequest.findOne({
     studentId,
     affiliationName,
@@ -36,7 +37,22 @@ export const submitAffiliationRequest = async (requestData) => {
     throw error;
   }
 
-  // 3. 새 요청 저장 (status 명시적으로 pending)
+  // 3. 소속명이 이미 DB에 존재하는지 확인 (승인된 Affiliation 포함 + 요청 이력 전체 포함)
+  const nameExistsInRequests = await AffiliationRequest.findOne({
+    affiliationName,
+  });
+
+  const nameExistsInAffiliations = await Affiliation.findOne({
+    name: affiliationName,
+  });
+
+  if (nameExistsInRequests || nameExistsInAffiliations) {
+    const error = new Error("이미 해당 소속명이 사용 중입니다.");
+    error.code = "AFFILIATION_NAME_EXISTS";
+    throw error;
+  }
+
+  // 4. 새 요청 저장 (status 명시적으로 pending)
   const newRequest = new AffiliationRequest({
     ...requestData,
     status: "pending",
