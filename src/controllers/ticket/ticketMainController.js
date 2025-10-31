@@ -50,6 +50,7 @@ export const ticketMainController = async (req, res) => {
         eventEndTime: ticket.eventEndTime,
         eventPlace: ticket.eventPlace,
         status: ticket.status,
+        affiliation: ticket.affiliation,
       })),
     });
   } catch (error) {
