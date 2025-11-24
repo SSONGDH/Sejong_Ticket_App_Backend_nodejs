@@ -2,11 +2,11 @@
 import cron from "node-cron";
 import moment from "moment-timezone";
 import sendEventReminderNotification from "../services/FCM/sendEventReminderNotification.js";
-import sendAdminAffiliationRequestNotification from "../services/FCM/sendAdminAffiliationRequestNotification.js"; // 📌 [추가됨]
+import sendAdminAffiliationRequestNotification from "../services/FCM/sendAdminAffiliationRequestNotification.js";
 import Ticket from "../models/ticketModel.js";
 import Refund from "../models/refundModel.js";
 import Payment from "../models/paymentModel.js";
-import User from "../models/userModel.js"; // 📌 [추가됨]
+import User from "../models/userModel.js";
 import AffiliationRequest from "../models/affiliationRequestModel.js";
 
 const startCronJob = () => {
@@ -48,7 +48,7 @@ const startCronJob = () => {
     }
   });
 
-  // 🛎️ 매 1분마다 - pending 상태 소속 신청 → root에게 알림 보내기  📌 [추가됨]
+  // 🛎️ 매 1분마다 - pending 소속 신청 → root에게 알림
   cron.schedule("*/1 * * * *", async () => {
     const now = moment().tz("Asia/Seoul");
 
@@ -93,7 +93,7 @@ const startCronJob = () => {
     }
   });
 
-  // 🌙 매일 자정에 만료 티켓 + 관련 환불/납부 내역 + 승인된 affiliation request 삭제
+  // 🌙 매일 자정 실행: 종료 후 2주 지난 티켓 삭제 + 승인 요청 삭제
   cron.schedule("0 0 * * *", async () => {
     const now = moment().tz("Asia/Seoul");
     console.log(
@@ -102,20 +102,30 @@ const startCronJob = () => {
     );
 
     try {
-      // 1️⃣ 만료 티켓 삭제
-      const expiredTickets = await Ticket.find({
-        eventDay: { $lt: now.format("YYYY-MM-DD") },
-      });
+      // 1️⃣ 행사 종료 후 2주 지난 티켓 삭제
+      const allTickets = await Ticket.find();
 
-      for (const ticket of expiredTickets) {
-        await Refund.deleteMany({ ticketId: ticket._id });
-        await Payment.deleteMany({ ticketId: ticket._id });
-        await Ticket.deleteOne({ _id: ticket._id });
-
-        console.log(
-          now.format("YYYY-MM-DD HH:mm:ss"),
-          `삭제 완료: 티켓 ${ticket._id} 및 관련 환불/납부 내역`
+      for (const ticket of allTickets) {
+        // 종료 시각 조합
+        const eventEndDate = moment.tz(
+          `${ticket.eventDay} ${ticket.eventEndTime}`,
+          "YYYY-MM-DD HH:mm:ss",
+          "Asia/Seoul"
         );
+
+        // 종료 후 14일(2주) 경과 여부 체크
+        const diffDays = now.diff(eventEndDate, "days");
+
+        if (diffDays >= 14) {
+          await Refund.deleteMany({ ticketId: ticket._id });
+          await Payment.deleteMany({ ticketId: ticket._id });
+          await Ticket.deleteOne({ _id: ticket._id });
+
+          console.log(
+            now.format("YYYY-MM-DD HH:mm:ss"),
+            `삭제 완료(종료 후 2주): 티켓 ${ticket._id} 및 관련 환불/납부 내역`
+          );
+        }
       }
 
       // 2️⃣ 승인된 affiliation request 중 2일 지난 것 삭제
