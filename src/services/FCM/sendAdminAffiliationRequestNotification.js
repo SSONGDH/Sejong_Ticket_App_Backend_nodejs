@@ -25,9 +25,9 @@ const sendAdminAffiliationRequestNotification = async (tokens, request) => {
         },
         data: {
           type: "AFFILIATION_REQUEST",
-          requestId: request._id.toString(),
-          userName: request.userName,
-          affiliation: request.affiliation,
+          requestId: String(request._id),
+          userName: String(request.userName),
+          affiliation: String(request.affiliation), // 반드시 문자열로 변환
         },
       };
 
