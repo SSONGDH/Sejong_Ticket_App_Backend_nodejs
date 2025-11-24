@@ -17,18 +17,18 @@ const sendAdminAffiliationRequestNotification = async (tokens, request) => {
     }
 
     for (const token of tokens) {
-      console.log("Request 객체 확인:", request);
+      
       const message = {
         token: token,
         notification: {
           title: "새 소속 신청 요청",
-          body: `${request.userName} 님이 ${request.affiliation} 소속 신청을 요청했습니다.`,
+          body: `${request.name} 님이 ${request.affiliationName} 소속 신청을 요청했습니다.`,
         },
         data: {
           type: "AFFILIATION_REQUEST",
           requestId: String(request._id),
-          userName: String(request.userName),
-          affiliation: String(request.affiliation), // 반드시 문자열로 변환
+          userName: String(request.name),
+          affiliation: String(request.affiliationName),
         },
       };
 
