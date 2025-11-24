@@ -56,8 +56,8 @@ export const submitAffiliationRequest = async (requestData) => {
     }
   }
 
-  if (requestAdmin) {
-    // 관리자 권한 신청 → DB에 반드시 존재해야 함
+  if (requestAdmin && !createAffiliation) {
+    // 관리자 권한 신청은 createAffiliation이 false일 때만 검증
     if (!nameExistsInAffiliations) {
       const error = new Error(
         "해당 소속이 존재하지 않습니다. 관리자 권한 신청 불가"
