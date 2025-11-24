@@ -2,10 +2,12 @@
 import cron from "node-cron";
 import moment from "moment-timezone";
 import sendEventReminderNotification from "../services/FCM/sendEventReminderNotification.js";
+import sendAdminAffiliationRequestNotification from "../services/FCM/sendAdminAffiliationRequestNotification.js"; // 📌 [추가됨]
 import Ticket from "../models/ticketModel.js";
 import Refund from "../models/refundModel.js";
 import Payment from "../models/paymentModel.js";
-import AffiliationRequest from "../models/affiliationRequestModel.js"; // 추가
+import User from "../models/userModel.js"; // 📌 [추가됨]
+import AffiliationRequest from "../models/affiliationRequestModel.js";
 
 const startCronJob = () => {
   // 🕙 매 1분마다 실행 - 이벤트 시작 1시간 전 알림
@@ -43,6 +45,51 @@ const startCronJob = () => {
           );
         }
       }
+    }
+  });
+
+  // 🛎️ 매 1분마다 - pending 상태 소속 신청 → root에게 알림 보내기  📌 [추가됨]
+  cron.schedule("*/1 * * * *", async () => {
+    const now = moment().tz("Asia/Seoul");
+
+    try {
+      const pendingRequests = await AffiliationRequest.find({
+        status: "pending",
+        adminNotified: false,
+      });
+
+      for (const req of pendingRequests) {
+        // root 계정 조회
+        const rootUsers = await User.find({
+          root: true,
+          notification: true,
+          fcmToken: { $ne: null },
+        });
+
+        if (rootUsers.length === 0) {
+          console.log(
+            now.format("YYYY-MM-DD HH:mm:ss"),
+            "root 계정이 없어 소속 신청 알림을 보낼 수 없음"
+          );
+          continue;
+        }
+
+        const tokens = rootUsers.map((u) => u.fcmToken);
+
+        // 알림 전송
+        await sendAdminAffiliationRequestNotification(tokens, req);
+
+        // 중복 알림 방지
+        req.adminNotified = true;
+        await req.save();
+
+        console.log(
+          now.format("YYYY-MM-DD HH:mm:ss"),
+          `root(${tokens.length}명)에게 소속 신청 알림 전송 완료`
+        );
+      }
+    } catch (err) {
+      console.error("root 소속 신청 알림 처리 실패:", err);
     }
   });
 

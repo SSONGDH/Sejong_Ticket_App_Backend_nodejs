@@ -10,16 +10,22 @@ const affiliationRequestSchema = new mongoose.Schema(
     affiliationName: { type: String, required: true }, // 만들고자 하는 소속 이름
     createAffiliation: { type: Boolean, required: true },
     requestAdmin: { type: Boolean, required: true },
+
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
+
+    // 📌 root에게 알림을 보냈는지 여부
+    adminNotified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-// 중요: 기본 mongoose 인스턴스가 아닌 db 인스턴스를 사용
 const AffiliationRequest = db.model(
   "AffiliationRequest",
   affiliationRequestSchema
