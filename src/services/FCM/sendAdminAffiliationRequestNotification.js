@@ -17,6 +17,7 @@ const sendAdminAffiliationRequestNotification = async (tokens, request) => {
     }
 
     for (const token of tokens) {
+      console.log("Request 객체 확인:", request);
       const message = {
         token: token,
         notification: {
