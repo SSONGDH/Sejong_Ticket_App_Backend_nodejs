@@ -1,40 +1,28 @@
 import { saveFcmToken } from "../../services/FCM/fcmTokenService.js";
-import verifySSOService from "../../services/ssoAuth.js";
+// import verifySSOService ... (삭제)
 
 export const addFcmToken = async (req, res) => {
-  const ssotoken = req.cookies.ssotoken;
-  const { fcmToken } = req.body;
-
-  if (!ssotoken) {
-    return res.status(400).json({
-      isSuccess: false,
-      code: "ERROR-0001",
-      message: "SSO 토큰이 없습니다.",
-    });
-  }
-
-  if (!fcmToken) {
-    return res.status(400).json({
-      isSuccess: false,
-      code: "ERROR-0002",
-      message: "FCM 토큰이 없습니다.",
-    });
-  }
-
   try {
-    const userProfile = await verifySSOService.verifySSOToken(ssotoken);
+    // [변경 핵심] 미들웨어가 검증해준 req.user에서 studentId 추출
+    const { studentId } = req.user;
+    const { fcmToken } = req.body;
 
-    if (!userProfile || !userProfile.studentId) {
-      return res.status(401).json({
+    // SSO 토큰 검사 로직(ERROR-0001)은 미들웨어가 대신 하므로 삭제
+
+    if (!fcmToken) {
+      return res.status(400).json({
         isSuccess: false,
-        code: "ERROR-0003",
-        message: "SSO 인증 실패",
+        code: "ERROR-0002",
+        message: "FCM 토큰이 없습니다.",
       });
     }
 
-    const result = await saveFcmToken(userProfile.studentId, fcmToken);
+    // SSO 인증 과정(verifySSOToken) 삭제 -> 바로 서비스 호출
+    const result = await saveFcmToken(studentId, fcmToken);
 
     if (!result) {
+      // saveFcmToken 서비스 내부 로직에 따라 다르겠지만,
+      // 보통 유저가 없으면 false를 반환한다면 이 처리가 필요합니다.
       return res.status(404).json({
         isSuccess: false,
         code: "ERROR-0004",

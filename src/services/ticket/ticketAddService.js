@@ -1,16 +1,15 @@
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
 import Payment from "../../models/paymentModel.js";
-import verifySSOService from "../../services/ssoAuth.js";
+// import verifySSOService ... (삭제: 서비스는 이제 인증을 신경 쓰지 않습니다)
 
-export const addTicketForUser = async (eventCode, ssotoken) => {
-  if (!ssotoken) {
-    return {
-      status: 400,
-      code: "ERROR-0003",
-      message: "SSO 토큰이 없습니다.",
-    };
-  }
+/**
+ * 유저에게 티켓을 추가하는 서비스 (SSO 토큰 제거 버전)
+ * @param {string} eventCode - 이벤트 코드
+ * @param {string} studentId - 학번 (컨트롤러에서 넘겨줌)
+ */
+export const addTicketForUser = async (eventCode, studentId) => {
+  // 1. 유효성 검사
   if (!eventCode) {
     return {
       status: 400,
@@ -19,17 +18,17 @@ export const addTicketForUser = async (eventCode, ssotoken) => {
     };
   }
 
-  // 1️⃣ SSO 토큰으로 유저 정보 가져오기
-  const userProfile = await verifySSOService.verifySSOToken(ssotoken);
-  if (!userProfile) {
+  if (!studentId) {
     return {
-      status: 401,
-      code: "ERROR-0007",
-      message: "유효하지 않은 SSO 토큰입니다.",
+      status: 400,
+      code: "ERROR-0003",
+      message: "studentId가 누락되었습니다.",
     };
   }
 
-  // 2️⃣ eventCode로 티켓 조회
+  // [삭제됨] verifySSOService.verifySSOToken 호출 로직
+
+  // 2. eventCode로 티켓 조회
   const ticket = await Ticket.findOne({ eventCode });
   if (!ticket) {
     return {
@@ -39,8 +38,8 @@ export const addTicketForUser = async (eventCode, ssotoken) => {
     };
   }
 
-  // 3️⃣ user 조회
-  const user = await User.findOne({ studentId: userProfile.studentId });
+  // 3. user 조회 (studentId로 바로 찾기)
+  const user = await User.findOne({ studentId });
   if (!user) {
     return {
       status: 404,
@@ -49,7 +48,7 @@ export const addTicketForUser = async (eventCode, ssotoken) => {
     };
   }
 
-  // 4️⃣ 소속 확인 (root는 무조건 통과)
+  // 4. 소속 확인 (root는 무조건 통과)
   const isRoot = user.root === true;
   const hasAffiliation =
     Array.isArray(user.affiliations) &&
@@ -63,22 +62,28 @@ export const addTicketForUser = async (eventCode, ssotoken) => {
     };
   }
 
-  // 5️⃣ 유저 티켓 추가
+  // 5. 유저 티켓 추가
   if (!user.tickets) user.tickets = [];
+
+  // 이미 있는 티켓인지 확인
   if (!user.tickets.includes(ticket._id)) {
     user.tickets.push(ticket._id);
     await user.save();
+  } else {
+    // (선택사항) 이미 티켓이 있다면?
+    // 현재 로직은 에러를 뱉지 않고 Payment 생성을 진행하지만,
+    // 필요하다면 여기서 return { status: 409, message: "이미 등록된 티켓입니다." } 할 수도 있음.
   }
 
-  // 6️⃣ Payment 문서 생성
+  // 6. Payment 문서 생성 (현장 추가용)
   const newPayment = new Payment({
     ticketId: ticket._id.toString(),
     name: user.name,
     studentId: user.studentId,
-    phone: "현장 조사 필요",
+    phone: "현장 조사 필요", // 현장 추가이므로 전화번호는 일단 placeholder
     major: user.major,
-    paymentPicture: "",
-    paymentPermissionStatus: true,
+    paymentPicture: "", // 현장 결제라 사진 없음
+    paymentPermissionStatus: true, // 현장이므로 즉시 승인
     etc: "현장 코드 추가",
   });
   await newPayment.save();

@@ -1,28 +1,19 @@
 import { toggleNotificationSetting } from "../../services/notification/notificationService.js";
-import verifySSOService from "../../services/ssoAuth.js"; // ssotoken 검증용
+// import verifySSOService ... (삭제)
 
 export const toggleNotification = async (req, res) => {
   try {
-    const ssotoken = req.cookies.ssotoken;
-    if (!ssotoken) {
-      return res.status(401).json({
-        isSuccess: false,
-        code: "ERROR-0001",
-        message: "SSO 토큰이 없습니다.",
-      });
-    }
+    // [변경 핵심] 미들웨어(authenticate)가 검증한 유저의 학번을 바로 사용
+    const { studentId } = req.user;
 
-    // 토큰 검증 및 프로필 추출
-    const profileData = await verifySSOService.verifySSOToken(ssotoken);
-    if (!profileData?.studentId) {
-      return res.status(401).json({
-        isSuccess: false,
-        code: "ERROR-0002",
-        message: "유효하지 않은 SSO 토큰입니다.",
-      });
-    }
+    /* [삭제된 로직]
+       - ssotoken 쿠키 확인
+       - verifySSOService 호출
+       - profileData 검증
+    */
 
-    const updatedUser = await toggleNotificationSetting(profileData.studentId);
+    // 서비스 호출 (기존 로직 유지)
+    const updatedUser = await toggleNotificationSetting(studentId);
 
     return res.status(200).json({
       isSuccess: true,

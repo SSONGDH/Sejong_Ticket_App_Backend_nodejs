@@ -1,35 +1,15 @@
 import User from "../../models/userModel.js";
-import verifySSOService from "../ssoAuth.js";
+// import verifySSOService ... (삭제)
 
 /**
- * SSO 토큰으로 유저를 인증하고 notification 상태 반환
- * @param {string} ssotoken
+ * 학번으로 유저의 notification 상태 반환 (JWT 버전)
+ * @param {string} studentId
  * @returns {Object} { status, notification, message }
  */
-export const getNotificationStatusBySSO = async (ssotoken) => {
-  if (!ssotoken) {
-    return {
-      status: 400,
-      code: "ERROR-0001",
-      message: "SSO 토큰이 제공되지 않았습니다.",
-      notification: null,
-    };
-  }
+export const getNotificationStatusByStudentId = async (studentId) => {
+  // [삭제됨] ssotoken 검사 및 verifySSOService 호출 로직
 
-  const userProfile = await verifySSOService.verifySSOToken(ssotoken);
-
-  if (!userProfile || !userProfile.studentId) {
-    return {
-      status: 401,
-      code: "ERROR-0002",
-      message: "유효하지 않은 SSO 토큰입니다.",
-      notification: null,
-    };
-  }
-
-  const user = await User.findOne({ studentId: userProfile.studentId }).select(
-    "notification"
-  );
+  const user = await User.findOne({ studentId }).select("notification");
 
   if (!user) {
     return {

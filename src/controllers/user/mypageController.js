@@ -1,32 +1,22 @@
-import verifySSOService from "../../services/ssoAuth.js";
 import {
   getMyPageInfoByStudentId,
   updateAffiliationByStudentId,
 } from "../../services/user/mypageService.js";
+// import verifySSOService ... (삭제)
 
+// 1. 마이페이지 조회
 export const getMyPage = async (req, res) => {
-  const ssotoken = req.cookies.ssotoken;
-
-  if (!ssotoken) {
-    return res.status(400).json({
-      code: "ERROR-0001",
-      message: "SSO 토큰이 없습니다.",
-      result: null,
-    });
-  }
-
   try {
-    const userProfile = await verifySSOService.verifySSOToken(ssotoken);
+    // [변경 핵심] 미들웨어(authenticate)가 검증한 유저의 학번 사용
+    const { studentId } = req.user;
 
-    if (!userProfile || !userProfile.studentId) {
-      return res.status(401).json({
-        code: "ERROR-0002",
-        message: "SSO 인증 실패",
-        result: null,
-      });
-    }
+    /* [삭제된 로직들]
+       - const ssotoken = req.cookies.ssotoken;
+       - verifySSOService.verifySSOToken...
+    */
 
-    const userInfo = await getMyPageInfoByStudentId(userProfile.studentId);
+    // 서비스 호출
+    const userInfo = await getMyPageInfoByStudentId(studentId);
 
     return res.status(200).json({
       code: "SUCCESS-0000",
@@ -43,39 +33,25 @@ export const getMyPage = async (req, res) => {
   }
 };
 
+// 2. 소속 정보 업데이트 (이 함수도 같은 파일에 있으니 같이 수정!)
 export const updateAffiliation = async (req, res) => {
-  const ssotoken = req.cookies.ssotoken;
-  const { affiliationList } = req.body;
-
-  if (!ssotoken) {
-    return res.status(400).json({
-      code: "ERROR-0001",
-      message: "SSO 토큰이 없습니다.",
-      result: null,
-    });
-  }
-
-  if (!Array.isArray(affiliationList)) {
-    return res.status(400).json({
-      code: "ERROR-0003",
-      message: "affiliationList는 배열이어야 합니다.",
-      result: null,
-    });
-  }
-
   try {
-    const userProfile = await verifySSOService.verifySSOToken(ssotoken);
+    // [변경 핵심] 여기도 똑같이 req.user 사용
+    const { studentId } = req.user;
 
-    if (!userProfile || !userProfile.studentId) {
-      return res.status(401).json({
-        code: "ERROR-0002",
-        message: "SSO 인증 실패",
+    const { affiliationList } = req.body;
+
+    if (!Array.isArray(affiliationList)) {
+      return res.status(400).json({
+        code: "ERROR-0003",
+        message: "affiliationList는 배열이어야 합니다.",
         result: null,
       });
     }
 
+    // 서비스 호출
     const updatedUser = await updateAffiliationByStudentId(
-      userProfile.studentId,
+      studentId,
       affiliationList
     );
 

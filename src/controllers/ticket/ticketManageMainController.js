@@ -1,31 +1,18 @@
-import verifySSOService from "../../services/ssoAuth.js";
 import { getAdminTicketsWithStatus } from "../../services/ticket/ticketManageMainService.js";
+// import verifySSOService ... (삭제)
 
 export const getAdminTickets = async (req, res) => {
-  const ssotoken = req.cookies.ssotoken;
-
-  if (!ssotoken) {
-    return res.status(400).json({
-      isSuccess: false,
-      code: "ERROR-0001",
-      message: "SSO 토큰이 없습니다.",
-      result: [],
-    });
-  }
-
   try {
-    const userProfile = await verifySSOService.verifySSOToken(ssotoken);
+    // [변경 핵심] 미들웨어(authenticate)가 검증한 유저의 학번을 바로 사용
+    const { studentId } = req.user;
 
-    if (!userProfile || !userProfile.studentId) {
-      return res.status(401).json({
-        isSuccess: false,
-        code: "ERROR-0002",
-        message: "SSO 인증 실패",
-        result: [],
-      });
-    }
+    /* [삭제된 로직들]
+       - const ssotoken = req.cookies.ssotoken;
+       - verifySSOService.verifySSOToken...
+    */
 
-    const tickets = await getAdminTicketsWithStatus(userProfile.studentId);
+    // 서비스 호출 (서비스 코드는 studentId만 있으면 되므로 수정 불필요)
+    const tickets = await getAdminTicketsWithStatus(studentId);
 
     return res.status(200).json({
       isSuccess: true,

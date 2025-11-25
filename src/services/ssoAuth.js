@@ -28,7 +28,7 @@ class VerifySSOService {
       });
 
       const html = await finalResponse.text();
-
+        
       // 응답이 로그인 페이지인지 확인
       if (html.includes("로그인") || html.includes("세종대학교 포털")) {
         throw new Error("❌ SSO 인증 실패: 로그인 페이지가 반환됨");

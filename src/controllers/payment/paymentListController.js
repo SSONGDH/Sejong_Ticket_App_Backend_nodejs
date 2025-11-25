@@ -1,37 +1,23 @@
-import verifySSOService from "../../services/ssoAuth.js";
 import { getPaymentListByAdmin } from "../../services/payment/paymentListService.js";
+// import verifySSOService ... (삭제)
 
 export const paymentListController = async (req, res) => {
-  const ssotoken = req.cookies.ssotoken;
-
-  if (!ssotoken) {
-    return res.status(400).json({
-      isSuccess: false,
-      code: "ERROR-0001",
-      message: "SSO 토큰이 없습니다.",
-      result: [],
-    });
-  }
-
   try {
-    const userProfile = await verifySSOService.verifySSOToken(ssotoken);
+    // [변경 핵심] 미들웨어(authenticate)가 이미 검증을 끝내고
+    // req.user에 studentId를 넣어두었습니다. 꺼내 쓰기만 하면 됩니다.
+    const { studentId } = req.user;
 
-    if (!userProfile || !userProfile.studentId) {
-      return res.status(401).json({
-        isSuccess: false,
-        code: "ERROR-0002",
-        message: "SSO 인증 실패",
-        result: [],
-      });
-    }
-
-    // 🔹 쿼리 파라미터에서 affiliationId 읽기
+    // 🔹 쿼리 파라미터에서 affiliationId 읽기 (기존 유지)
     const { affiliationId } = req.query;
 
-    const result = await getPaymentListByAdmin(
-      userProfile.studentId,
-      affiliationId
-    );
+    /* [삭제된 로직들]
+       - const ssotoken = req.cookies.ssotoken;
+       - if (!ssotoken) ...
+       - verifySSOService.verifySSOToken ...
+    */
+
+    // 서비스 호출
+    const result = await getPaymentListByAdmin(studentId, affiliationId);
 
     return res.status(200).json({
       isSuccess: true,

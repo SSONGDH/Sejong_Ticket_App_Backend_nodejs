@@ -1,20 +1,19 @@
 import User from "../../models/userModel.js";
-import VerifySSOService from "../ssoAuth.js";
+// import VerifySSOService ... (삭제)
 
-export const getAdminAffiliationsBySSO = async (ssoToken) => {
-  // 1. SSO 토큰으로 학생 정보 조회
-  const profile = await VerifySSOService.verifySSOToken(ssoToken);
-  if (!profile || !profile.studentId) {
-    throw new Error("SSO 인증 실패: 학번을 가져올 수 없음");
-  }
+// [변경] 함수 이름도 명확하게 바꾸는 걸 추천 (BySSO -> ByStudentId)
+// 파라미터: ssoToken -> studentId
+export const getAdminAffiliationsByStudentId = async (studentId) => {
+  // [삭제된 로직] verifySSOService 호출 부분
 
-  // 2. DB에서 해당 유저 조회
-  const user = await User.findOne({ studentId: profile.studentId });
+  // 1. DB에서 해당 유저 조회 (studentId 사용)
+  const user = await User.findOne({ studentId });
+
   if (!user) {
     throw new Error("해당 유저를 찾을 수 없습니다.");
   }
 
-  // 3. affiliations 중 admin === true만 필터링
+  // 2. affiliations 중 admin === true만 필터링
   const adminAffiliations = (user.affiliations || []).filter(
     (aff) => aff.admin === true
   );
