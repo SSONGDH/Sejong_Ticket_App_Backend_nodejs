@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import db from "../config/db.js"; // 통합 DB 연결 import
+import db from "../config/db.js";
 
 const ticketSchema = new mongoose.Schema(
   {
@@ -23,7 +23,7 @@ const ticketSchema = new mongoose.Schema(
     kakaoPlace: {
       place_name: String,
       address_name: String,
-      x: String, // 또는 Number로 저장하고 싶으면 Number로 변경 가능
+      x: String,
       y: String,
     },
   },

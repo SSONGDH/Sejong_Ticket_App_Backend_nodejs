@@ -1,9 +1,6 @@
 import Ticket from "../../models/ticketModel.js";
 import moment from "moment";
 
-/**
- * 중복되지 않는 랜덤 eventCode 생성
- */
 const generateUniqueEventCode = async () => {
   let uniqueCode;
   let isUnique = false;
@@ -31,7 +28,6 @@ export const createTicket = async (body) => {
     kakaoPlace,
   } = body;
 
-  // 누락 필드 리스트 만들기
   const missingFields = [];
   if (!eventTitle) missingFields.push("eventTitle");
   if (!eventDay) missingFields.push("eventDay");
@@ -51,7 +47,6 @@ export const createTicket = async (body) => {
     };
   }
 
-  // kakaoPlace가 문자열이면 JSON.parse로 변환
   if (typeof kakaoPlace === "string") {
     try {
       kakaoPlace = JSON.parse(kakaoPlace);
@@ -61,7 +56,6 @@ export const createTicket = async (body) => {
     }
   }
 
-  // 이벤트 코드 생성 또는 중복 검사
   let finalEventCode = eventCode?.trim() || null;
 
   if (finalEventCode) {
@@ -77,7 +71,6 @@ export const createTicket = async (body) => {
     finalEventCode = await generateUniqueEventCode();
   }
 
-  // 시간 포맷팅
   const formattedEventStartTime = moment(eventStartTime, "HH:mm:ss").format(
     "HH:mm:ss"
   );
@@ -85,7 +78,6 @@ export const createTicket = async (body) => {
     "HH:mm:ss"
   );
 
-  // 새 티켓 생성
   const newTicket = new Ticket({
     eventTitle,
     eventDay,

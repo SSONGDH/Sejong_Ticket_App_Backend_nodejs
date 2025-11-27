@@ -3,12 +3,10 @@ import User from "../../models/userModel.js";
 
 export const getAllAffiliations = async () => {
   try {
-    // 모든 소속 조회 (members 필드 포함)
     const affiliations = await Affiliation.find({})
-      .populate("members", "name studentId affiliations") // 멤버 기본 정보 + affiliations 배열
+      .populate("members", "name studentId affiliations")
       .sort({ createdAt: -1 });
 
-    // 관리자 여부 추가
     const affiliationsWithAdmins = affiliations.map((aff) => {
       const admins = aff.members.filter((member) => {
         const affData = member.affiliations?.find(
@@ -22,7 +20,7 @@ export const getAllAffiliations = async () => {
         name: aff.name,
         membersCount: aff.membersCount,
         members: aff.members,
-        admins, // 관리자 멤버 배열
+        admins,
         createdAt: aff.createdAt,
         updatedAt: aff.updatedAt,
       };

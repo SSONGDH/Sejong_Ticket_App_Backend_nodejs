@@ -1,9 +1,6 @@
 import Ticket from "../../models/ticketModel.js";
 import moment from "moment";
 
-/**
- * 중복되지 않는 랜덤 eventCode 생성
- */
 const generateUniqueEventCode = async () => {
   let uniqueCode;
   let isUnique = false;
@@ -28,7 +25,7 @@ export const createTicket = async (body) => {
     eventComment,
     eventCode,
     affiliation,
-    kakaoPlace, // 전체 객체를 받음
+    kakaoPlace,
   } = body;
 
   if (
@@ -48,7 +45,6 @@ export const createTicket = async (body) => {
     };
   }
 
-  // kakaoPlace는 optional이지만, 만약 들어온다면 구조 체크 (간단히)
   const validkakaoPlace =
     kakaoPlace &&
     typeof kakaoPlace === "object" &&
@@ -78,8 +74,6 @@ export const createTicket = async (body) => {
   const formattedEventEndTime = moment(eventEndTime, "HH:mm:ss").format(
     "HH:mm:ss"
   );
-
-  // 사진 관련 필드 제거됨
 
   const newTicket = new Ticket({
     eventTitle,

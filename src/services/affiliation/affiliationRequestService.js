@@ -6,11 +6,9 @@ export const submitAffiliationRequest = async (requestData) => {
   const { studentId, affiliationName, createAffiliation, requestAdmin } =
     requestData;
 
-  // 1. 유저 조회
   const user = await User.findOne({ studentId });
 
   if (user && Array.isArray(user.affiliations)) {
-    // 1-1. 이미 소속의 관리자면 신청 막기
     const isAlreadyAdmin = user.affiliations.some(
       (aff) => aff.name === affiliationName && aff.admin === true
     );
@@ -22,7 +20,6 @@ export const submitAffiliationRequest = async (requestData) => {
     }
   }
 
-  // 2. 동일 유저의 중복 요청 여부 확인
   const existingRequest = await AffiliationRequest.findOne({
     studentId,
     affiliationName,
@@ -37,7 +34,6 @@ export const submitAffiliationRequest = async (requestData) => {
     throw error;
   }
 
-  // 3. 소속 존재 여부 확인
   const nameExistsInRequests = await AffiliationRequest.findOne({
     affiliationName,
   });
@@ -46,9 +42,7 @@ export const submitAffiliationRequest = async (requestData) => {
     name: affiliationName,
   });
 
-  // ✅ 케이스별 처리
   if (createAffiliation) {
-    // 새 소속 만들기 → DB에 없어야 함
     if (nameExistsInRequests || nameExistsInAffiliations) {
       const error = new Error("이미 해당 소속명이 사용 중입니다.");
       error.code = "AFFILIATION_NAME_EXISTS";
@@ -57,7 +51,6 @@ export const submitAffiliationRequest = async (requestData) => {
   }
 
   if (requestAdmin && !createAffiliation) {
-    // 관리자 권한 신청은 createAffiliation이 false일 때만 검증
     if (!nameExistsInAffiliations) {
       const error = new Error(
         "해당 소속이 존재하지 않습니다. 관리자 권한 신청 불가"
@@ -67,7 +60,6 @@ export const submitAffiliationRequest = async (requestData) => {
     }
   }
 
-  // 4. 새 요청 저장 (status 명시적으로 pending)
   const newRequest = new AffiliationRequest({
     ...requestData,
     status: "pending",

@@ -7,18 +7,15 @@ export const handleAffiliationApproval = async (requestId) => {
   if (!request) throw new Error("해당 요청을 찾을 수 없습니다.");
   if (request.status !== "pending") throw new Error("이미 처리된 요청입니다.");
 
-  // 요청 상태 승인
   request.status = "approved";
   await request.save();
 
-  // 유저 찾기
   const user = await User.findOne({ studentId: request.studentId });
   if (!user) throw new Error("해당 유저를 찾을 수 없습니다.");
 
   const affiliationName = request.affiliationName;
   let affiliationDoc;
 
-  // 소속 생성 여부
   if (request.createAffiliation) {
     affiliationDoc = await Affiliation.findOne({ name: affiliationName });
     if (!affiliationDoc) {
@@ -44,19 +41,18 @@ export const handleAffiliationApproval = async (requestId) => {
     }
   }
 
-  // 유저 affiliations 배열 업데이트
   if (!Array.isArray(user.affiliations)) user.affiliations = [];
 
   const existingAff = user.affiliations.find((a) => a.name === affiliationName);
 
   if (!existingAff) {
     user.affiliations.push({
-      _id: affiliationDoc._id, // 이전 id → _id로 변경
+      _id: affiliationDoc._id,
       name: affiliationName,
       admin: !!request.requestAdmin,
     });
   } else if (request.requestAdmin) {
-    existingAff.admin = true; // admin 업데이트
+    existingAff.admin = true;
     user.markModified("affiliations");
   }
 

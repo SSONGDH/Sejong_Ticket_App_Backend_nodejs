@@ -1,14 +1,6 @@
 import User from "../../models/userModel.js";
-// import verifySSOService ... (삭제)
 
-/**
- * 학번으로 유저의 notification 상태 반환 (JWT 버전)
- * @param {string} studentId
- * @returns {Object} { status, notification, message }
- */
 export const getNotificationStatusByStudentId = async (studentId) => {
-  // [삭제됨] ssotoken 검사 및 verifySSOService 호출 로직
-
   const user = await User.findOne({ studentId }).select("notification");
 
   if (!user) {

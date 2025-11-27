@@ -1,8 +1,5 @@
 import AffiliationRequest from "../../models/affiliationRequestModel.js";
 
-/**
- * 소속 신청 전체 조회 (필터링 가능)
- */
 export const getAffiliationRequests = async (status) => {
   try {
     const filter = status ? { status } : {};
@@ -26,9 +23,6 @@ export const getAffiliationRequests = async (status) => {
   }
 };
 
-/**
- * 특정 신청 상세 조회
- */
 export const getAffiliationRequestById = async (id) => {
   try {
     const request = await AffiliationRequest.findById(id);

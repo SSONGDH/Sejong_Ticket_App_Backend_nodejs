@@ -3,21 +3,11 @@ import admin from "../../config/firebaseConfig.js";
 
 const sendAdminAffiliationRequestNotification = async (tokens, request) => {
   try {
-    console.log(
-      moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-      `📢 소속 신청 알림 함수 호출됨: ${request._id}`
-    );
-
     if (!tokens || tokens.length === 0) {
-      console.log(
-        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-        "⚠️ 알림 대상 토큰이 없습니다."
-      );
       return;
     }
 
     for (const token of tokens) {
-      
       const message = {
         token: token,
         notification: {
@@ -34,10 +24,6 @@ const sendAdminAffiliationRequestNotification = async (tokens, request) => {
 
       try {
         await admin.messaging().send(message);
-        console.log(
-          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
-          `✅ 토큰 ${token}에게 알림 전송 완료`
-        );
       } catch (sendError) {
         console.error(
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),

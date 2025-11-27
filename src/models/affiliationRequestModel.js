@@ -3,11 +3,11 @@ import db from "../config/db.js";
 
 const affiliationRequestSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true }, // 신청자 이름 (SSO)
-    major: { type: String, required: true }, // 학과 (SSO)
-    studentId: { type: String, required: true }, // 학번 (SSO)
-    phone: { type: String, required: true }, // 입력 받음
-    affiliationName: { type: String, required: true }, // 만들고자 하는 소속 이름
+    name: { type: String, required: true },
+    major: { type: String, required: true },
+    studentId: { type: String, required: true },
+    phone: { type: String, required: true },
+    affiliationName: { type: String, required: true },
     createAffiliation: { type: Boolean, required: true },
     requestAdmin: { type: Boolean, required: true },
 
@@ -17,7 +17,6 @@ const affiliationRequestSchema = new mongoose.Schema(
       default: "pending",
     },
 
-    // 📌 root에게 알림을 보냈는지 여부
     adminNotified: {
       type: Boolean,
       default: false,

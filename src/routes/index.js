@@ -1,4 +1,3 @@
-// src/routes/index.js
 import express from "express";
 
 import authRouter from "./login/authRoute.js";
@@ -27,9 +26,6 @@ import paymentDetailRoutes from "./payment/paymentDetailRoute.js";
 import paymentPermissionRoutes from "./payment/paymentPermissionRoute.js";
 import paymentDenyRoutes from "./payment/paymentDenyRoute.js";
 
-import adminConnectionRoutes from "./admin/adminConnection.js";
-import fcmTokenRoutes from "./FCM/fcmTokenAddRoute.js";
-
 import mypageRoutes from "./user/mypageRoute.js";
 import userAffiliationUpdate from "./user/userAffiliationUpdate.js";
 import notificationStatusRoutes from "./user/notificationStatusRoute.js";
@@ -38,63 +34,66 @@ import adminAffilliationRoutes from "./user/adminAffilliationRoute.js";
 import affiliationRequestRoutes from "./affiliation/affiliationRequestRoute.js";
 import affiliationApproveRoutes from "./affiliation/affiliationApproveRoute.js";
 import affiliationListRoutes from "./affiliation/affiliationListRoute.js";
+import affiliationRequestsListRoute from "./affiliation/affiliationRequestsListRoute.js";
 
+import adminConnectionRoutes from "./admin/adminConnection.js";
 import rootConnectionRoutes from "./root/rootConnection.js";
 
 import notificationRoutes from "./notification/notificationRoute.js";
-
-import affiliationRequestsListRoute from "./affiliation/affiliationRequestsListRoute.js";
+import fcmTokenRoutes from "./FCM/fcmTokenAddRoute.js";
 
 const router = express.Router();
 
-// auth
 router.use("/auth", authRouter);
 
-// ticket
-router.use("/ticket", ticketMainRoutes);
-router.use("/ticket", ticketDetailRoutes);
-router.use("/ticket", createTicketRoutes);
-router.use("/ticket", ticketAddRoute);
-router.use("/ticket", ticketAddNFCRoutes);
-router.use("/ticket", ticketListRoutes);
-router.use("/ticket", modifyTicketRoutes);
-router.use("/ticket", ticketRefundDetailRoutes);
-router.use("/ticket", modifyTicketDetailRoutes);
-router.use("/ticket", ticketDeleteRoutes);
-router.use("/ticket", ticketManageMainRoutes);
+router.use("/ticket", [
+  ticketMainRoutes,
+  ticketDetailRoutes,
+  createTicketRoutes,
+  ticketAddRoute,
+  ticketAddNFCRoutes,
+  ticketListRoutes,
+  modifyTicketRoutes,
+  ticketRefundDetailRoutes,
+  modifyTicketDetailRoutes,
+  ticketDeleteRoutes,
+  ticketManageMainRoutes,
+]);
 
-// refund
-router.use("/refund", refundRequestRoutes);
-router.use("/refund", refundListRoutes);
-router.use("/refund", refundDetailRoutes);
-router.use("/refund", refundPermissionRoutes);
-router.use("/refund", refundDenyRoutes);
+router.use("/refund", [
+  refundRequestRoutes,
+  refundListRoutes,
+  refundDetailRoutes,
+  refundPermissionRoutes,
+  refundDenyRoutes,
+]);
 
-// payment
-router.use("/payment", paymentPostRoutes);
-router.use("/payment", paymentListRoutes);
-router.use("/payment", paymentDetailRoutes);
-router.use("/payment", paymentPermissionRoutes);
-router.use("/payment", paymentDenyRoutes);
+router.use("/payment", [
+  paymentPostRoutes,
+  paymentListRoutes,
+  paymentDetailRoutes,
+  paymentPermissionRoutes,
+  paymentDenyRoutes,
+]);
 
-// admin
+router.use("/user", [
+  mypageRoutes,
+  userAffiliationUpdate,
+  notificationStatusRoutes,
+  adminAffilliationRoutes,
+]);
+
+router.use("/affiliation", [
+  affiliationRequestRoutes,
+  affiliationApproveRoutes,
+  affiliationListRoutes,
+  affiliationRequestsListRoute,
+]);
+
 router.use("/admin", adminConnectionRoutes);
-
 router.use("/root", rootConnectionRoutes);
 
-// FCM
-router.use("/fcm", fcmTokenRoutes);
-
-router.use("/user", mypageRoutes);
-router.use("/user", userAffiliationUpdate);
-router.use("/user", notificationStatusRoutes);
-router.use("/user", adminAffilliationRoutes);
-
-router.use("/affiliation", affiliationRequestRoutes);
-router.use("/affiliation", affiliationApproveRoutes);
-router.use("/affiliation", affiliationListRoutes);
-router.use("/affiliation", affiliationRequestsListRoute);
-
 router.use("/notification", notificationRoutes);
+router.use("/fcm", fcmTokenRoutes);
 
 export default router;

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import db from "../config/db.js"; // 단일 통합 DB 연결 import
+import db from "../config/db.js";
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -8,7 +8,7 @@ const paymentSchema = new mongoose.Schema(
     studentId: { type: String, required: true },
     phone: { type: String, required: true },
     major: { type: String, required: true },
-    paymentPicture: { type: String }, // 이미지 URL 저장
+    paymentPicture: { type: String },
     paymentPermissionStatus: {
       type: Boolean,
       default: false,

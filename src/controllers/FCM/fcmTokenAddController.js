@@ -1,13 +1,9 @@
 import { saveFcmToken } from "../../services/FCM/fcmTokenService.js";
-// import verifySSOService ... (삭제)
 
 export const addFcmToken = async (req, res) => {
   try {
-    // [변경 핵심] 미들웨어가 검증해준 req.user에서 studentId 추출
     const { studentId } = req.user;
     const { fcmToken } = req.body;
-
-    // SSO 토큰 검사 로직(ERROR-0001)은 미들웨어가 대신 하므로 삭제
 
     if (!fcmToken) {
       return res.status(400).json({
@@ -17,12 +13,9 @@ export const addFcmToken = async (req, res) => {
       });
     }
 
-    // SSO 인증 과정(verifySSOToken) 삭제 -> 바로 서비스 호출
     const result = await saveFcmToken(studentId, fcmToken);
 
     if (!result) {
-      // saveFcmToken 서비스 내부 로직에 따라 다르겠지만,
-      // 보통 유저가 없으면 false를 반환한다면 이 처리가 필요합니다.
       return res.status(404).json({
         isSuccess: false,
         code: "ERROR-0004",

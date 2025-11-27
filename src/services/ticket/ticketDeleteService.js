@@ -4,7 +4,6 @@ import Payment from "../../models/paymentModel.js";
 import Refund from "../../models/refundModel.js";
 
 export const deleteTicketAndRelatedData = async (ticketId) => {
-  // 1. 티켓 삭제
   const deletedTicket = await Ticket.findByIdAndDelete(ticketId);
   if (!deletedTicket) {
     return {
@@ -14,28 +13,23 @@ export const deleteTicketAndRelatedData = async (ticketId) => {
     };
   }
 
-  // 2. User 컬렉션에서 tickets 배열에서 ticketId 제거
   await User.updateMany(
     { tickets: ticketId },
     { $pull: { tickets: ticketId } }
   );
 
-  // 3. Payment 컬렉션에서 해당 ticketId 삭제
   await Payment.deleteMany({ ticketId });
 
-  // 4. Refund 컬렉션에서 ticketId 관련 환불들 찾기 및 삭제
   const relatedRefunds = await Refund.find({ ticketId });
 
   if (relatedRefunds.length > 0) {
     const refundIds = relatedRefunds.map((r) => r._id.toString());
 
-    // 4-1. User 컬렉션에서 refunds 배열에서 해당 refundId들 제거
     await User.updateMany(
       { refunds: { $in: refundIds } },
       { $pull: { refunds: { $in: refundIds } } }
     );
 
-    // 4-2. Refund 컬렉션에서 해당 refundId들 삭제
     await Refund.deleteMany({ _id: { $in: refundIds } });
   }
 

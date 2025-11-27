@@ -13,8 +13,8 @@ const userSchema = new mongoose.Schema(
     fcmToken: { type: String, default: null },
     affiliations: [
       {
-        name: String, // 소속 이름
-        admin: { type: Boolean, default: false }, // 관리자 여부
+        name: String,
+        admin: { type: Boolean, default: false },
       },
     ],
     notification: { type: Boolean, default: true },

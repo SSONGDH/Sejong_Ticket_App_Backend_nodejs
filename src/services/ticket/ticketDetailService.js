@@ -1,8 +1,8 @@
 import Ticket from "../../models/ticketModel.js";
 import moment from "moment";
-import "moment/locale/ko.js"; // 한글 요일 지원
+import "moment/locale/ko.js";
 
-moment.locale("ko"); // 한글 요일 출력 설정
+moment.locale("ko");
 
 export const getTicketDetail = async (ticketId) => {
   const ticket = await Ticket.findById(ticketId, {
@@ -14,8 +14,8 @@ export const getTicketDetail = async (ticketId) => {
     eventComment: 1,
     eventPlaceComment: 1,
 
-    affiliation: 1, // ✅ 추가
-    kakaoPlace: 1, // ✅ 추가
+    affiliation: 1,
+    kakaoPlace: 1,
   });
 
   if (!ticket) {
@@ -27,7 +27,6 @@ export const getTicketDetail = async (ticketId) => {
     };
   }
 
-  // 날짜와 시간 포맷 변경
   const formattedEventDay = moment(ticket.eventDay).format("YYYY.MM.DD(ddd)");
   const formattedStartTime = moment(ticket.eventStartTime, [
     "HH:mm:ss",

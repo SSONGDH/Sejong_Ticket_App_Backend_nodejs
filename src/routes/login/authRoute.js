@@ -1,4 +1,3 @@
-// 📁 src/routes/login/authRoute.js
 import express from "express";
 import { loginController } from "../../controllers/login/authController.js";
 

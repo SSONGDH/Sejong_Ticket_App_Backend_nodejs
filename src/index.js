@@ -8,7 +8,7 @@ import { exec } from "child_process";
 import moment from "moment-timezone";
 
 import db from "./config/db.js";
-import routes from "./routes/index.js"; // 메인 API 라우터
+import routes from "./routes/index.js";
 import cronJob from "./jobs/cronJob.js";
 
 dotenv.config();
@@ -28,10 +28,8 @@ app.use(
   express.static(path.join(__dirname, "..", "uploads", "paymentPictures"))
 );
 
-// 메인 API 라우터 등록
 app.use("/", routes);
 
-// --- Webhook 서버 라우트 추가 ---
 app.post("/webhook", express.json(), (req, res) => {
   try {
     console.log(`[Webhook] Payload received:`, req.body);
@@ -69,10 +67,8 @@ app.post("/webhook", express.json(), (req, res) => {
   }
 });
 
-// 크론 작업 실행
 cronJob();
 
-// 서버 실행 및 DB 연결 확인
 app.listen(port, "0.0.0.0", () => {
   console.log(
     moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),

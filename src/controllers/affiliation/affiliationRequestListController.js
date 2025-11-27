@@ -3,10 +3,6 @@ import {
   getAffiliationRequestById,
 } from "../../services/affiliation/affiliationRequestListService.js";
 
-/**
- * 전체 소속 신청 조회
- * - GET /affiliation/affiliationRequestsList?status=pending
- */
 export const affiliationRequestListController = async (req, res) => {
   try {
     const { status } = req.query;
@@ -23,10 +19,6 @@ export const affiliationRequestListController = async (req, res) => {
   }
 };
 
-/**
- * 특정 신청 상세 조회
- * - GET /affiliation/affiliationRequests/:id
- */
 export const affiliationRequestDetailController = async (req, res) => {
   try {
     const { id } = req.params;

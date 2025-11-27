@@ -1,12 +1,8 @@
-// [변경] 함수 이름 변경 (BySSO -> ByStudentId)
 import { getNotificationStatusByStudentId } from "../../services/user/notificationStatusService.js";
 
 export const getNotificationStatus = async (req, res) => {
   try {
-    // [변경] 쿠키(ssotoken) 대신 미들웨어가 준 학번 사용
     const { studentId } = req.user;
-
-    // [변경] 서비스 호출 (토큰 대신 학번 전달)
     const result = await getNotificationStatusByStudentId(studentId);
 
     return res.status(result.status).json({

@@ -3,9 +3,9 @@ import Refund from "../../models/refundModel.js";
 import Payment from "../../models/paymentModel.js";
 import User from "../../models/userModel.js";
 import moment from "moment";
-import "moment/locale/ko.js"; // 한글 요일 지원
+import "moment/locale/ko.js";
 
-moment.locale("ko"); // 전역 로케일 설정
+moment.locale("ko");
 
 export const getTicketStatus = async (ticketId) => {
   const ticket = await Ticket.findById(ticketId);
@@ -46,7 +46,6 @@ export const getUserTicketsWithStatus = async (studentId) => {
     tickets.map(async (ticket) => {
       const status = await getTicketStatus(ticket._id);
 
-      // 날짜, 시간 포맷 변경
       const formattedEventDay = moment(ticket.eventDay).format(
         "YYYY.MM.DD(ddd)"
       );

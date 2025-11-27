@@ -2,20 +2,10 @@ import {
   getMyPageInfoByStudentId,
   updateAffiliationByStudentId,
 } from "../../services/user/mypageService.js";
-// import verifySSOService ... (삭제)
 
-// 1. 마이페이지 조회
 export const getMyPage = async (req, res) => {
   try {
-    // [변경 핵심] 미들웨어(authenticate)가 검증한 유저의 학번 사용
     const { studentId } = req.user;
-
-    /* [삭제된 로직들]
-       - const ssotoken = req.cookies.ssotoken;
-       - verifySSOService.verifySSOToken...
-    */
-
-    // 서비스 호출
     const userInfo = await getMyPageInfoByStudentId(studentId);
 
     return res.status(200).json({
@@ -33,10 +23,8 @@ export const getMyPage = async (req, res) => {
   }
 };
 
-// 2. 소속 정보 업데이트 (이 함수도 같은 파일에 있으니 같이 수정!)
 export const updateAffiliation = async (req, res) => {
   try {
-    // [변경 핵심] 여기도 똑같이 req.user 사용
     const { studentId } = req.user;
 
     const { affiliationList } = req.body;
@@ -49,7 +37,6 @@ export const updateAffiliation = async (req, res) => {
       });
     }
 
-    // 서비스 호출
     const updatedUser = await updateAffiliationByStudentId(
       studentId,
       affiliationList

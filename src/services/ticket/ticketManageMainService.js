@@ -29,24 +29,20 @@ const getTicketStatus = async (ticketId) => {
 };
 
 export const getAdminTicketsWithStatus = async (studentId) => {
-  // 1. 유저 찾기
   const user = await User.findOne({ studentId });
   if (!user) return [];
 
   let tickets = [];
 
-  // root면 모든 티켓 조회
   if (user.root === true) {
     tickets = await Ticket.find({});
   } else {
-    // admin인 소속 이름만 추출
     const adminAffiliationNames = (user.affiliations || [])
       .filter((aff) => aff.admin === true)
       .map((aff) => aff.name);
 
     if (!adminAffiliationNames.length) return [];
 
-    // 티켓 조회 (해당 affiliation 이름만)
     tickets = await Ticket.find({
       affiliation: { $in: adminAffiliationNames },
     });
@@ -54,12 +50,10 @@ export const getAdminTicketsWithStatus = async (studentId) => {
 
   if (!tickets.length) return [];
 
-  // 상태, 날짜 포맷
   const ticketStatuses = await Promise.all(
     tickets.map(async (ticket) => {
       const status = await getTicketStatus(ticket._id);
 
-      // getUserTicketsWithStatus 함수처럼 날짜/시간 포맷 적용
       const formattedEventDay = moment(ticket.eventDay).format(
         "YYYY.MM.DD(ddd)"
       );

@@ -1,16 +1,11 @@
-// import verifySSOService ... (삭제)
 import { submitAffiliationRequest } from "../../services/affiliation/affiliationRequestService.js";
 
 export const postAffiliationRequest = async (req, res) => {
   try {
-    // [변경 핵심] 미들웨어(authenticate)가 로그인한 유저 정보를 req.user에 담아뒀습니다.
-    // SSO 서비스 호출 없이 여기서 바로 꺼내 씁니다.
     const { name, major, studentId } = req.user;
-
     const { phone, affiliationName, createAffiliation, requestAdmin } =
       req.body;
 
-    // 필수 항목 검증
     if (
       !phone ||
       !affiliationName ||
@@ -23,11 +18,10 @@ export const postAffiliationRequest = async (req, res) => {
       });
     }
 
-    // 서비스에 전달할 데이터 구성
     const requestData = {
-      name, // req.user에서 온 정보
-      major, // req.user에서 온 정보
-      studentId, // req.user에서 온 정보
+      name,
+      major,
+      studentId,
       phone,
       affiliationName,
       createAffiliation,
@@ -44,7 +38,6 @@ export const postAffiliationRequest = async (req, res) => {
   } catch (err) {
     console.error("❌ 소속 신청 중 오류:", err);
 
-    // 에러 처리 로직 (기존 유지)
     if (err.code === "ALREADY_MEMBER") {
       return res.status(400).json({ code: err.code, message: err.message });
     }

@@ -3,9 +3,9 @@ import db from "../config/db.js";
 
 const affiliationSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true }, // 소속 이름
-    membersCount: { type: Number, default: 0 }, // 멤버 수
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // 모든 멤버
+    name: { type: String, required: true, unique: true },
+    membersCount: { type: Number, default: 0 },
+    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

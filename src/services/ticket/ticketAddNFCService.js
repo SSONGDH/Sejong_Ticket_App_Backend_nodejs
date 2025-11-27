@@ -11,7 +11,6 @@ export const addTicketByNFC = async (userProfile, eventCode) => {
     };
   }
 
-  // 티켓 찾기
   const ticket = await Ticket.findOne({ eventCode });
   if (!ticket) {
     return {
@@ -21,7 +20,6 @@ export const addTicketByNFC = async (userProfile, eventCode) => {
     };
   }
 
-  // 유저 찾기
   const user = await User.findOne({ studentId: userProfile.studentId });
   if (!user) {
     return {
@@ -31,7 +29,6 @@ export const addTicketByNFC = async (userProfile, eventCode) => {
     };
   }
 
-  // 🔍 소속 확인 (root는 통과)
   const isRoot = user.root === true;
   const hasAffiliation =
     Array.isArray(user.affiliations) &&
@@ -45,7 +42,6 @@ export const addTicketByNFC = async (userProfile, eventCode) => {
     };
   }
 
-  // 티켓 추가
   if (!user.tickets) {
     user.tickets = [];
   }
@@ -54,7 +50,6 @@ export const addTicketByNFC = async (userProfile, eventCode) => {
     await user.save();
   }
 
-  // Payment 존재 여부 확인 후 없으면 새로 생성
   const existingPayment = await Payment.findOne({
     ticketId: ticket._id.toString(),
     studentId: user.studentId,

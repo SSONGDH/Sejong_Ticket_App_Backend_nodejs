@@ -1,17 +1,8 @@
 import { getAdminTicketsWithStatus } from "../../services/ticket/ticketManageMainService.js";
-// import verifySSOService ... (삭제)
 
 export const getAdminTickets = async (req, res) => {
   try {
-    // [변경 핵심] 미들웨어(authenticate)가 검증한 유저의 학번을 바로 사용
     const { studentId } = req.user;
-
-    /* [삭제된 로직들]
-       - const ssotoken = req.cookies.ssotoken;
-       - verifySSOService.verifySSOToken...
-    */
-
-    // 서비스 호출 (서비스 코드는 studentId만 있으면 되므로 수정 불필요)
     const tickets = await getAdminTicketsWithStatus(studentId);
 
     return res.status(200).json({
