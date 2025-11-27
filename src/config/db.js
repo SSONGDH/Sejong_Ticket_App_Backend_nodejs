@@ -7,9 +7,6 @@ import mongoose from "mongoose";
 
 const mongoURI = process.env.MONGO_URI;
 
-const db = mongoose.createConnection(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const db = mongoose.createConnection(mongoURI);
 
 export default db;
