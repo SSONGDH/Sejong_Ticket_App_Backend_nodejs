@@ -1,14 +1,14 @@
 import SchoolAuthService from "../authService.js";
-import verifySSOService from "../ssoAuth.js";
+import VerifySSOService from "../ssoAuth.js";
 import User from "../../models/userModel.js";
-
-const schoolAuthService = new SchoolAuthService();
 
 export const handleLogin = async ({ userId, password }) => {
   try {
-    const ssoToken = await schoolAuthService.getSsotoken(userId, password);
+    console.log(`🔄 로그인 시도: ${userId}`);
 
-    const profile = await verifySSOService.verifySSOToken(ssoToken);
+    const ssotoken = await SchoolAuthService.getSsotoken(userId, password);
+
+    const profile = await VerifySSOService.verifySSOToken(ssotoken);
 
     const user = await User.findOneAndUpdate(
       { studentId: profile.studentId },
