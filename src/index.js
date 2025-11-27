@@ -32,14 +32,8 @@ app.use("/", routes);
 
 app.post("/webhook", express.json(), (req, res) => {
   try {
-    console.log(`[Webhook] Payload received:`, req.body);
-
     const eventType = req.headers["x-github-event"];
     if (eventType === "push") {
-      console.log(
-        "🔔 GitHub push event received. Pulling latest code and restarting server..."
-      );
-
       exec(
         "git pull origin master && pm2 restart SEJONG-PASSTIME",
         (error, stdout, stderr) => {

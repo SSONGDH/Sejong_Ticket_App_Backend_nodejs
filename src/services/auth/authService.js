@@ -4,10 +4,7 @@ import User from "../../models/userModel.js";
 
 export const handleLogin = async ({ userId, password }) => {
   try {
-    console.log(`🔄 로그인 시도: ${userId}`);
-
     const ssotoken = await SchoolAuthService.getSsotoken(userId, password);
-
     const profile = await VerifySSOService.verifySSOToken(ssotoken);
 
     const user = await User.findOneAndUpdate(
