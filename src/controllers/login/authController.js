@@ -15,11 +15,15 @@ export const loginController = async (req, res) => {
     return res.status(200).json({
       isSuccess: true,
       message: "로그인 성공 (쿠키 발급)",
-
       result: {
         name: user.name,
         studentId: user.studentId,
       },
     });
-  } catch (error) {}
+  } catch (error) {
+    return res.status(401).json({
+      isSuccess: false,
+      message: "아이디 또는 비밀번호가 올바르지 않습니다.",
+    });
+  }
 };
