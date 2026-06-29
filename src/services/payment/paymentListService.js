@@ -41,5 +41,12 @@ export const getPaymentListByAdmin = async (studentId, affiliationId) => {
 
 export const getPaymentCountByAdmin = async (studentId, affiliationId) => {
   const payments = await getPaymentsByAdmin(studentId, affiliationId);
-  return { totalCount: payments.length };
+  const approvedCount = payments.filter((p) => p.paymentPermissionStatus).length;
+  const pendingCount = payments.length - approvedCount;
+
+  return {
+    totalCount: payments.length,
+    approvedCount,
+    pendingCount,
+  };
 };

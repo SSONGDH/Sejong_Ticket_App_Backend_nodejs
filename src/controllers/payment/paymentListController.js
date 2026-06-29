@@ -44,7 +44,7 @@ export const paymentCountController = async (req, res) => {
       isSuccess: false,
       code: "ERROR-0003",
       message: "서버 오류",
-      result: { totalCount: 0 },
+      result: { totalCount: 0, approvedCount: 0, pendingCount: 0 },
     });
   }
 };
