@@ -2,6 +2,7 @@ import {
   getMyPageInfoByStudentId,
   updateAffiliationByStudentId,
 } from "../../services/user/mypageService.js";
+import { getMyAffiliationRequests } from "../../services/affiliation/affiliationMyRequestService.js";
 
 export const getMyPage = async (req, res) => {
   try {
@@ -49,6 +50,26 @@ export const updateAffiliation = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ 소속 업데이트 중 오류:", error);
+    return res.status(error.status || 500).json({
+      code: "ERROR-9999",
+      message: error.message || "서버 오류",
+      result: null,
+    });
+  }
+};
+
+export const getMyAffiliationRequestHistory = async (req, res) => {
+  try {
+    const { studentId } = req.user;
+    const result = await getMyAffiliationRequests(studentId);
+
+    return res.status(200).json({
+      code: "SUCCESS-0000",
+      message: "신청 내역 조회 성공",
+      result,
+    });
+  } catch (error) {
+    console.error("❌ 신청 내역 조회 중 오류:", error);
     return res.status(error.status || 500).json({
       code: "ERROR-9999",
       message: error.message || "서버 오류",
