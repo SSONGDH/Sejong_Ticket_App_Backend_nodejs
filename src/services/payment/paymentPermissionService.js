@@ -2,6 +2,7 @@ import Payment from "../../models/paymentModel.js";
 import User from "../../models/userModel.js";
 import Ticket from "../../models/ticketModel.js";
 import sendTicketApprovalNotification from "../FCM/sendTicketApprovalNotification.js";
+import { getPaymentsByAdmin } from "./paymentListService.js";
 
 export const approvePayment = async (paymentId) => {
   const payment = await Payment.findById(paymentId);
@@ -28,5 +29,32 @@ export const approvePayment = async (paymentId) => {
     paymentPermissionStatus: payment.paymentPermissionStatus,
     userId: user._id,
     updatedTickets: user.tickets,
+  };
+};
+
+export const approveAllPayments = async (studentId, affiliationId) => {
+  const payments = await getPaymentsByAdmin(studentId, affiliationId);
+  const pendingPayments = payments.filter((p) => !p.paymentPermissionStatus);
+
+  const approved = [];
+  const errors = [];
+
+  for (const payment of pendingPayments) {
+    const result = await approvePayment(payment._id);
+
+    if (result.error) {
+      errors.push({ paymentId: payment._id, error: result.error });
+    } else {
+      approved.push(result);
+    }
+  }
+
+  return {
+    totalCount: payments.length,
+    approvedCount: approved.length,
+    skippedCount: payments.length - pendingPayments.length,
+    failedCount: errors.length,
+    approved,
+    errors,
   };
 };

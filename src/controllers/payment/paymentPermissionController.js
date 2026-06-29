@@ -1,4 +1,7 @@
-import { approvePayment } from "../../services/payment/paymentPermissionService.js";
+import {
+  approvePayment,
+  approveAllPayments,
+} from "../../services/payment/paymentPermissionService.js";
 
 export const paymentPermissionController = async (req, res) => {
   const { paymentId } = req.query;
@@ -38,6 +41,29 @@ export const paymentPermissionController = async (req, res) => {
       code: "SUCCESS-0000",
       message:
         "결제 승인 상태가 성공적으로 변경되었고, 유저 티켓에 추가되었습니다.",
+      result,
+    });
+  } catch (error) {
+    console.error("❌ 서버 오류:", error);
+    return res.status(500).json({
+      isSuccess: false,
+      code: "ERROR-0002",
+      message: "서버 오류",
+      result: [],
+    });
+  }
+};
+
+export const paymentApproveAllController = async (req, res) => {
+  try {
+    const { studentId } = req.user;
+    const { affiliationId } = req.query;
+    const result = await approveAllPayments(studentId, affiliationId);
+
+    return res.status(200).json({
+      isSuccess: true,
+      code: "SUCCESS-0000",
+      message: "전체 납부 내역 수락이 완료되었습니다.",
       result,
     });
   } catch (error) {
