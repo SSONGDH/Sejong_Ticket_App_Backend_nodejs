@@ -21,7 +21,10 @@ export const getTicketStatus = async (ticketId, studentId) => {
     if (refund.refundPermissionStatus === true) return "환불됨";
   }
 
-  const payment = await Payment.findOne({ ticketId, studentId });
+  const payment = await Payment.findOne({
+    ticketId: String(ticketId),
+    studentId,
+  }).sort({ paymentPermissionStatus: -1 });
   if (payment) {
     if (payment.paymentPermissionStatus === false) return "사용 불가";
     if (payment.paymentPermissionStatus === true) return "사용 가능";

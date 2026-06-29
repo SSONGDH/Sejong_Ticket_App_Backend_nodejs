@@ -18,7 +18,7 @@ export const paymentPostController = async (req, res) => {
       req.file.filename
     }`;
 
-    const newPayment = await savePaymentData({
+    const result = await savePaymentData({
       ticketId,
       name,
       studentId,
@@ -27,11 +27,29 @@ export const paymentPostController = async (req, res) => {
       imageUrl,
     });
 
+    if (result.error === "ALREADY_APPROVED") {
+      return res.status(400).json({
+        isSuccess: false,
+        code: "ERROR-0004",
+        message: result.message,
+        result: [],
+      });
+    }
+
+    if (result.error === "ALREADY_PENDING") {
+      return res.status(400).json({
+        isSuccess: false,
+        code: "ERROR-0005",
+        message: result.message,
+        result: [],
+      });
+    }
+
     return res.status(200).json({
       isSuccess: true,
       code: "SUCCESS-0000",
       message: "납부내역이 성공적으로 저장되었습니다.",
-      result: newPayment,
+      result,
     });
   } catch (error) {
     console.error("❌ 결제 저장 오류:", error);

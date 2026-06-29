@@ -42,22 +42,31 @@ export const addTicketByNFC = async (userProfile, eventCode) => {
     };
   }
 
+  const ticketIdStr = ticket._id.toString();
+
   if (!user.tickets) {
     user.tickets = [];
   }
-  if (!user.tickets.includes(ticket._id)) {
-    user.tickets.push(ticket._id);
+
+  const hasTicket = user.tickets.some((t) => String(t) === ticketIdStr);
+  if (!hasTicket) {
+    user.tickets.push(ticketIdStr);
     await user.save();
   }
 
   const existingPayment = await Payment.findOne({
-    ticketId: ticket._id.toString(),
+    ticketId: ticketIdStr,
     studentId: user.studentId,
   });
 
-  if (!existingPayment) {
+  if (existingPayment) {
+    if (!existingPayment.paymentPermissionStatus) {
+      existingPayment.paymentPermissionStatus = true;
+      await existingPayment.save();
+    }
+  } else {
     const newPayment = new Payment({
-      ticketId: ticket._id.toString(),
+      ticketId: ticketIdStr,
       name: user.name,
       studentId: user.studentId,
       phone: user.phone || "현장 조사 필요",

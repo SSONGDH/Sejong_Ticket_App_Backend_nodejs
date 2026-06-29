@@ -50,24 +50,39 @@ export const addTicketForUser = async (eventCode, studentId) => {
     };
   }
 
+  const ticketIdStr = ticket._id.toString();
+
   if (!user.tickets) user.tickets = [];
 
-  if (!user.tickets.includes(ticket._id)) {
-    user.tickets.push(ticket._id);
+  const hasTicket = user.tickets.some((t) => String(t) === ticketIdStr);
+  if (!hasTicket) {
+    user.tickets.push(ticketIdStr);
     await user.save();
   }
 
-  const newPayment = new Payment({
-    ticketId: ticket._id.toString(),
-    name: user.name,
+  const existingPayment = await Payment.findOne({
+    ticketId: ticketIdStr,
     studentId: user.studentId,
-    phone: "현장 조사 필요",
-    major: user.major,
-    paymentPicture: "",
-    paymentPermissionStatus: true,
-    etc: "현장 코드 추가",
   });
-  await newPayment.save();
+
+  if (existingPayment) {
+    if (!existingPayment.paymentPermissionStatus) {
+      existingPayment.paymentPermissionStatus = true;
+      await existingPayment.save();
+    }
+  } else {
+    const newPayment = new Payment({
+      ticketId: ticketIdStr,
+      name: user.name,
+      studentId: user.studentId,
+      phone: "현장 조사 필요",
+      major: user.major,
+      paymentPicture: "",
+      paymentPermissionStatus: true,
+      etc: "현장 코드 추가",
+    });
+    await newPayment.save();
+  }
 
   return {
     status: 200,
