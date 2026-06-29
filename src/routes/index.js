@@ -30,6 +30,7 @@ import mypageRoutes from "./user/mypageRoute.js";
 import userAffiliationUpdate from "./user/userAffiliationUpdate.js";
 import notificationStatusRoutes from "./user/notificationStatusRoute.js";
 import adminAffilliationRoutes from "./user/adminAffilliationRoute.js";
+import userAffiliationListRoute from "./user/userAffiliationListRoute.js";
 
 import affiliationRequestRoutes from "./affiliation/affiliationRequestRoute.js";
 import affiliationApproveRoutes from "./affiliation/affiliationApproveRoute.js";
@@ -82,6 +83,7 @@ router.use("/user", [
   userAffiliationUpdate,
   notificationStatusRoutes,
   adminAffilliationRoutes,
+  userAffiliationListRoute,
 ]);
 
 router.use("/affiliation", [

@@ -24,6 +24,7 @@ export const handleAffiliationApproval = async (requestId) => {
     if (!affiliationDoc) {
       affiliationDoc = await Affiliation.create({
         name: affiliationName,
+        introduction: request.introduction || "",
         membersCount: 1,
         members: [user._id],
       });

@@ -8,6 +8,7 @@ const affiliationRequestSchema = new mongoose.Schema(
     studentId: { type: String, required: true },
     phone: { type: String, required: true },
     affiliationName: { type: String, required: true },
+    introduction: { type: String, default: "" },
     requestType: {
       type: String,
       enum: ["create", "admin"],

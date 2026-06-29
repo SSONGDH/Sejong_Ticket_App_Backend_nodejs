@@ -1,4 +1,5 @@
 import AffiliationRequest from "../../models/affiliationRequestModel.js";
+import { formatAffiliationRequest } from "./affiliationRequestFormatter.js";
 
 export const getAffiliationRequests = async (status, requestType) => {
   try {
@@ -14,7 +15,7 @@ export const getAffiliationRequests = async (status, requestType) => {
       status: 200,
       code: "SUCCESS-0000",
       message: "소속 신청 목록 조회 성공",
-      result: requests,
+      result: requests.map(formatAffiliationRequest),
     };
   } catch (error) {
     console.error("❌ getAffiliationRequests Error:", error);
@@ -42,7 +43,7 @@ export const getAffiliationRequestById = async (id) => {
       status: 200,
       code: "SUCCESS-0000",
       message: "소속 신청 상세 조회 성공",
-      result: request,
+      result: formatAffiliationRequest(request),
     };
   } catch (error) {
     console.error("❌ getAffiliationRequestById Error:", error);

@@ -1,4 +1,5 @@
 import { submitAffiliationRequest } from "../../services/affiliation/affiliationRequestService.js";
+import { formatAffiliationRequest } from "../../services/affiliation/affiliationRequestFormatter.js";
 
 const REQUEST_TYPE_LABELS = {
   create: "소속 생성",
@@ -8,7 +9,7 @@ const REQUEST_TYPE_LABELS = {
 export const postAffiliationRequest = async (req, res) => {
   try {
     const { name, major, studentId } = req.user;
-    const { phone, affiliationName, requestType } = req.body;
+    const { phone, affiliationName, requestType, introduction } = req.body;
 
     if (!phone || !affiliationName || !requestType) {
       return res.status(400).json({
@@ -24,6 +25,13 @@ export const postAffiliationRequest = async (req, res) => {
       });
     }
 
+    if (introduction != null && typeof introduction !== "string") {
+      return res.status(400).json({
+        code: "ERROR-0005",
+        message: "introduction은 문자열이어야 합니다.",
+      });
+    }
+
     const requestData = {
       name,
       major,
@@ -31,6 +39,8 @@ export const postAffiliationRequest = async (req, res) => {
       phone,
       affiliationName,
       requestType,
+      introduction:
+        requestType === "create" ? (introduction || "").trim() : "",
     };
 
     const saved = await submitAffiliationRequest(requestData);
@@ -38,7 +48,7 @@ export const postAffiliationRequest = async (req, res) => {
     return res.status(201).json({
       code: "SUCCESS-0000",
       message: `${REQUEST_TYPE_LABELS[requestType]} 신청이 완료되었습니다.`,
-      result: saved,
+      result: formatAffiliationRequest(saved),
     });
   } catch (err) {
     console.error("❌ 소속 신청 중 오류:", err);

@@ -18,6 +18,7 @@ export const getAllAffiliations = async () => {
       return {
         _id: aff._id,
         name: aff.name,
+        introduction: aff.introduction || "",
         membersCount: aff.membersCount,
         members: aff.members,
         admins,
