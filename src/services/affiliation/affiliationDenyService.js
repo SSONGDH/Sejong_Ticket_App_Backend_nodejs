@@ -5,7 +5,11 @@ const resolveRequestType = (request) => {
   return request.createAffiliation ? "create" : "admin";
 };
 
-export const denyAffiliationRequest = async (requestId, expectedType) => {
+export const denyAffiliationRequest = async (
+  requestId,
+  expectedType,
+  adminComment = ""
+) => {
   const request = await AffiliationRequest.findById(requestId);
   if (!request) return { error: "NOT_FOUND" };
 
@@ -18,12 +22,16 @@ export const denyAffiliationRequest = async (requestId, expectedType) => {
     return { error: "INVALID_TYPE" };
   }
 
-  await AffiliationRequest.deleteOne({ _id: requestId });
+  request.status = "rejected";
+  request.adminComment = adminComment.trim();
+  await request.save();
 
   return {
-    requestId,
+    requestId: request._id,
     requestType,
     affiliationName: request.affiliationName,
     studentId: request.studentId,
+    adminComment: request.adminComment,
+    status: request.status,
   };
 };

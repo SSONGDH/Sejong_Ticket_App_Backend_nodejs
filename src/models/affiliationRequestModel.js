@@ -26,6 +26,11 @@ const affiliationRequestSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    adminComment: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );

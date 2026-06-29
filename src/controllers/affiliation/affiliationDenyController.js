@@ -2,7 +2,15 @@ import { denyAffiliationRequest } from "../../services/affiliation/affiliationDe
 
 const handleDeny = async (req, res, expectedType, successMessage) => {
   try {
+    if (!req.user?.root) {
+      return res.status(403).json({
+        code: "ERROR-0005",
+        message: "root 관리자만 신청을 거절할 수 있습니다.",
+      });
+    }
+
     const { requestId } = req.query;
+    const { comment } = req.body;
 
     if (!requestId) {
       return res.status(400).json({
@@ -11,7 +19,18 @@ const handleDeny = async (req, res, expectedType, successMessage) => {
       });
     }
 
-    const result = await denyAffiliationRequest(requestId, expectedType);
+    if (comment != null && typeof comment !== "string") {
+      return res.status(400).json({
+        code: "ERROR-0006",
+        message: "comment는 문자열이어야 합니다.",
+      });
+    }
+
+    const result = await denyAffiliationRequest(
+      requestId,
+      expectedType,
+      comment || ""
+    );
 
     if (result.error === "NOT_FOUND") {
       return res.status(404).json({
@@ -50,12 +69,7 @@ const handleDeny = async (req, res, expectedType, successMessage) => {
 };
 
 export const denyCreateAffiliationRequest = (req, res) =>
-  handleDeny(req, res, "create", "소속 생성 신청이 거절되어 삭제되었습니다.");
+  handleDeny(req, res, "create", "소속 생성 신청이 거절되었습니다.");
 
 export const denyAdminAffiliationRequest = (req, res) =>
-  handleDeny(
-    req,
-    res,
-    "admin",
-    "주최자 권한 신청이 거절되어 삭제되었습니다."
-  );
+  handleDeny(req, res, "admin", "주최자 권한 신청이 거절되었습니다.");
