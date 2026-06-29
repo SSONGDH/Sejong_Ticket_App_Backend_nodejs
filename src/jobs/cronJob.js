@@ -81,10 +81,17 @@ const startCronJob = () => {
 
         const diffDays = now.diff(eventEndDate, "days");
 
-        if (diffDays >= 14) {
+        if (diffDays >= 3) {
+          const ticketId = ticket._id.toString();
+
           await Refund.deleteMany({ ticketId: ticket._id });
-          await Payment.deleteMany({ ticketId: ticket._id });
+          await Payment.deleteMany({ ticketId });
           await Ticket.deleteOne({ _id: ticket._id });
+
+          await User.updateMany(
+            { tickets: ticketId },
+            { $pull: { tickets: ticketId } }
+          );
         }
       }
 

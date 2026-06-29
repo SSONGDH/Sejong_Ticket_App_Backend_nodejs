@@ -5,8 +5,8 @@ import {
 
 export const affiliationRequestListController = async (req, res) => {
   try {
-    const { status } = req.query;
-    const response = await getAffiliationRequests(status);
+    const { status, requestType } = req.query;
+    const response = await getAffiliationRequests(status, requestType);
 
     return res.status(response.status).json(response);
   } catch (error) {

@@ -8,14 +8,23 @@ const sendAdminAffiliationRequestNotification = async (tokens, request) => {
     }
 
     for (const token of tokens) {
+      const isCreateRequest = request.requestType === "create";
+      const title = isCreateRequest
+        ? "새 소속 생성 신청"
+        : "소속 관리자 권한 신청";
+      const body = isCreateRequest
+        ? `${request.name} 님이 ${request.affiliationName} 소속 생성을 신청했습니다.`
+        : `${request.name} 님이 ${request.affiliationName} 소속의 관리자 권한을 신청했습니다.`;
+
       const message = {
         token: token,
         notification: {
-          title: "새 소속 신청 요청",
-          body: `${request.name} 님이 ${request.affiliationName} 소속 신청을 요청했습니다.`,
+          title,
+          body,
         },
         data: {
           type: "AFFILIATION_REQUEST",
+          requestType: String(request.requestType || "create"),
           requestId: String(request._id),
           userName: String(request.name),
           affiliation: String(request.affiliationName),

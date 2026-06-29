@@ -16,7 +16,10 @@ export const handleAffiliationApproval = async (requestId) => {
   const affiliationName = request.affiliationName;
   let affiliationDoc;
 
-  if (request.createAffiliation) {
+  const isCreateRequest =
+    request.requestType === "create" || request.createAffiliation;
+
+  if (isCreateRequest) {
     affiliationDoc = await Affiliation.findOne({ name: affiliationName });
     if (!affiliationDoc) {
       affiliationDoc = await Affiliation.create({
@@ -59,7 +62,11 @@ export const handleAffiliationApproval = async (requestId) => {
   await user.save();
 
   return {
-    message: "승인이 완료되었습니다.",
+    message:
+      request.requestType === "admin"
+        ? "관리자 권한 승인이 완료되었습니다."
+        : "소속 생성 승인이 완료되었습니다.",
+    requestType: request.requestType || (isCreateRequest ? "create" : "admin"),
     userId: user._id,
     updatedAffiliations: user.affiliations,
     isAdmin:

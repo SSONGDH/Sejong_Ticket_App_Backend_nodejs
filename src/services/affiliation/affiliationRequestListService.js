@@ -1,8 +1,11 @@
 import AffiliationRequest from "../../models/affiliationRequestModel.js";
 
-export const getAffiliationRequests = async (status) => {
+export const getAffiliationRequests = async (status, requestType) => {
   try {
-    const filter = status ? { status } : {};
+    const filter = {};
+    if (status) filter.status = status;
+    if (requestType) filter.requestType = requestType;
+
     const requests = await AffiliationRequest.find(filter).sort({
       createdAt: -1,
     });

@@ -6,13 +6,13 @@ import moment from "moment";
 
 const deleteExpiredTickets = async () => {
   try {
-    const threeDaysAgo = moment().subtract(14, "days").startOf("day");
+    const retentionCutoff = moment().subtract(3, "days").startOf("day");
     const allTickets = await Ticket.find();
 
     for (const ticket of allTickets) {
       const eventDate = moment(ticket.eventDay, "YYYY-MM-DD");
 
-      if (eventDate.isBefore(threeDaysAgo)) {
+      if (eventDate.isBefore(retentionCutoff)) {
         const ticketId = ticket._id.toString();
 
         await Ticket.findByIdAndDelete(ticketId);
