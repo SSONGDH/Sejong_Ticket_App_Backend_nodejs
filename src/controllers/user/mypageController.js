@@ -3,6 +3,7 @@ import {
   updateAffiliationByStudentId,
 } from "../../services/user/mypageService.js";
 import { getMyAffiliationRequests } from "../../services/affiliation/affiliationMyRequestService.js";
+import { getUserParticipatedEventCount } from "../../services/user/userEventCountService.js";
 
 export const getMyPage = async (req, res) => {
   try {
@@ -74,6 +75,33 @@ export const getMyAffiliationRequestHistory = async (req, res) => {
       code: "ERROR-9999",
       message: error.message || "서버 오류",
       result: null,
+    });
+  }
+};
+
+export const getMyParticipatedEventCount = async (req, res) => {
+  try {
+    const { studentId } = req.user;
+    const result = await getUserParticipatedEventCount(studentId);
+
+    return res.status(200).json({
+      isSuccess: true,
+      code: "SUCCESS-0000",
+      message: "참여 행사 수 조회 성공",
+      result,
+    });
+  } catch (error) {
+    console.error("❌ 참여 행사 수 조회 중 오류:", error);
+    return res.status(500).json({
+      isSuccess: false,
+      code: "ERROR-9999",
+      message: error.message || "서버 오류",
+      result: {
+        participatedCount: 0,
+        totalCount: 0,
+        pendingCount: 0,
+        refundCount: 0,
+      },
     });
   }
 };
