@@ -9,7 +9,7 @@ export const getMyPageInfoByStudentId = async (studentId) => {
   }
 
   const user = await User.findOne({ studentId }).select(
-    "name studentId major affiliations"
+    "name studentId major affiliations root"
   );
 
   if (!user) {
@@ -25,6 +25,7 @@ export const getMyPageInfoByStudentId = async (studentId) => {
     name: user.name,
     studentId: user.studentId,
     major: user.major,
+    root: user.root ?? false,
     affiliations: user.affiliations || [],
     totalAffiliation,
   };

@@ -10,7 +10,7 @@ const formatAffiliation = (affiliationDoc, admin) => ({
 });
 
 export const getAuthorizedAffiliationsByStudentId = async (studentId) => {
-  const user = await User.findOne({ studentId });
+  const user = await User.findOne({ studentId }).select("root affiliations");
 
   if (!user) {
     const error = new Error("해당 유저를 찾을 수 없습니다.");
@@ -18,9 +18,14 @@ export const getAuthorizedAffiliationsByStudentId = async (studentId) => {
     throw error;
   }
 
-  if (user.root === true) {
+  const root = user.root === true;
+
+  if (root) {
     const affiliations = await Affiliation.find({}).sort({ name: 1 });
-    return affiliations.map((aff) => formatAffiliation(aff, true));
+    return {
+      root: true,
+      affiliations: affiliations.map((aff) => formatAffiliation(aff, true)),
+    };
   }
 
   const authorizedAffiliations = (user.affiliations || []).filter(
@@ -28,7 +33,7 @@ export const getAuthorizedAffiliationsByStudentId = async (studentId) => {
   );
 
   if (!authorizedAffiliations.length) {
-    return [];
+    return { root: false, affiliations: [] };
   }
 
   const affiliationNames = authorizedAffiliations.map((aff) => aff.name);
@@ -36,19 +41,22 @@ export const getAuthorizedAffiliationsByStudentId = async (studentId) => {
     name: { $in: affiliationNames },
   });
 
-  return authorizedAffiliations.map((userAff) => {
-    const doc = affiliationDocs.find((d) => d.name === userAff.name);
+  return {
+    root: false,
+    affiliations: authorizedAffiliations.map((userAff) => {
+      const doc = affiliationDocs.find((d) => d.name === userAff.name);
 
-    if (doc) {
-      return formatAffiliation(doc, true);
-    }
+      if (doc) {
+        return formatAffiliation(doc, true);
+      }
 
-    return {
-      affiliationId: userAff._id || null,
-      name: userAff.name,
-      introduction: "",
-      admin: true,
-      membersCount: 0,
-    };
-  });
+      return {
+        affiliationId: userAff._id || null,
+        name: userAff.name,
+        introduction: "",
+        admin: true,
+        membersCount: 0,
+      };
+    }),
+  };
 };
