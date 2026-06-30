@@ -18,6 +18,14 @@ export const authenticate = async (req, res, next) => {
     const user = await User.findById(decoded.id);
     if (!user) throw new Error("유효하지 않은 유저");
 
+    const currentVersion = user.sessionVersion ?? 0;
+    if (
+      decoded.sessionVersion === undefined ||
+      decoded.sessionVersion !== currentVersion
+    ) {
+      throw new Error("다른 기기에서 로그인되어 세션이 만료되었습니다.");
+    }
+
     req.user = {
       studentId: user.studentId,
       name: user.name,

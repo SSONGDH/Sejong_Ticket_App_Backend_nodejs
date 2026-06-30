@@ -21,6 +21,7 @@ export const handleLogin = async ({ userId, password }) => {
           root: false,
           notification: true,
         },
+        $inc: { sessionVersion: 1 },
       },
       { new: true, upsert: true }
     );

@@ -7,6 +7,7 @@ export const generateToken = (user) => {
     id: user._id,
     studentId: user.studentId,
     isAdmin: user.root || false,
+    sessionVersion: user.sessionVersion ?? 0,
   };
 
   return jwt.sign(payload, SECRET_KEY, { expiresIn: "1d" });
