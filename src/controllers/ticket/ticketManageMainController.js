@@ -18,6 +18,8 @@ export const getAdminTickets = async (req, res) => {
         eventPlace: ticket.eventPlace,
         affiliation: ticket.affiliation,
         status: ticket.status,
+        totalCount: ticket.totalCount,
+        pendingCount: ticket.pendingCount,
       })),
     });
   } catch (error) {
