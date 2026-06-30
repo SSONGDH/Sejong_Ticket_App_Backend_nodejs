@@ -20,6 +20,7 @@ export const getAdminTickets = async (req, res) => {
         status: ticket.status,
         totalCount: ticket.totalCount,
         pendingCount: ticket.pendingCount,
+        approvedCount: ticket.approvedCount,
       })),
     });
   } catch (error) {

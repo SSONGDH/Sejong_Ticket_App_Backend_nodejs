@@ -61,6 +61,7 @@ export const getAdminTicketsWithStatus = async (studentId) => {
       status,
       totalCount: counts?.totalCount ?? 0,
       pendingCount: counts?.pendingCount ?? 0,
+      approvedCount: counts?.approvedCount ?? 0,
     };
   });
 
