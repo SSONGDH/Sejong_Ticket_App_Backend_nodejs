@@ -2,6 +2,7 @@ import {
   delegateLeadership,
   getAffiliationMembersWithRoles,
   grantExecutivePermission,
+  removeAffiliationMember,
   revokeExecutivePermission,
 } from "../../services/affiliation/affiliationPermissionService.js";
 
@@ -118,6 +119,37 @@ export const delegateLeadershipController = async (req, res) => {
       isSuccess: true,
       code: "SUCCESS-0000",
       message: "소속장 위임이 완료되었습니다.",
+      result,
+    });
+  } catch (error) {
+    return handlePermissionError(res, error);
+  }
+};
+
+export const removeAffiliationMemberController = async (req, res) => {
+  try {
+    const { studentId } = req.user;
+    const { affiliationId, targetStudentId } = req.body;
+
+    if (!affiliationId || !targetStudentId) {
+      return res.status(400).json({
+        isSuccess: false,
+        code: "ERROR-0003",
+        message: "affiliationId와 targetStudentId가 필요합니다.",
+        result: null,
+      });
+    }
+
+    const result = await removeAffiliationMember(
+      studentId,
+      affiliationId,
+      targetStudentId
+    );
+
+    return res.status(200).json({
+      isSuccess: true,
+      code: "SUCCESS-0000",
+      message: "소속 멤버 삭제 및 권한 해제가 완료되었습니다.",
       result,
     });
   } catch (error) {

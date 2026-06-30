@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
     fcmToken: { type: String, default: null },
     affiliations: [
       {
+        _id: { type: mongoose.Schema.Types.ObjectId, ref: "Affiliation" },
         name: String,
         admin: { type: Boolean, default: false },
         role: {

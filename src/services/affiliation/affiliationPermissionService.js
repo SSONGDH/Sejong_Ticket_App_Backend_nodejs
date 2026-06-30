@@ -11,7 +11,9 @@ import {
   isLeader,
   matchAffiliationId,
   normalizeRole,
+  isSameAffiliation,
 } from "../../utils/affiliationRole.js";
+import { resolveAffiliationMemberUsers } from "../../utils/affiliationMemberSync.js";
 
 const createError = (message, status = 400, code = "PERMISSION_ERROR") => {
   const error = new Error(message);
@@ -116,6 +118,41 @@ const upsertMemberAffiliationRef = (user, affiliation, role) => {
   applyAffiliationRole(affiliationRef, role);
   user.markModified("affiliations");
   return affiliationRef;
+};
+
+export const detachUserFromAffiliation = async (
+  user,
+  { affiliationId, affiliationName }
+) => {
+  const removedAffiliationRef = (user.affiliations || []).find((aff) =>
+    isSameAffiliation(aff, { affiliationId, affiliationName })
+  );
+  const hadHostPermission = hasHostPermission(removedAffiliationRef);
+
+  user.affiliations = (user.affiliations || []).filter(
+    (aff) => !isSameAffiliation(aff, { affiliationId, affiliationName })
+  );
+  user.markModified("affiliations");
+
+  const affiliation = await Affiliation.findOne({
+    $or: [
+      ...(affiliationId ? [{ _id: affiliationId }] : []),
+      ...(affiliationName ? [{ name: affiliationName }] : []),
+    ],
+  });
+
+  if (affiliation) {
+    affiliation.members = affiliation.members.filter(
+      (memberId) => !memberId.equals(user._id)
+    );
+    affiliation.membersCount = affiliation.members.length;
+    await affiliation.save();
+  }
+
+  return {
+    hadHostPermission,
+    permissionsRevoked: hadHostPermission,
+  };
 };
 
 export const grantExecutivePermission = async (
@@ -265,9 +302,7 @@ export const delegateLeadership = async (
 export const getAffiliationMembersWithRoles = async (studentId, affiliationId) => {
   const { affiliation } = await assertHostPermission(studentId, affiliationId);
 
-  const members = await User.find({ _id: { $in: affiliation.members } }).select(
-    "name studentId major affiliations"
-  );
+  const members = await resolveAffiliationMemberUsers(affiliation, { sync: true });
 
   const memberList = members.map((member) => {
     const affRef = findMemberAffiliationRef(member, affiliation._id, affiliation.name);
@@ -294,5 +329,38 @@ export const getAffiliationMembersWithRoles = async (studentId, affiliationId) =
       const roleOrder = { leader: 0, executive: 1, member: 2 };
       return (roleOrder[a.role] ?? 3) - (roleOrder[b.role] ?? 3);
     }),
+  };
+};
+
+export const removeAffiliationMember = async (
+  actorStudentId,
+  affiliationId,
+  targetStudentId
+) => {
+  const { affiliation } = await assertLeader(actorStudentId, affiliationId);
+
+  if (actorStudentId === targetStudentId) {
+    throw createError(
+      "본인을 소속에서 삭제하려면 소속 설정에서 탈퇴해 주세요.",
+      400
+    );
+  }
+
+  const targetUser = await ensureMemberOfAffiliation(targetStudentId, affiliation);
+  const detachResult = await detachUserFromAffiliation(targetUser, {
+    affiliationId: affiliation._id,
+    affiliationName: affiliation.name,
+  });
+
+  await targetUser.save();
+
+  return {
+    affiliationId: affiliation._id,
+    affiliationName: affiliation.name,
+    targetStudentId,
+    ...detachResult,
+    role: AFFILIATION_ROLES.MEMBER,
+    roleLabel: "일반",
+    admin: false,
   };
 };

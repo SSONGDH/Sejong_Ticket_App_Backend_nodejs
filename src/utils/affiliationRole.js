@@ -74,3 +74,7 @@ export const formatRoleFields = (affiliationRef) => {
     admin: hasHostPermission(affiliationRef),
   };
 };
+
+export const isSameAffiliation = (affiliationRef, { affiliationId, affiliationName }) =>
+  (affiliationId && matchAffiliationId(affiliationRef, affiliationId)) ||
+  (affiliationName && affiliationRef?.name === affiliationName);
