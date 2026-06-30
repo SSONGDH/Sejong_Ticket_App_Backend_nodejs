@@ -1,6 +1,7 @@
 import Payment from "../../models/paymentModel.js";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
+import { findPaymentsByTicketIds } from "./paymentCountService.js";
 
 export const getPaymentsByAdmin = async (studentId, affiliationId) => {
   const user = await User.findOne({ studentId });
@@ -22,11 +23,7 @@ export const getPaymentsByAdmin = async (studentId, affiliationId) => {
 
   const ticketIds = tickets.map((t) => t._id.toString());
 
-  return Payment.find({
-    $expr: {
-      $in: [{ $toString: "$ticketId" }, ticketIds],
-    },
-  });
+  return findPaymentsByTicketIds(ticketIds);
 };
 
 export const getPaymentListByAdmin = async (studentId, affiliationId) => {

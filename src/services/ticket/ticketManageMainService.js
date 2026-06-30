@@ -1,6 +1,6 @@
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
-import Payment from "../../models/paymentModel.js";
+import { countPaymentsByTicketIds } from "../payment/paymentCountService.js";
 import moment from "moment";
 import "moment/locale/ko.js";
 
@@ -36,31 +36,7 @@ export const getAdminTicketsWithStatus = async (studentId) => {
   if (!tickets.length) return [];
 
   const ticketIds = tickets.map((ticket) => ticket._id.toString());
-
-  const paymentCounts = await Payment.aggregate([
-    {
-      $match: {
-        $expr: {
-          $in: [{ $toString: "$ticketId" }, ticketIds],
-        },
-      },
-    },
-    {
-      $group: {
-        _id: { $toString: "$ticketId" },
-        totalCount: { $sum: 1 },
-        pendingCount: {
-          $sum: {
-            $cond: [{ $eq: ["$paymentPermissionStatus", false] }, 1, 0],
-          },
-        },
-      },
-    },
-  ]);
-
-  const countMap = Object.fromEntries(
-    paymentCounts.map((item) => [String(item._id), item])
-  );
+  const countMap = await countPaymentsByTicketIds(ticketIds);
 
   const ticketStatuses = tickets.map((ticket) => {
     const status = getAdminTicketStatus(ticket);
