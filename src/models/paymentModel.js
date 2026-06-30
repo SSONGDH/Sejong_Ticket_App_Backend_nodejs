@@ -21,13 +21,16 @@ const paymentSchema = new mongoose.Schema(
     aiReview: {
       extractedAmount: Number,
       extractedDate: String,
+      normalizedDate: String,
       extractedSenderName: String,
       extractedAccountHolderName: String,
+      extractedCounterpartyName: String,
       isTransferScreenshot: Boolean,
       confidence: Number,
       ruleScore: Number,
       combinedConfidence: Number,
       reasons: [String],
+      notes: [String],
       criteria: {
         announcementDate: String,
         participationFee: Number,

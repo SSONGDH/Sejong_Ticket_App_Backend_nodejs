@@ -23,6 +23,27 @@ export const maskedNameMatches = (expected, detected) => {
   return e.includes(d) || d.includes(e);
 };
 
+export const normalizeExtractedDate = (dateValue, announcementDate) => {
+  if (!dateValue) return null;
+
+  const str = String(dateValue).trim().replace(/\./g, "-");
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    return str;
+  }
+
+  const shortMatch = str.match(/^(\d{1,2})-(\d{1,2})$/);
+  if (shortMatch) {
+    const year =
+      announcementDate?.slice(0, 4) || String(new Date().getFullYear());
+    const month = shortMatch[1].padStart(2, "0");
+    const day = shortMatch[2].padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  return str.slice(0, 10);
+};
+
 const parseDate = (value) => {
   if (!value) return null;
   const normalized = String(value).replace(/\./g, "-").slice(0, 10);
@@ -52,12 +73,18 @@ export const evaluatePaymentReview = ({
   aiConfidence,
 }) => {
   const reasons = [];
+  const notes = [];
   let ruleScore = 0;
 
-  if (!extracted.isTransferScreenshot) {
-    reasons.push("송금 캡처 화면으로 인식되지 않음");
+  const normalizedDate = normalizeExtractedDate(
+    extracted.date,
+    criteria.announcementDate
+  );
+
+  if (!extracted.isPaymentProof) {
+    reasons.push("납부 증빙으로 인식되지 않음 (송금/이체/거래내역 화면이 아님)");
   } else {
-    ruleScore += 0.2;
+    ruleScore += 0.15;
   }
 
   if (extracted.amount == null) {
@@ -67,47 +94,55 @@ export const evaluatePaymentReview = ({
       `금액 불일치 (기대: ${criteria.participationFee}, 추출: ${extracted.amount})`
     );
   } else {
-    ruleScore += 0.25;
+    ruleScore += 0.35;
   }
 
-  if (!maskedNameMatches(payment.name, extracted.senderName)) {
+  const recipientName =
+    extracted.accountHolderName ?? extracted.counterpartyName ?? null;
+
+  if (!maskedNameMatches(criteria.accountHolderName, recipientName)) {
     reasons.push(
-      `보낸 사람 이름 불일치 (기대: ${payment.name}, 추출: ${extracted.senderName ?? "없음"})`
+      `받는 사람 이름 불일치 (기대: ${criteria.accountHolderName}, 추출: ${recipientName ?? "없음"})`
     );
   } else {
-    ruleScore += 0.25;
+    ruleScore += 0.35;
   }
 
-  if (!maskedNameMatches(criteria.accountHolderName, extracted.accountHolderName)) {
-    reasons.push(
-      `받는 사람 이름 불일치 (기대: ${criteria.accountHolderName}, 추출: ${extracted.accountHolderName ?? "없음"})`
-    );
-  } else {
-    ruleScore += 0.2;
-  }
-
-  if (!extracted.date) {
+  if (!normalizedDate) {
     reasons.push("송금 날짜를 읽을 수 없음");
-  } else if (!isDateOnOrAfter(extracted.date, criteria.announcementDate)) {
+  } else if (!isDateOnOrAfter(normalizedDate, criteria.announcementDate)) {
     reasons.push(
-      `송금일이 공시일(${criteria.announcementDate}) 이전임 (추출: ${extracted.date})`
+      `송금일이 공시일(${criteria.announcementDate}) 이전임 (추출: ${normalizedDate})`
     );
-  } else if (isDateInFuture(extracted.date)) {
-    reasons.push(`송금일이 미래 날짜임 (추출: ${extracted.date})`);
+  } else if (isDateInFuture(normalizedDate)) {
+    reasons.push(`송금일이 미래 날짜임 (추출: ${normalizedDate})`);
   } else {
-    ruleScore += 0.1;
+    ruleScore += 0.15;
+  }
+
+  if (extracted.senderName) {
+    if (maskedNameMatches(payment.name, extracted.senderName)) {
+      ruleScore += 0.1;
+      notes.push("보낸 사람 이름 일치");
+    } else {
+      notes.push(
+        `보낸 사람 이름 참고: 신청자 ${payment.name}, 추출 ${extracted.senderName}`
+      );
+    }
   }
 
   const confidence = Number(aiConfidence) || 0;
-  const combinedConfidence = confidence * 0.4 + ruleScore * 0.6;
+  const combinedConfidence = confidence * 0.35 + ruleScore * 0.65;
   const canAutoApprove =
     reasons.length === 0 &&
-    combinedConfidence >= 0.85 &&
-    confidence >= 0.8;
+    combinedConfidence >= 0.8 &&
+    confidence >= 0.7;
 
   return {
     status: canAutoApprove ? "auto_approved" : "suspicious",
     reasons,
+    notes,
+    normalizedDate,
     ruleScore,
     combinedConfidence,
     canAutoApprove,
