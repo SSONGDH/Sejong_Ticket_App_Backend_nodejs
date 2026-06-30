@@ -68,6 +68,11 @@ export const getPaymentListByAdmin = async (studentId, affiliationId) => {
     major: payment.major,
     affiliation: affiliationByTicketId[String(payment.ticketId)] ?? null,
     paymentPermissionStatus: payment.paymentPermissionStatus,
+    aiReviewStatus: payment.aiReviewStatus ?? "none",
+    aiReviewReasons:
+      payment.aiReviewStatus === "suspicious"
+        ? payment.aiReview?.reasons ?? []
+        : [],
   }));
 };
 

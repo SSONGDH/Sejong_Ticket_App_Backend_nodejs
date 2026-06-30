@@ -17,5 +17,7 @@ export const getPaymentDetail = async (paymentId) => {
     paymentPermissionStatus: payment.paymentPermissionStatus,
     eventTitle: ticket.eventTitle,
     paymentPicture: payment.paymentPicture,
+    aiReviewStatus: payment.aiReviewStatus ?? "none",
+    aiReview: payment.aiReview ?? null,
   };
 };

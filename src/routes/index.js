@@ -25,6 +25,7 @@ import paymentListRoutes from "./payment/paymentListRoute.js";
 import paymentDetailRoutes from "./payment/paymentDetailRoute.js";
 import paymentPermissionRoutes from "./payment/paymentPermissionRoute.js";
 import paymentDenyRoutes from "./payment/paymentDenyRoute.js";
+import paymentAiReviewRoutes from "./payment/paymentAiReviewRoute.js";
 
 import mypageRoutes from "./user/mypageRoute.js";
 import userAffiliationUpdate from "./user/userAffiliationUpdate.js";
@@ -77,6 +78,7 @@ router.use("/payment", [
   paymentDetailRoutes,
   paymentPermissionRoutes,
   paymentDenyRoutes,
+  paymentAiReviewRoutes,
 ]);
 
 router.use("/user", [
