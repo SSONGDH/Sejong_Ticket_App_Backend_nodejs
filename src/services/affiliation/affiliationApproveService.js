@@ -2,6 +2,7 @@ import AffiliationRequest from "../../models/affiliationRequestModel.js";
 import User from "../../models/userModel.js";
 import Affiliation from "../../models/affiliationModel.js";
 import { countPrivilegedMembers } from "./affiliationPermissionService.js";
+import sendAffiliationRequestResultNotification from "../FCM/sendAffiliationRequestResultNotification.js";
 import {
   AFFILIATION_ROLES,
   MAX_PRIVILEGED_COUNT,
@@ -87,13 +88,21 @@ export const handleAffiliationApproval = async (requestId) => {
   await user.save();
 
   const updatedAff = user.affiliations.find((a) => a.name === affiliationName);
+  const requestType = request.requestType || (isCreateRequest ? "create" : "admin");
+
+  await sendAffiliationRequestResultNotification({
+    studentId: request.studentId,
+    affiliationName,
+    requestType,
+    status: "approved",
+  });
 
   return {
     message:
       request.requestType === "admin"
         ? "임원 권한 승인이 완료되었습니다."
         : "소속 생성 승인이 완료되었습니다.",
-    requestType: request.requestType || (isCreateRequest ? "create" : "admin"),
+    requestType,
     userId: user._id,
     updatedAffiliations: user.affiliations,
     role: updatedAff?.role || AFFILIATION_ROLES.MEMBER,

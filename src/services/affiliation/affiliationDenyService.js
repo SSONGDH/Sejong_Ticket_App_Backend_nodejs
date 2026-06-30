@@ -1,4 +1,5 @@
 import AffiliationRequest from "../../models/affiliationRequestModel.js";
+import sendAffiliationRequestResultNotification from "../FCM/sendAffiliationRequestResultNotification.js";
 
 const resolveRequestType = (request) => {
   if (request.requestType) return request.requestType;
@@ -25,6 +26,14 @@ export const denyAffiliationRequest = async (
   request.status = "rejected";
   request.adminComment = adminComment.trim();
   await request.save();
+
+  await sendAffiliationRequestResultNotification({
+    studentId: request.studentId,
+    affiliationName: request.affiliationName,
+    requestType,
+    status: "rejected",
+    adminComment: request.adminComment,
+  });
 
   return {
     requestId: request._id,
