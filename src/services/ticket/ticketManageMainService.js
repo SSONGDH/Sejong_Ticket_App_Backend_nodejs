@@ -38,10 +38,16 @@ export const getAdminTicketsWithStatus = async (studentId) => {
   const ticketIds = tickets.map((ticket) => ticket._id.toString());
 
   const paymentCounts = await Payment.aggregate([
-    { $match: { ticketId: { $in: ticketIds } } },
+    {
+      $match: {
+        $expr: {
+          $in: [{ $toString: "$ticketId" }, ticketIds],
+        },
+      },
+    },
     {
       $group: {
-        _id: "$ticketId",
+        _id: { $toString: "$ticketId" },
         totalCount: { $sum: 1 },
         pendingCount: {
           $sum: {
@@ -53,7 +59,7 @@ export const getAdminTicketsWithStatus = async (studentId) => {
   ]);
 
   const countMap = Object.fromEntries(
-    paymentCounts.map((item) => [item._id, item])
+    paymentCounts.map((item) => [String(item._id), item])
   );
 
   const ticketStatuses = tickets.map((ticket) => {

@@ -20,10 +20,12 @@ export const getPaymentsByAdmin = async (studentId, affiliationId) => {
     affiliation: targetAffiliation.name,
   });
 
-  const ticketIds = tickets.map((t) => t._id);
+  const ticketIds = tickets.map((t) => t._id.toString());
 
   return Payment.find({
-    ticketId: { $in: ticketIds },
+    $expr: {
+      $in: [{ $toString: "$ticketId" }, ticketIds],
+    },
   });
 };
 
