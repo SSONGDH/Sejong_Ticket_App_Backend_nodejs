@@ -36,19 +36,12 @@ export const paymentPostController = async (req, res) => {
       });
     }
 
-    if (result.error === "ALREADY_PENDING") {
-      return res.status(400).json({
-        isSuccess: false,
-        code: "ERROR-0005",
-        message: result.message,
-        result: [],
-      });
-    }
-
     return res.status(200).json({
       isSuccess: true,
       code: "SUCCESS-0000",
-      message: "납부내역이 성공적으로 저장되었습니다.",
+      message: result.updated
+        ? "납부내역이 수정되었습니다."
+        : "납부내역이 성공적으로 저장되었습니다.",
       result,
     });
   } catch (error) {
