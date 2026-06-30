@@ -6,6 +6,7 @@ import {
   isLeader,
   normalizeRole,
 } from "../../utils/affiliationRole.js";
+import { detachUserFromAffiliation } from "../affiliation/affiliationPermissionService.js";
 
 export const getMyPageInfoByStudentId = async (studentId) => {
   if (!studentId) {
@@ -82,19 +83,23 @@ export const updateAffiliationByStudentId = async (
     }
   }
 
-  const updatedAffiliations = affiliationList.map((newAff) => {
+  for (const removed of removedAffiliations) {
+    await detachUserFromAffiliation(user, {
+      affiliationId: removed._id,
+      affiliationName: removed.name,
+    });
+  }
+
+  for (const newAff of affiliationList) {
     const affId = String(newAff._id || newAff.affiliationId);
-    const existing = previousAffiliations.find(
+    const existing = (user.affiliations || []).find(
       (prev) => String(prev._id) === affId
     );
 
     if (existing) {
-      const ref = {
-        _id: existing._id,
-        name: existing.name || newAff.name,
-      };
-      applyAffiliationRole(ref, normalizeRole(existing));
-      return ref;
+      existing.name = existing.name || newAff.name;
+      applyAffiliationRole(existing, normalizeRole(existing));
+      continue;
     }
 
     const ref = {
@@ -102,32 +107,25 @@ export const updateAffiliationByStudentId = async (
       name: newAff.name,
     };
     applyAffiliationRole(ref, AFFILIATION_ROLES.MEMBER);
-    return ref;
-  });
-
-  user.affiliations = updatedAffiliations;
-  await user.save();
-
-  for (const removed of removedAffiliations) {
-    const affiliationDoc = await Affiliation.findById(removed._id);
-    if (!affiliationDoc) continue;
-
-    affiliationDoc.members = affiliationDoc.members.filter(
-      (memberId) => String(memberId) !== String(user._id)
-    );
-    affiliationDoc.membersCount = affiliationDoc.members.length;
-    await affiliationDoc.save();
+    if (!Array.isArray(user.affiliations)) {
+      user.affiliations = [];
+    }
+    user.affiliations.push(ref);
   }
 
-  for (const added of updatedAffiliations) {
+  user.markModified("affiliations");
+  await user.save();
+
+  for (const newAff of affiliationList) {
+    const affId = String(newAff._id || newAff.affiliationId);
     const wasInPrevious = previousAffiliations.some(
-      (prev) => String(prev._id) === String(added._id)
+      (prev) => String(prev._id) === affId
     );
     if (wasInPrevious) continue;
 
-    let affiliationDoc = await Affiliation.findById(added._id);
-    if (!affiliationDoc && added.name) {
-      affiliationDoc = await Affiliation.findOne({ name: added.name });
+    let affiliationDoc = await Affiliation.findById(newAff._id);
+    if (!affiliationDoc && newAff.name) {
+      affiliationDoc = await Affiliation.findOne({ name: newAff.name });
     }
     if (!affiliationDoc) continue;
 
