@@ -12,6 +12,7 @@ export const getAdminTickets = async (req, res) => {
       result: (tickets || []).map((ticket) => ({
         _id: ticket._id,
         eventTitle: ticket.eventTitle,
+        eventCode: ticket.eventCode,
         eventDay: ticket.eventDay,
         eventStartTime: ticket.eventStartTime,
         eventEndTime: ticket.eventEndTime,
