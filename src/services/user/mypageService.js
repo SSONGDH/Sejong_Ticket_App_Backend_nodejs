@@ -81,7 +81,7 @@ export const updateAffiliationByStudentId = async (
   }
 
   const user = await User.findOne({ studentId }).select(
-    "affiliations name studentId major"
+    "affiliations name studentId major root"
   );
 
   if (!user) {
@@ -105,7 +105,7 @@ export const updateAffiliationByStudentId = async (
   );
 
   for (const removed of removedAffiliations) {
-    if (isLeader(removed)) {
+    if (!user.root && isLeader(removed)) {
       const error = new Error(
         "소속장은 소속장 위임 후 소속을 나갈 수 있습니다."
       );

@@ -250,21 +250,67 @@ export const revokeExecutivePermission = async (
   };
 };
 
+const demoteCurrentLeaders = async (affiliation, exceptUserId = null) => {
+  const members = await User.find({ _id: { $in: affiliation.members } });
+  const savePromises = [];
+
+  for (const member of members) {
+    if (exceptUserId && member._id.equals(exceptUserId)) continue;
+
+    const affRef = findMemberAffiliationRef(
+      member,
+      affiliation._id,
+      affiliation.name
+    );
+
+    if (!isLeader(affRef)) continue;
+
+    applyAffiliationRole(affRef, AFFILIATION_ROLES.MEMBER);
+    member.markModified("affiliations");
+    savePromises.push(member.save());
+  }
+
+  await Promise.all(savePromises);
+};
+
+const ensureRootMemberOfAffiliation = async (rootUser, affiliation) => {
+  if (!affiliation.members.some((memberId) => memberId.equals(rootUser._id))) {
+    affiliation.members.push(rootUser._id);
+    affiliation.membersCount = affiliation.members.length;
+    await affiliation.save();
+  }
+
+  upsertMemberAffiliationRef(rootUser, affiliation, AFFILIATION_ROLES.MEMBER);
+  rootUser.markModified("affiliations");
+  await rootUser.save();
+
+  return rootUser;
+};
+
 export const delegateLeadership = async (
   leaderStudentId,
   affiliationId,
   targetStudentId
 ) => {
-  const { user: leaderUser, affiliation } = await assertLeader(
+  const { user: actorUser, affiliation } = await assertLeader(
     leaderStudentId,
     affiliationId
   );
 
-  if (leaderStudentId === targetStudentId) {
+  const isRootClaimingSelf =
+    actorUser.root === true && leaderStudentId === targetStudentId;
+
+  if (leaderStudentId === targetStudentId && !isRootClaimingSelf) {
     throw createError("본인에게 위임할 수 없습니다.", 400);
   }
 
-  const targetUser = await ensureMemberOfAffiliation(targetStudentId, affiliation);
+  let targetUser;
+  if (isRootClaimingSelf) {
+    targetUser = await ensureRootMemberOfAffiliation(actorUser, affiliation);
+  } else {
+    targetUser = await ensureMemberOfAffiliation(targetStudentId, affiliation);
+  }
+
   const targetAffRef = findMemberAffiliationRef(
     targetUser,
     affiliation._id,
@@ -275,24 +321,42 @@ export const delegateLeadership = async (
     throw createError("이미 소속장입니다.", 400, "ALREADY_LEADER");
   }
 
-  const leaderAffRef = findMemberAffiliationRef(
-    leaderUser,
-    affiliation._id,
-    affiliation.name
-  );
+  let previousLeaderStudentId = leaderStudentId;
 
-  applyAffiliationRole(leaderAffRef, AFFILIATION_ROLES.MEMBER);
+  if (actorUser.root === true) {
+    const currentLeaders = await User.find({ _id: { $in: affiliation.members } });
+    const currentLeader = currentLeaders.find((member) => {
+      const affRef = findMemberAffiliationRef(
+        member,
+        affiliation._id,
+        affiliation.name
+      );
+      return isLeader(affRef);
+    });
+    if (currentLeader) {
+      previousLeaderStudentId = currentLeader.studentId;
+    }
+
+    await demoteCurrentLeaders(affiliation, targetUser._id);
+  } else {
+    const leaderAffRef = findMemberAffiliationRef(
+      actorUser,
+      affiliation._id,
+      affiliation.name
+    );
+    applyAffiliationRole(leaderAffRef, AFFILIATION_ROLES.MEMBER);
+    actorUser.markModified("affiliations");
+    await actorUser.save();
+  }
+
   applyAffiliationRole(targetAffRef, AFFILIATION_ROLES.LEADER);
-
-  leaderUser.markModified("affiliations");
   targetUser.markModified("affiliations");
-
-  await Promise.all([leaderUser.save(), targetUser.save()]);
+  await targetUser.save();
 
   return {
     affiliationId: affiliation._id,
     affiliationName: affiliation.name,
-    previousLeaderStudentId: leaderStudentId,
+    previousLeaderStudentId,
     newLeaderStudentId: targetStudentId,
     privilegedCount: await countPrivilegedMembers(affiliation._id, affiliation.name),
     maxPrivilegedCount: MAX_PRIVILEGED_COUNT,
@@ -300,13 +364,18 @@ export const delegateLeadership = async (
 };
 
 export const getAffiliationMembersWithRoles = async (studentId, affiliationId) => {
-  const { affiliation } = await assertHostPermission(studentId, affiliationId);
+  const { user: viewerUser, affiliation } = await assertHostPermission(
+    studentId,
+    affiliationId
+  );
 
   const members = await resolveAffiliationMemberUsers(affiliation, { sync: true });
+  const viewerIsRoot = viewerUser.root === true;
 
   const memberList = members.map((member) => {
     const affRef = findMemberAffiliationRef(member, affiliation._id, affiliation.name);
     const roleFields = formatRoleFields(affRef);
+    const memberIsRoot = member.root === true;
 
     return {
       userId: member._id,
@@ -314,10 +383,32 @@ export const getAffiliationMembersWithRoles = async (studentId, affiliationId) =
       studentId: member.studentId,
       major: member.major || "",
       ...roleFields,
+      isRoot: memberIsRoot,
     };
   });
 
   const privilegedCount = memberList.filter((member) => member.admin).length;
+
+  const viewerInList = memberList.some(
+    (member) => member.studentId === viewerUser.studentId
+  );
+
+  if (viewerIsRoot && !viewerInList) {
+    const viewerAffRef = findMemberAffiliationRef(
+      viewerUser,
+      affiliation._id,
+      affiliation.name
+    );
+
+    memberList.push({
+      userId: viewerUser._id,
+      name: viewerUser.name,
+      studentId: viewerUser.studentId,
+      major: viewerUser.major || "",
+      ...formatRoleFields(viewerAffRef),
+      isRoot: true,
+    });
+  }
 
   return {
     affiliationId: affiliation._id,
@@ -325,9 +416,13 @@ export const getAffiliationMembersWithRoles = async (studentId, affiliationId) =
     membersCount: memberList.length,
     privilegedCount,
     maxPrivilegedCount: MAX_PRIVILEGED_COUNT,
+    viewerIsRoot,
     members: memberList.sort((a, b) => {
-      const roleOrder = { leader: 0, executive: 1, member: 2 };
-      return (roleOrder[a.role] ?? 3) - (roleOrder[b.role] ?? 3);
+      const roleOrder = { leader: 0, executive: 2, member: 3 };
+      const orderA = (roleOrder[a.role] ?? 4) - (a.isRoot ? 1 : 0);
+      const orderB = (roleOrder[b.role] ?? 4) - (b.isRoot ? 1 : 0);
+      if (orderA !== orderB) return orderA - orderB;
+      return a.name.localeCompare(b.name);
     }),
   };
 };
