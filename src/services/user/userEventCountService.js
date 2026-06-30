@@ -6,6 +6,7 @@ import {
   getTicketStatus,
   getUserTicketsWithStatus,
 } from "../ticket/ticketMainService.js";
+import { countPaymentsByTicketIds } from "../payment/paymentCountService.js";
 
 moment.locale("ko");
 
@@ -18,16 +19,22 @@ const emptyCounts = () => ({
   refundCount: 0,
 });
 
-const formatParticipatedEvent = (ticket) => ({
-  ticketId: ticket._id,
-  eventTitle: ticket.eventTitle,
-  eventDay: ticket.eventDay,
-  eventStartTime: ticket.eventStartTime,
-  eventEndTime: ticket.eventEndTime,
-  eventPlace: ticket.eventPlace,
-  affiliation: ticket.affiliation,
-  status: ticket.status,
-});
+const formatParticipatedEvent = (ticket, countMap = {}) => {
+  const ticketId = ticket._id?.toString?.() ?? String(ticket._id);
+  const counts = countMap[ticketId];
+
+  return {
+    ticketId: ticket._id,
+    eventTitle: ticket.eventTitle,
+    eventDay: ticket.eventDay,
+    eventStartTime: ticket.eventStartTime,
+    eventEndTime: ticket.eventEndTime,
+    eventPlace: ticket.eventPlace,
+    affiliation: ticket.affiliation,
+    status: ticket.status,
+    participantCount: counts?.totalCount ?? 0,
+  };
+};
 
 export const getUserParticipatedEventCount = async (studentId) => {
   const user = await User.findOne({ studentId }).select("tickets");
@@ -73,9 +80,15 @@ export const getUserParticipatedEventList = async (studentId) => {
     return [];
   }
 
-  return tickets
-    .filter((ticket) => PARTICIPATED_STATUSES.has(ticket.status))
-    .map(formatParticipatedEvent)
+  const filtered = tickets.filter((ticket) =>
+    PARTICIPATED_STATUSES.has(ticket.status)
+  );
+
+  const ticketIds = filtered.map((ticket) => ticket._id.toString());
+  const countMap = await countPaymentsByTicketIds(ticketIds);
+
+  return filtered
+    .map((ticket) => formatParticipatedEvent(ticket, countMap))
     .sort(
       (a, b) =>
         moment(b.eventDay, "YYYY.MM.DD(ddd)").valueOf() -
