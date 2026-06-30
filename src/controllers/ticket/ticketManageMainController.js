@@ -9,7 +9,16 @@ export const getAdminTickets = async (req, res) => {
       isSuccess: true,
       code: "SUCCESS-0000",
       message: "관리 소속 티켓 조회 성공",
-      result: tickets || [],
+      result: (tickets || []).map((ticket) => ({
+        _id: ticket._id,
+        eventTitle: ticket.eventTitle,
+        eventDay: ticket.eventDay,
+        eventStartTime: ticket.eventStartTime,
+        eventEndTime: ticket.eventEndTime,
+        eventPlace: ticket.eventPlace,
+        affiliation: ticket.affiliation,
+        status: ticket.status,
+      })),
     });
   } catch (error) {
     console.error("❌ 관리자 티켓 조회 오류:", error);
