@@ -29,11 +29,19 @@ export const getPaymentsByAdmin = async (studentId, affiliationId) => {
 export const getPaymentListByAdmin = async (studentId, affiliationId) => {
   const payments = await getPaymentsByAdmin(studentId, affiliationId);
 
+  const ticketIds = [...new Set(payments.map((p) => String(p.ticketId)))];
+  const tickets = await Ticket.find({ _id: { $in: ticketIds } });
+  const affiliationByTicketId = Object.fromEntries(
+    tickets.map((ticket) => [ticket._id.toString(), ticket.affiliation])
+  );
+
   return payments.map((payment) => ({
     ticketId: payment.ticketId,
     paymentId: payment._id,
     name: payment.name,
     studentId: payment.studentId,
+    major: payment.major,
+    affiliation: affiliationByTicketId[String(payment.ticketId)] ?? null,
     paymentPermissionStatus: payment.paymentPermissionStatus,
   }));
 };
