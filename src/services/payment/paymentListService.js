@@ -2,6 +2,7 @@ import Payment from "../../models/paymentModel.js";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
 import Affiliation from "../../models/affiliationModel.js";
+import Refund from "../../models/refundModel.js";
 import { findPaymentsByTicketIds } from "./paymentCountService.js";
 import {
   findUserAffiliation,
@@ -49,8 +50,30 @@ export const getPaymentsByAdmin = async (studentId, affiliationId) => {
   return getPaymentsForAffiliationName(targetAffiliation.name);
 };
 
+const excludeRefundedPayments = async (payments) => {
+  if (!payments.length) return [];
+
+  const ticketIds = [...new Set(payments.map((p) => String(p.ticketId)))];
+  const studentIds = [...new Set(payments.map((p) => p.studentId))];
+
+  const refunds = await Refund.find({
+    ticketId: { $in: ticketIds },
+    studentId: { $in: studentIds },
+  });
+
+  const refundedKeys = new Set(
+    refunds.map((r) => `${String(r.ticketId)}:${r.studentId}`)
+  );
+
+  return payments.filter(
+    (p) => !refundedKeys.has(`${String(p.ticketId)}:${p.studentId}`)
+  );
+};
+
 export const getPaymentListByAdmin = async (studentId, affiliationId) => {
-  const payments = await getPaymentsByAdmin(studentId, affiliationId);
+  const payments = await excludeRefundedPayments(
+    await getPaymentsByAdmin(studentId, affiliationId)
+  );
 
   const ticketIds = [...new Set(payments.map((p) => String(p.ticketId)))];
   const tickets = ticketIds.length
@@ -68,6 +91,7 @@ export const getPaymentListByAdmin = async (studentId, affiliationId) => {
     major: payment.major,
     affiliation: affiliationByTicketId[String(payment.ticketId)] ?? null,
     paymentPermissionStatus: payment.paymentPermissionStatus,
+    status: payment.paymentPermissionStatus ? "승인됨" : "승인대기",
     aiReviewStatus: payment.aiReviewStatus ?? "none",
     aiReviewReasons:
       payment.aiReviewStatus === "suspicious"
@@ -77,7 +101,9 @@ export const getPaymentListByAdmin = async (studentId, affiliationId) => {
 };
 
 export const getPaymentCountByAdmin = async (studentId, affiliationId) => {
-  const payments = await getPaymentsByAdmin(studentId, affiliationId);
+  const payments = await excludeRefundedPayments(
+    await getPaymentsByAdmin(studentId, affiliationId)
+  );
   const approvedCount = payments.filter((p) => p.paymentPermissionStatus).length;
   const pendingCount = payments.length - approvedCount;
 
