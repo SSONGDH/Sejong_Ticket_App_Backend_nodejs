@@ -1,10 +1,24 @@
 import Refund from "../../models/refundModel.js";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
+import Affiliation from "../../models/affiliationModel.js";
 import {
   findUserAffiliation,
   hasHostPermission,
 } from "../../utils/affiliationRole.js";
+
+const getRefundsForAffiliationName = async (affiliationName) => {
+  const tickets = await Ticket.find({ affiliation: affiliationName });
+
+  if (!tickets.length) {
+    return { refunds: [], tickets: [] };
+  }
+
+  const ticketIds = tickets.map((ticket) => ticket._id);
+  const refunds = await Refund.find({ ticketId: { $in: ticketIds } });
+
+  return { refunds, tickets };
+};
 
 export const getRefundListByAdmin = async (studentId, affiliationId) => {
   const user = await User.findOne({ studentId });
@@ -13,12 +27,25 @@ export const getRefundListByAdmin = async (studentId, affiliationId) => {
   let refunds = [];
   let tickets = [];
 
-  if (user.root === true) {
+  if (affiliationId) {
+    const affiliation = await Affiliation.findById(affiliationId);
+    if (!affiliation) return [];
+
+    if (user.root !== true) {
+      const targetAffiliation = findUserAffiliation(user, affiliationId);
+
+      if (!targetAffiliation || !hasHostPermission(targetAffiliation)) {
+        return [];
+      }
+    }
+
+    ({ refunds, tickets } = await getRefundsForAffiliationName(affiliation.name));
+  } else if (user.root === true) {
     refunds = await Refund.find({});
 
     if (refunds.length > 0) {
       tickets = await Ticket.find({
-        _id: { $in: refunds.map((r) => r.ticketId) },
+        _id: { $in: refunds.map((refund) => refund.ticketId) },
       });
     }
   } else {
@@ -26,16 +53,9 @@ export const getRefundListByAdmin = async (studentId, affiliationId) => {
 
     if (!targetAffiliation || !hasHostPermission(targetAffiliation)) return [];
 
-    tickets = await Ticket.find({
-      affiliation: targetAffiliation.name,
-    });
-
-    if (tickets.length > 0) {
-      const ticketIds = tickets.map((t) => t._id);
-      refunds = await Refund.find({
-        ticketId: { $in: ticketIds },
-      });
-    }
+    ({ refunds, tickets } = await getRefundsForAffiliationName(
+      targetAffiliation.name
+    ));
   }
 
   return refunds.map((refund) => {
@@ -46,6 +66,7 @@ export const getRefundListByAdmin = async (studentId, affiliationId) => {
       name: refund.name,
       studentId: refund.studentId,
       eventName,
+      affiliation: ticket?.affiliation ?? null,
       visitDate: refund.visitDate,
       visitTime: refund.visitTime,
       refundPermissionStatus: refund.refundPermissionStatus ? "TRUE" : "FALSE",
