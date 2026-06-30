@@ -1,6 +1,7 @@
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
 import { countPaymentsByTicketIds } from "../payment/paymentCountService.js";
+import { hasHostPermission } from "../../utils/affiliationRole.js";
 import moment from "moment";
 import "moment/locale/ko.js";
 
@@ -23,7 +24,7 @@ export const getAdminTicketsWithStatus = async (studentId) => {
     tickets = await Ticket.find({});
   } else {
     const adminAffiliationNames = (user.affiliations || [])
-      .filter((aff) => aff.admin === true)
+      .filter((aff) => hasHostPermission(aff))
       .map((aff) => aff.name);
 
     if (!adminAffiliationNames.length) return [];

@@ -37,6 +37,7 @@ import affiliationApproveRoutes from "./affiliation/affiliationApproveRoute.js";
 import affiliationDenyRoutes from "./affiliation/affiliationDenyRoute.js";
 import affiliationListRoutes from "./affiliation/affiliationListRoute.js";
 import affiliationRequestsListRoute from "./affiliation/affiliationRequestsListRoute.js";
+import affiliationPermissionRoute from "./affiliation/affiliationPermissionRoute.js";
 
 import adminConnectionRoutes from "./admin/adminConnection.js";
 import rootConnectionRoutes from "./root/rootConnection.js";
@@ -87,6 +88,7 @@ router.use("/user", [
 ]);
 
 router.use("/affiliation", [
+  affiliationPermissionRoute,
   affiliationRequestRoutes,
   affiliationApproveRoutes,
   affiliationDenyRoutes,

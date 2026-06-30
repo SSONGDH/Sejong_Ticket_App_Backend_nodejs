@@ -1,18 +1,37 @@
 import Affiliation from "../../models/affiliationModel.js";
-import User from "../../models/userModel.js";
+import {
+  findMemberAffiliationRef,
+  formatRoleFields,
+  hasHostPermission,
+  isLeader,
+} from "../../utils/affiliationRole.js";
 
 export const getAllAffiliations = async () => {
   try {
     const affiliations = await Affiliation.find({})
-      .populate("members", "name studentId affiliations")
+      .populate("members", "name studentId major affiliations")
       .sort({ createdAt: -1 });
 
     const affiliationsWithAdmins = affiliations.map((aff) => {
-      const admins = aff.members.filter((member) => {
-        const affData = member.affiliations?.find(
-          (a) => a.id?.toString() === aff._id.toString()
-        );
-        return affData?.admin === true;
+      const privilegedMembers = aff.members.filter((member) => {
+        const affData = findMemberAffiliationRef(member, aff._id, aff.name);
+        return hasHostPermission(affData);
+      });
+
+      const leaders = aff.members.filter((member) => {
+        const affData = findMemberAffiliationRef(member, aff._id, aff.name);
+        return isLeader(affData);
+      });
+
+      const members = aff.members.map((member) => {
+        const affData = findMemberAffiliationRef(member, aff._id, aff.name);
+        return {
+          _id: member._id,
+          name: member.name,
+          studentId: member.studentId,
+          major: member.major || "",
+          ...formatRoleFields(affData),
+        };
       });
 
       return {
@@ -20,8 +39,10 @@ export const getAllAffiliations = async () => {
         name: aff.name,
         introduction: aff.introduction || "",
         membersCount: aff.membersCount,
-        members: aff.members,
-        admins,
+        members,
+        admins: privilegedMembers,
+        leaders,
+        privilegedCount: privilegedMembers.length,
         createdAt: aff.createdAt,
         updatedAt: aff.updatedAt,
       };

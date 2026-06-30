@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema(
       {
         name: String,
         admin: { type: Boolean, default: false },
+        role: {
+          type: String,
+          enum: ["leader", "executive", "member"],
+          default: "member",
+        },
       },
     ],
     notification: { type: Boolean, default: true },

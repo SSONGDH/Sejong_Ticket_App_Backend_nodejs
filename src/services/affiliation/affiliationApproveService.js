@@ -1,6 +1,13 @@
 import AffiliationRequest from "../../models/affiliationRequestModel.js";
 import User from "../../models/userModel.js";
 import Affiliation from "../../models/affiliationModel.js";
+import { countPrivilegedMembers } from "./affiliationPermissionService.js";
+import {
+  AFFILIATION_ROLES,
+  MAX_PRIVILEGED_COUNT,
+  applyAffiliationRole,
+  hasHostPermission,
+} from "../../utils/affiliationRole.js";
 
 export const handleAffiliationApproval = async (requestId) => {
   const request = await AffiliationRequest.findById(requestId);
@@ -48,29 +55,48 @@ export const handleAffiliationApproval = async (requestId) => {
   if (!Array.isArray(user.affiliations)) user.affiliations = [];
 
   const existingAff = user.affiliations.find((a) => a.name === affiliationName);
+  const assignedRole = isCreateRequest
+    ? AFFILIATION_ROLES.LEADER
+    : AFFILIATION_ROLES.EXECUTIVE;
+
+  if (!isCreateRequest) {
+    const privilegedCount = await countPrivilegedMembers(
+      affiliationDoc._id,
+      affiliationName
+    );
+
+    if (privilegedCount >= MAX_PRIVILEGED_COUNT) {
+      throw new Error(
+        `소속 권한 인원은 최대 ${MAX_PRIVILEGED_COUNT}명까지 가능합니다.`
+      );
+    }
+  }
 
   if (!existingAff) {
-    user.affiliations.push({
+    const newAffiliationRef = {
       _id: affiliationDoc._id,
       name: affiliationName,
-      admin: !!request.requestAdmin,
-    });
+    };
+    applyAffiliationRole(newAffiliationRef, assignedRole);
+    user.affiliations.push(newAffiliationRef);
   } else if (request.requestAdmin) {
-    existingAff.admin = true;
+    applyAffiliationRole(existingAff, assignedRole);
     user.markModified("affiliations");
   }
 
   await user.save();
 
+  const updatedAff = user.affiliations.find((a) => a.name === affiliationName);
+
   return {
     message:
       request.requestType === "admin"
-        ? "관리자 권한 승인이 완료되었습니다."
+        ? "임원 권한 승인이 완료되었습니다."
         : "소속 생성 승인이 완료되었습니다.",
     requestType: request.requestType || (isCreateRequest ? "create" : "admin"),
     userId: user._id,
     updatedAffiliations: user.affiliations,
-    isAdmin:
-      user.affiliations.find((a) => a.name === affiliationName)?.admin || false,
+    role: updatedAff?.role || AFFILIATION_ROLES.MEMBER,
+    isAdmin: hasHostPermission(updatedAff),
   };
 };

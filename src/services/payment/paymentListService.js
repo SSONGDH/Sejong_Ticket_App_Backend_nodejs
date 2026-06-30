@@ -2,6 +2,10 @@ import Payment from "../../models/paymentModel.js";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
 import { findPaymentsByTicketIds } from "./paymentCountService.js";
+import {
+  findUserAffiliation,
+  hasHostPermission,
+} from "../../utils/affiliationRole.js";
 
 export const getPaymentsByAdmin = async (studentId, affiliationId) => {
   const user = await User.findOne({ studentId });
@@ -11,11 +15,9 @@ export const getPaymentsByAdmin = async (studentId, affiliationId) => {
     return Payment.find({});
   }
 
-  const targetAffiliation = (user.affiliations || []).find(
-    (aff) => aff.id === affiliationId
-  );
+  const targetAffiliation = findUserAffiliation(user, affiliationId);
 
-  if (!targetAffiliation) return [];
+  if (!targetAffiliation || !hasHostPermission(targetAffiliation)) return [];
 
   const tickets = await Ticket.find({
     affiliation: targetAffiliation.name,
@@ -29,19 +31,12 @@ export const getPaymentsByAdmin = async (studentId, affiliationId) => {
 export const getPaymentListByAdmin = async (studentId, affiliationId) => {
   const payments = await getPaymentsByAdmin(studentId, affiliationId);
 
-  const ticketIds = [...new Set(payments.map((p) => String(p.ticketId)))];
-  const tickets = await Ticket.find({ _id: { $in: ticketIds } });
-  const affiliationByTicketId = Object.fromEntries(
-    tickets.map((ticket) => [ticket._id.toString(), ticket.affiliation])
-  );
-
   return payments.map((payment) => ({
     ticketId: payment.ticketId,
     paymentId: payment._id,
     name: payment.name,
     studentId: payment.studentId,
     major: payment.major,
-    affiliation: affiliationByTicketId[String(payment.ticketId)] ?? null,
     paymentPermissionStatus: payment.paymentPermissionStatus,
   }));
 };

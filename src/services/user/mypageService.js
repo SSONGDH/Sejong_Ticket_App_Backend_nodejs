@@ -1,5 +1,10 @@
 import User from "../../models/userModel.js";
 import Affiliation from "../../models/affiliationModel.js";
+import {
+  formatRoleFields,
+  matchAffiliationId,
+  normalizeRole,
+} from "../../utils/affiliationRole.js";
 
 export const getMyPageInfoByStudentId = async (studentId) => {
   if (!studentId) {
@@ -58,10 +63,18 @@ export const updateAffiliationByStudentId = async (
   }
 
   const updatedAffiliations = affiliationList.map((newAff) => {
+    const existingAff = (user.affiliations || []).find(
+      (aff) =>
+        matchAffiliationId(aff, newAff._id) ||
+        (newAff.name && aff.name === newAff.name)
+    );
+
+    const role = normalizeRole(existingAff);
+
     return {
       _id: newAff._id,
       name: newAff.name,
-      admin: !!newAff.admin,
+      ...formatRoleFields({ role }),
     };
   });
 

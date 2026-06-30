@@ -1,6 +1,10 @@
 import Refund from "../../models/refundModel.js";
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
+import {
+  findUserAffiliation,
+  hasHostPermission,
+} from "../../utils/affiliationRole.js";
 
 export const getRefundListByAdmin = async (studentId, affiliationId) => {
   const user = await User.findOne({ studentId });
@@ -18,11 +22,9 @@ export const getRefundListByAdmin = async (studentId, affiliationId) => {
       });
     }
   } else {
-    const targetAffiliation = (user.affiliations || []).find(
-      (aff) => aff.id === affiliationId
-    );
+    const targetAffiliation = findUserAffiliation(user, affiliationId);
 
-    if (!targetAffiliation) return [];
+    if (!targetAffiliation || !hasHostPermission(targetAffiliation)) return [];
 
     tickets = await Ticket.find({
       affiliation: targetAffiliation.name,

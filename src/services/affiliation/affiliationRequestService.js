@@ -1,6 +1,7 @@
 import AffiliationRequest from "../../models/affiliationRequestModel.js";
 import User from "../../models/userModel.js";
 import Affiliation from "../../models/affiliationModel.js";
+import { hasHostPermission } from "../../utils/affiliationRole.js";
 
 const mapRequestTypeToFlags = (requestType) => {
   if (requestType === "create") {
@@ -31,15 +32,15 @@ export const submitAffiliationRequest = async (requestData) => {
       (aff) => aff.name === affiliationName
     );
 
-    if (requestType === "create" && existingAff?.admin === true) {
-      const error = new Error("이미 해당 소속의 관리자입니다.");
+    if (requestType === "create" && existingAff && hasHostPermission(existingAff)) {
+      const error = new Error("이미 해당 소속의 권한을 보유하고 있습니다.");
       error.code = "ALREADY_ADMIN";
       throw error;
     }
 
     if (requestType === "admin") {
-      if (existingAff?.admin === true) {
-        const error = new Error("이미 해당 소속의 관리자 권한을 보유하고 있습니다.");
+      if (existingAff && hasHostPermission(existingAff)) {
+        const error = new Error("이미 해당 소속의 권한을 보유하고 있습니다.");
         error.code = "ALREADY_ADMIN";
         throw error;
       }

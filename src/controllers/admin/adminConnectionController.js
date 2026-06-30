@@ -1,4 +1,5 @@
 import User from "../../models/userModel.js";
+import { hasHostPermission } from "../../utils/affiliationRole.js";
 
 export const adminConnection = async (req, res) => {
   try {
@@ -17,7 +18,7 @@ export const adminConnection = async (req, res) => {
     const hasAnyAdminRole =
       user.root === true ||
       (Array.isArray(user.affiliations) &&
-        user.affiliations.some((aff) => aff.admin === true));
+        user.affiliations.some((aff) => hasHostPermission(aff)));
 
     if (!hasAnyAdminRole) {
       return res.status(403).json({
