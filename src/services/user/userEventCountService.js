@@ -1,12 +1,32 @@
 import User from "../../models/userModel.js";
 import Ticket from "../../models/ticketModel.js";
-import { getTicketStatus } from "../ticket/ticketMainService.js";
+import moment from "moment";
+import "moment/locale/ko.js";
+import {
+  getTicketStatus,
+  getUserTicketsWithStatus,
+} from "../ticket/ticketMainService.js";
+
+moment.locale("ko");
+
+const PARTICIPATED_STATUSES = new Set(["사용 가능", "만료됨"]);
 
 const emptyCounts = () => ({
   participatedCount: 0,
   totalCount: 0,
   pendingCount: 0,
   refundCount: 0,
+});
+
+const formatParticipatedEvent = (ticket) => ({
+  ticketId: ticket._id,
+  eventTitle: ticket.eventTitle,
+  eventDay: ticket.eventDay,
+  eventStartTime: ticket.eventStartTime,
+  eventEndTime: ticket.eventEndTime,
+  eventPlace: ticket.eventPlace,
+  affiliation: ticket.affiliation,
+  status: ticket.status,
 });
 
 export const getUserParticipatedEventCount = async (studentId) => {
@@ -44,4 +64,21 @@ export const getUserParticipatedEventCount = async (studentId) => {
     pendingCount,
     refundCount,
   };
+};
+
+export const getUserParticipatedEventList = async (studentId) => {
+  const tickets = await getUserTicketsWithStatus(studentId);
+
+  if (!tickets?.length) {
+    return [];
+  }
+
+  return tickets
+    .filter((ticket) => PARTICIPATED_STATUSES.has(ticket.status))
+    .map(formatParticipatedEvent)
+    .sort(
+      (a, b) =>
+        moment(b.eventDay, "YYYY.MM.DD(ddd)").valueOf() -
+        moment(a.eventDay, "YYYY.MM.DD(ddd)").valueOf()
+    );
 };

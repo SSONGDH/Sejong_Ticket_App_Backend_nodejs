@@ -3,7 +3,10 @@ import {
   updateAffiliationByStudentId,
 } from "../../services/user/mypageService.js";
 import { getMyAffiliationRequests } from "../../services/affiliation/affiliationMyRequestService.js";
-import { getUserParticipatedEventCount } from "../../services/user/userEventCountService.js";
+import {
+  getUserParticipatedEventCount,
+  getUserParticipatedEventList,
+} from "../../services/user/userEventCountService.js";
 
 export const getMyPage = async (req, res) => {
   try {
@@ -102,6 +105,28 @@ export const getMyParticipatedEventCount = async (req, res) => {
         pendingCount: 0,
         refundCount: 0,
       },
+    });
+  }
+};
+
+export const getMyParticipatedEventList = async (req, res) => {
+  try {
+    const { studentId } = req.user;
+    const result = await getUserParticipatedEventList(studentId);
+
+    return res.status(200).json({
+      isSuccess: true,
+      code: "SUCCESS-0000",
+      message: "참여 행사 목록 조회 성공",
+      result,
+    });
+  } catch (error) {
+    console.error("❌ 참여 행사 목록 조회 중 오류:", error);
+    return res.status(500).json({
+      isSuccess: false,
+      code: "ERROR-9999",
+      message: error.message || "서버 오류",
+      result: [],
     });
   }
 };
