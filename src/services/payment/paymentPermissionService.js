@@ -2,6 +2,7 @@ import Payment from "../../models/paymentModel.js";
 import User from "../../models/userModel.js";
 import Ticket from "../../models/ticketModel.js";
 import sendTicketApprovalNotification from "../FCM/sendTicketApprovalNotification.js";
+import { checkAndSendReminderIfDue } from "../FCM/sendEventReminderNotification.js";
 import { getPaymentsByAdmin } from "./paymentListService.js";
 
 export const approvePayment = async (paymentId) => {
@@ -17,6 +18,9 @@ export const approvePayment = async (paymentId) => {
   if (!user.tickets.includes(payment.ticketId)) {
     user.tickets.push(payment.ticketId);
     await user.save();
+    checkAndSendReminderIfDue(payment.ticketId, user._id).catch((err) => {
+      console.error("이벤트 리마인더 즉시 발송 실패:", err);
+    });
   }
 
   const ticket = await Ticket.findById(payment.ticketId);

@@ -1,4 +1,5 @@
 import Ticket from "../../models/ticketModel.js";
+import User from "../../models/userModel.js";
 import moment from "moment";
 
 export const modifyTicket = async (body, req) => {
@@ -42,11 +43,16 @@ export const modifyTicket = async (body, req) => {
     : existingTicket.eventEndTime;
 
   let reminderSent = existingTicket.reminderSent;
-  if (
+  const scheduleChanged =
     formattedStartTime !== existingTicket.eventStartTime ||
-    eventDay !== existingTicket.eventDay
-  ) {
+    eventDay !== existingTicket.eventDay;
+
+  if (scheduleChanged) {
     reminderSent = false;
+    await User.updateMany(
+      { eventRemindersSent: String(_id) },
+      { $pull: { eventRemindersSent: String(_id) } }
+    );
   }
 
   const updatedTicket = await Ticket.findByIdAndUpdate(

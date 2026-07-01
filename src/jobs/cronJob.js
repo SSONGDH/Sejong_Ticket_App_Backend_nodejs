@@ -2,6 +2,7 @@ import cron from "node-cron";
 import moment from "moment-timezone";
 import sendEventReminderNotification from "../services/FCM/sendEventReminderNotification.js";
 import sendAdminAffiliationRequestNotification from "../services/FCM/sendAdminAffiliationRequestNotification.js";
+import { parseEventStartAt } from "../utils/eventTime.js";
 import Ticket from "../models/ticketModel.js";
 import Refund from "../models/refundModel.js";
 import Payment from "../models/paymentModel.js";
@@ -14,18 +15,19 @@ const startCronJob = () => {
     const upcomingEvents = await Ticket.find();
 
     for (const event of upcomingEvents) {
-      const eventStartDate = moment.tz(
-        `${event.eventDay} ${event.eventStartTime}`,
-        "YYYY-MM-DD HH:mm:ss",
-        "Asia/Seoul"
+      const eventStartDate = parseEventStartAt(
+        event.eventDay,
+        event.eventStartTime
       );
 
+      if (!eventStartDate) {
+        continue;
+      }
+
       const diffMinutes = eventStartDate.diff(now, "minutes");
-      if (!event.reminderSent && diffMinutes <= 60 && diffMinutes > 0) {
+      if (diffMinutes <= 60 && diffMinutes > 0) {
         try {
           await sendEventReminderNotification(event._id);
-          event.reminderSent = true;
-          await event.save();
         } catch (err) {
           console.error(
             now.format("YYYY-MM-DD HH:mm:ss"),

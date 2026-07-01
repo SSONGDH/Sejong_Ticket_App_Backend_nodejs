@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
     notification: { type: Boolean, default: true },
+    eventRemindersSent: { type: [String], default: [] },
     sessionVersion: { type: Number, default: 0 },
   },
   { timestamps: true }
