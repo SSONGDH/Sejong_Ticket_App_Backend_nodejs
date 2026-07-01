@@ -22,6 +22,13 @@ export const sendEventReminderForUser = async (ticketId, userId) => {
     return false;
   }
 
+  const isExcluded = (user.eventReminderExcludedTickets || []).some(
+    (id) => String(id) === ticketIdStr
+  );
+  if (isExcluded) {
+    return false;
+  }
+
   const alreadySent = (user.eventRemindersSent || []).some(
     (id) => String(id) === ticketIdStr
   );

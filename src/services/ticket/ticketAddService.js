@@ -1,7 +1,6 @@
 import Ticket from "../../models/ticketModel.js";
 import User from "../../models/userModel.js";
 import Payment from "../../models/paymentModel.js";
-import { checkAndSendReminderIfDue } from "../FCM/sendEventReminderNotification.js";
 
 export const addTicketForUser = async (eventCode, studentId) => {
   if (!eventCode) {
@@ -58,10 +57,15 @@ export const addTicketForUser = async (eventCode, studentId) => {
   const hasTicket = user.tickets.some((t) => String(t) === ticketIdStr);
   if (!hasTicket) {
     user.tickets.push(ticketIdStr);
+    if (!user.eventReminderExcludedTickets) {
+      user.eventReminderExcludedTickets = [];
+    }
+    if (
+      !user.eventReminderExcludedTickets.some((id) => String(id) === ticketIdStr)
+    ) {
+      user.eventReminderExcludedTickets.push(ticketIdStr);
+    }
     await user.save();
-    checkAndSendReminderIfDue(ticketIdStr, user._id).catch((err) => {
-      console.error("이벤트 리마인더 즉시 발송 실패:", err);
-    });
   }
 
   const existingPayment = await Payment.findOne({
