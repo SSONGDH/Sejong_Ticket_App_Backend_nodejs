@@ -4,7 +4,14 @@ import User from "../../models/userModel.js";
 import Ticket from "../../models/ticketModel.js";
 import { parseEventStartAt } from "../../utils/eventTime.js";
 
-export const sendEventReminderForUser = async (ticketId, userId) => {
+const buildReminderKey = (ticket) =>
+  `${ticket.eventTitle}|${String(ticket.eventDay).slice(0, 10)}|${ticket.eventStartTime}`;
+
+export const sendEventReminderForUser = async (
+  ticketId,
+  userId,
+  sentTokens = null
+) => {
   const ticketIdStr = String(ticketId);
   const ticket = await Ticket.findById(ticketIdStr);
 
@@ -14,6 +21,10 @@ export const sendEventReminderForUser = async (ticketId, userId) => {
 
   const user = await User.findById(userId);
   if (!user?.fcmToken || user.notification !== true) {
+    return false;
+  }
+
+  if (sentTokens?.has(user.fcmToken)) {
     return false;
   }
 
@@ -29,8 +40,9 @@ export const sendEventReminderForUser = async (ticketId, userId) => {
     return false;
   }
 
+  const reminderKey = buildReminderKey(ticket);
   const alreadySent = (user.eventRemindersSent || []).some(
-    (id) => String(id) === ticketIdStr
+    (id) => String(id) === ticketIdStr || String(id) === reminderKey
   );
   if (alreadySent) {
     return false;
@@ -39,9 +51,9 @@ export const sendEventReminderForUser = async (ticketId, userId) => {
   const claimed = await User.findOneAndUpdate(
     {
       _id: user._id,
-      eventRemindersSent: { $ne: ticketIdStr },
+      eventRemindersSent: { $nin: [ticketIdStr, reminderKey] },
     },
-    { $addToSet: { eventRemindersSent: ticketIdStr } }
+    { $addToSet: { eventRemindersSent: { $each: [ticketIdStr, reminderKey] } } }
   );
 
   if (!claimed) {
@@ -54,6 +66,16 @@ export const sendEventReminderForUser = async (ticketId, userId) => {
       title: "이벤트 시작 1시간 전!",
       body: `${ticket.eventTitle}이(가) 곧 시작됩니다. 준비하세요!`,
     },
+    android: {
+      notification: {
+        tag: `event_reminder_${ticketIdStr}`,
+      },
+    },
+    apns: {
+      headers: {
+        "apns-collapse-id": `event_reminder_${ticketIdStr}`,
+      },
+    },
     data: {
       type: "EVENT_REMINDER",
       userId: user._id.toString(),
@@ -64,11 +86,12 @@ export const sendEventReminderForUser = async (ticketId, userId) => {
 
   try {
     await admin.messaging().send(message);
+    sentTokens?.add(user.fcmToken);
     return true;
   } catch (sendError) {
     await User.updateOne(
       { _id: user._id },
-      { $pull: { eventRemindersSent: ticketIdStr } }
+      { $pull: { eventRemindersSent: { $in: [ticketIdStr, reminderKey] } } }
     );
     console.error(
       moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss"),
@@ -104,12 +127,17 @@ export const checkAndSendReminderIfDue = async (ticketId, userId) => {
 const sendEventReminderNotification = async (eventId) => {
   const ticketIdStr = String(eventId);
   const users = await User.find({ tickets: ticketIdStr });
+  const sentTokens = new Set();
 
   let sentCount = 0;
   let skippedCount = 0;
 
   for (const user of users) {
-    const sent = await sendEventReminderForUser(ticketIdStr, user._id);
+    const sent = await sendEventReminderForUser(
+      ticketIdStr,
+      user._id,
+      sentTokens
+    );
     if (sent) {
       sentCount += 1;
     } else {

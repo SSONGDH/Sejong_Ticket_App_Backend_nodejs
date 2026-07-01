@@ -13,6 +13,7 @@ const startCronJob = () => {
   cron.schedule("*/1 * * * *", async () => {
     const now = moment().tz("Asia/Seoul");
     const upcomingEvents = await Ticket.find();
+    const processedEventKeys = new Set();
 
     for (const event of upcomingEvents) {
       const eventStartDate = parseEventStartAt(
@@ -26,6 +27,12 @@ const startCronJob = () => {
 
       const diffMinutes = eventStartDate.diff(now, "minutes");
       if (diffMinutes <= 60 && diffMinutes > 0) {
+        const eventKey = `${event.eventTitle}|${String(event.eventDay).slice(0, 10)}|${event.eventStartTime}`;
+        if (processedEventKeys.has(eventKey)) {
+          continue;
+        }
+        processedEventKeys.add(eventKey);
+
         try {
           await sendEventReminderNotification(event._id);
         } catch (err) {
