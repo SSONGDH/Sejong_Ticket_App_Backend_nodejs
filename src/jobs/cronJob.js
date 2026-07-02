@@ -3,6 +3,7 @@ import moment from "moment-timezone";
 import sendEventReminderNotification from "../services/FCM/sendEventReminderNotification.js";
 import sendAdminAffiliationRequestNotification from "../services/FCM/sendAdminAffiliationRequestNotification.js";
 import { parseEventStartAt } from "../utils/eventTime.js";
+import { snapshotTicketParticipation } from "../services/user/participationHistoryService.js";
 import Ticket from "../models/ticketModel.js";
 import Refund from "../models/refundModel.js";
 import Payment from "../models/paymentModel.js";
@@ -94,6 +95,8 @@ const startCronJob = () => {
 
         if (diffDays >= 3) {
           const ticketId = ticket._id.toString();
+
+          await snapshotTicketParticipation(ticket);
 
           await Refund.deleteMany({ ticketId: ticket._id });
           await Payment.deleteMany({ ticketId });
