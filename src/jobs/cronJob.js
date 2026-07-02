@@ -82,13 +82,15 @@ const startCronJob = () => {
       const allTickets = await Ticket.find();
 
       for (const ticket of allTickets) {
-        const eventEndDate = moment.tz(
-          `${ticket.eventDay} ${ticket.eventEndTime}`,
-          "YYYY-MM-DD HH:mm:ss",
-          "Asia/Seoul"
-        );
+        const eventDate = moment
+          .tz(String(ticket.eventDay).slice(0, 10), "YYYY-MM-DD", "Asia/Seoul")
+          .startOf("day");
 
-        const diffDays = now.diff(eventEndDate, "days");
+        if (!eventDate.isValid()) {
+          continue;
+        }
+
+        const diffDays = now.clone().startOf("day").diff(eventDate, "days");
 
         if (diffDays >= 3) {
           const ticketId = ticket._id.toString();

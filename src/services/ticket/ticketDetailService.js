@@ -32,10 +32,9 @@ export const getTicketDetail = async (ticketId) => {
     "HH:mm:ss",
     "HH:mm",
   ]).format("HH:mm");
-  const formattedEndTime = moment(ticket.eventEndTime, [
-    "HH:mm:ss",
-    "HH:mm",
-  ]).format("HH:mm");
+  const formattedEndTime = ticket.eventEndTime
+    ? moment(ticket.eventEndTime, ["HH:mm:ss", "HH:mm"]).format("HH:mm")
+    : "";
 
   const formattedTicket = {
     ...ticket.toObject(),

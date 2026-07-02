@@ -49,10 +49,9 @@ export const getAdminTicketsWithStatus = async (studentId) => {
       "HH:mm:ss",
       "HH:mm",
     ]).format("HH:mm");
-    const formattedEndTime = moment(ticket.eventEndTime, [
-      "HH:mm:ss",
-      "HH:mm",
-    ]).format("HH:mm");
+    const formattedEndTime = ticket.eventEndTime
+      ? moment(ticket.eventEndTime, ["HH:mm:ss", "HH:mm"]).format("HH:mm")
+      : "";
 
     return {
       ...ticket.toObject(),

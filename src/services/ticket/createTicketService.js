@@ -32,7 +32,6 @@ export const createTicket = async (body) => {
   if (!eventTitle) missingFields.push("eventTitle");
   if (!eventDay) missingFields.push("eventDay");
   if (!eventStartTime) missingFields.push("eventStartTime");
-  if (!eventEndTime) missingFields.push("eventEndTime");
   if (!eventPlace) missingFields.push("eventPlace");
   if (!eventPlaceComment) missingFields.push("eventPlaceComment");
   if (!eventComment) missingFields.push("eventComment");
@@ -74,9 +73,9 @@ export const createTicket = async (body) => {
   const formattedEventStartTime = moment(eventStartTime, "HH:mm:ss").format(
     "HH:mm:ss"
   );
-  const formattedEventEndTime = moment(eventEndTime, "HH:mm:ss").format(
-    "HH:mm:ss"
-  );
+  const formattedEventEndTime = eventEndTime
+    ? moment(eventEndTime, "HH:mm:ss").format("HH:mm:ss")
+    : null;
 
   const newTicket = new Ticket({
     eventTitle,
