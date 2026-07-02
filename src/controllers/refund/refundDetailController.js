@@ -36,6 +36,8 @@ export const refundDetailController = async (req, res) => {
         studentId: refund.studentId,
         phone: refund.phone,
         refundReason: refund.refundReason,
+        bankName: refund.bankName,
+        accountNumber: refund.accountNumber,
         visitDate: refund.visitDate,
         visitTime: refund.visitTime,
         refundPermissionStatus: refund.refundPermissionStatus,

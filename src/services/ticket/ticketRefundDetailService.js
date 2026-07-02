@@ -17,6 +17,8 @@ export const getTicketRefundDetail = async (ticketId) => {
     studentId: user.studentId,
     major: user.major,
     eventName: ticket.eventTitle,
+    bankName: refund.bankName,
+    accountNumber: refund.accountNumber,
     visitDate: refund.visitDate,
     visitTime: refund.visitTime,
     refundPermissionStatus: refund.refundPermissionStatus

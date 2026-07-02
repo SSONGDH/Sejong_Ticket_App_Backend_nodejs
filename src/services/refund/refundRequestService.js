@@ -2,11 +2,19 @@ import Refund from "../../models/refundModel.js";
 import User from "../../models/userModel.js";
 
 export const createRefundRequest = async (userProfile, body) => {
-  const { refundReason, visitDate, visitTime, ticketId, phone } = body;
+  const { refundReason, visitDate, visitTime, ticketId, phone, bankName, accountNumber } =
+    body;
 
   const { major, studentId, name } = userProfile;
 
-  if (!refundReason || !visitDate || !visitTime || !ticketId) {
+  if (
+    !refundReason ||
+    !visitDate ||
+    !visitTime ||
+    !ticketId ||
+    !bankName ||
+    !accountNumber
+  ) {
     return { status: 400, code: "ERROR-0002", message: "필수 데이터가 누락되었습니다." };
   }
 
@@ -30,6 +38,8 @@ export const createRefundRequest = async (userProfile, body) => {
     studentId,
     phone,
     refundReason,
+    bankName,
+    accountNumber,
     visitDate,
     visitTime,
     major,

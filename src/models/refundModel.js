@@ -9,6 +9,8 @@ const refundSchema = new mongoose.Schema(
     major: { type: String, required: true },
     phone: { type: String, required: true },
     refundReason: { type: String, required: true },
+    bankName: { type: String, required: true },
+    accountNumber: { type: String, required: true },
     visitDate: { type: String, required: true },
     visitTime: { type: String, required: true },
     refundPermissionStatus: { type: Boolean, default: false },
